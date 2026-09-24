@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "username": "Naveen Bellad",
+      "gmail": "belladnaveen027@gmail.com",
+      "phone": "9019040426",
+      "password": "1234",
+      "id": 1,
+      "role": "user"
+    },
+    {
+      "username": "Bellad",
+      "gmail": "naveenbellad2627@gmail.com",
+      "phone": "7894563211",
+      "password": "Naveen@027",
+      "id": 2,
+      "role": "user"
+    },
+    {
+      "username": "nike",
+      "gmail": "nike@gmail.com",
+      "phone": "7418529636",
+      "password": "Naveen@027",
+      "id": 3
+    },
+    {
+      "username": "cap",
+      "gmail": "cap@gmail.com",
+      "phone": "9632587411",
+      "password": "cap@1234",
+      "role": "user",
+      "id": 4
+    },
+    {
+      "username": "hammer",
+      "gmail": "hammer@gmail.com",
+      "phone": "8521479632",
+      "password": "Hammer@027",
+      "role": "user",
+      "id": 5
+    }
+  ],
+  "admins": [
+    {
+      "username": "admin",
+      "gmail": "admin@gmail.com",
+      "phone": "9999999999",
+      "password": "admin123",
+      "id": 1,
+      "role": "admin"
+    }
+  ]
+}
