@@ -425,6 +425,10 @@ body {
     color: var(--accent-teal);
 }
 
+.theme-dark .metric-value:not(.metric-value-active) {
+    color: #ffffff;
+}
+
 /* ========== Model Cards ========== */
 .model-card {
     background-color: var(--card-bg);
