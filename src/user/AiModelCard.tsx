@@ -1,45 +1,50 @@
 import { useState } from "react";
+import codexImage from "../assets/codex.jpeg";
+import dalleImage from "../assets/dalle.jpeg";
+import gptImage from "../assets/gpt.jpeg";
+import stableImage from "../assets/stable.jpeg";
+import whisperImage from "../assets/whisper.jpeg";
 
 export interface AiModel {
     name: string;
     category: string;
     description: string;
-    icon: string;
+    image: string;
 }
 
 export const aiModels: AiModel[] = [
     {
         name: "GPT-4",
         category: "Text Generation",
-        icon: "💬",
+        image: gptImage,
         description:
             "Advanced natural language processing to understand natural language, prompts, and personalized responses.",
     },
     {
         name: "DALL-E 3",
         category: "Image Generation",
-        icon: "🖌️",
+        image: dalleImage,
         description:
             "Generate creative images from text prompts to produce imaginative and visually appealing images.",
     },
     {
         name: "Whisper",
         category: "Speech-to-Text",
-        icon: "🎙️",
+        image: whisperImage,
         description:
             "Convert audio to text accurately to convert customer calls, conversations, and recordings.",
     },
     {
         name: "Codex",
         category: "Code Assistance",
-        icon: "</>",
+        image: codexImage,
         description:
             "Generate code snippets and debug, optimize, and improve code across different programming languages.",
     },
     {
         name: "Stable Diffusion",
         category: "Open-Source Image",
-        icon: "📷",
+        image: stableImage,
         description:
             "Customizable image generation to customize your image editors and filters with creative outputs.",
     },
@@ -58,12 +63,12 @@ function AiModelCard({ model }: AiModelCardProps) {
             <div className="model-card">
                 <div className="model-heading">
                     <div className="model-icon">
-                        <span>{model.icon}</span>
+                        <img src={model.image} alt="" />
                     </div>
                     <h5 className="model-name">
                         {model.name}{" "}
                         <span className="model-category">
-                            ({model.category.toLowerCase()})
+                            ({model.category})
                         </span>
                     </h5>
                 </div>

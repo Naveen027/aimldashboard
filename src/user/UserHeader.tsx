@@ -1,4 +1,5 @@
 import "../css/UserDashboard.css";
+import { Bell, Search } from "lucide-react";
 import { GlobalThemeToggle } from "./ThemeToggle";
 
 interface UserHeaderProps {
@@ -17,7 +18,7 @@ function UserHeader({
                 className="btn-notification"
                 aria-label="Notifications"
             >
-                🔔
+                <Bell aria-hidden="true" />
             </button>
             <div className="search-box">
                 <label
@@ -26,6 +27,11 @@ function UserHeader({
                 >
                     Search
                 </label>
+                <Search
+                    className="search-icon"
+                    size={18}
+                    aria-hidden="true"
+                />
                 <input
                     id="search-input"
                     type="search"
