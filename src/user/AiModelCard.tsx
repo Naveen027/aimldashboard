@@ -1,39 +1,47 @@
+import { useState } from "react";
+
 export interface AiModel {
     name: string;
     category: string;
     description: string;
+    icon: string;
 }
 
 export const aiModels: AiModel[] = [
     {
         name: "GPT-4",
         category: "Text Generation",
+        icon: "💬",
         description:
-            "Advanced language generation for writing, analysis, and conversation.",
+            "Advanced natural language processing to understand natural language, prompts, and personalized responses.",
     },
     {
         name: "DALL-E 3",
         category: "Image Generation",
+        icon: "🖌️",
         description:
-            "Create detailed images from natural language descriptions.",
+            "Generate creative images from text prompts to produce imaginative and visually appealing images.",
     },
     {
         name: "Whisper",
         category: "Speech-to-Text",
+        icon: "🎙️",
         description:
-            "Transcribe spoken audio accurately into written text.",
+            "Convert audio to text accurately to convert customer calls, conversations, and recordings.",
     },
     {
         name: "Codex",
         category: "Code Assistance",
+        icon: "</>",
         description:
-            "Generate, explain, and improve code across popular languages.",
+            "Generate code snippets and debug, optimize, and improve code across different programming languages.",
     },
     {
         name: "Stable Diffusion",
         category: "Open-Source Image",
+        icon: "📷",
         description:
-            "Generate creative images with a flexible open-source model.",
+            "Customizable image generation to customize your image editors and filters with creative outputs.",
     },
 ];
 
@@ -48,11 +56,17 @@ function AiModelCard({ model }: AiModelCardProps) {
         <>
         <div className="col-md-6 col-lg-4 mb-4">
             <div className="model-card">
-                <div className="model-icon">
-                    <span>🤖</span>
+                <div className="model-heading">
+                    <div className="model-icon">
+                        <span>{model.icon}</span>
+                    </div>
+                    <h5 className="model-name">
+                        {model.name}{" "}
+                        <span className="model-category">
+                            ({model.category.toLowerCase()})
+                        </span>
+                    </h5>
                 </div>
-                <h5 className="model-name">{model.name}</h5>
-                <p className="model-category">{model.category}</p>
                 <p className="model-description">{model.description}</p>
                 <div className="model-status">
                     <p className="status-badge">
@@ -64,7 +78,7 @@ function AiModelCard({ model }: AiModelCardProps) {
                 </div>
                 <button
                     type="button"
-                    className="btn btn-view-details w-100"
+                    className="btn btn-view-details"
                     onClick={() => setIsModalOpen(true)}
                 >
                     View Details
@@ -110,9 +124,8 @@ function AiModelCard({ model }: AiModelCardProps) {
                 </article>
             </div>
         )}
-        </>
+        </> 
     );
 }
 
 export default AiModelCard;
-import { useState } from "react";

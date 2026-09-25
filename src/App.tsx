@@ -8,13 +8,12 @@ import {
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard.tsx";
+import AdminDashboard from "./admin/AdminDashboard.tsx";
 import ApiKeys from "./pages/ApiKeys";
 import Support from "./pages/Support";
 import Billing from "./pages/Billing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import {
-  GlobalThemeToggle,
   useDashboardTheme,
 } from "./user/ThemeToggle";
 
@@ -23,8 +22,7 @@ function App() {
 
   return (
     <div className={isDarkMode ? "theme-dark" : "theme-light"}>
-      <GlobalThemeToggle />
-      <BrowserRouter>
+    <BrowserRouter>
         <Routes>
           <Route
             path="/"

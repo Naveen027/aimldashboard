@@ -53,15 +53,15 @@ export function GlobalThemeToggle() {
     return <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />;
 }
 
-interface ThemeToggleProps {
+export interface ThemeToggleProps {
     isDarkMode: boolean;
     onToggle: () => void;
 }
 
-function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
+export function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
     return (
         <button
-            className="theme-toggle global-theme-toggle"
+            className="theme-toggle"
             type="button"
             onClick={onToggle}
             aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}

@@ -1,4 +1,5 @@
 import "../css/UserDashboard.css";
+import { GlobalThemeToggle } from "./ThemeToggle";
 
 interface UserHeaderProps {
     searchQuery: string;
@@ -36,6 +37,7 @@ function UserHeader({
                     }
                 />
             </div>
+            <GlobalThemeToggle />
         </header>
     );
 }
