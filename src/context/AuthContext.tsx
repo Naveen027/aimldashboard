@@ -33,12 +33,42 @@ const AuthContext =
         undefined
     );
 
+const AUTH_SESSION_KEY = "authSession";
+
+const getStoredAuthResponse = (): LoginResponse | null => {
+    const storedSession = localStorage.getItem(AUTH_SESSION_KEY);
+
+    if (!storedSession) {
+        return null;
+    }
+
+    try {
+        const parsedSession = JSON.parse(storedSession) as LoginResponse;
+
+        if (
+            parsedSession.status === 200 &&
+            (parsedSession.role === "user" ||
+                parsedSession.role === "admin") &&
+            typeof parsedSession.username === "string"
+        ) {
+            return parsedSession;
+        }
+    } catch (error) {
+        console.error("Invalid stored authentication session:", error);
+    }
+
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    return null;
+};
+
 export function AuthProvider({
     children,
 }: AuthProviderProps) {
 
     const [authResponse, setAuthResponse] =
-        useState<LoginResponse | null>(null);
+        useState<LoginResponse | null>(
+            getStoredAuthResponse
+        );
 
     const login = async (
         username: string,
@@ -54,6 +84,10 @@ export function AuthProvider({
         if (response.status === 200) {
 
             setAuthResponse(response);
+            localStorage.setItem(
+                AUTH_SESSION_KEY,
+                JSON.stringify(response)
+            );
 
             if (rememberMe) {
 
@@ -86,6 +120,7 @@ export function AuthProvider({
     const logout = () => {
 
         setAuthResponse(null);
+        localStorage.removeItem(AUTH_SESSION_KEY);
 
         localStorage.removeItem(
             "loginCredentials"
