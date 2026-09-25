@@ -70,7 +70,8 @@ function UserSidebar({
                     className="btn btn-logout w-100"
                     onClick={onLogout}
                 >
-                    Logout
+                    <span>Logout</span>
+                    <i className="bi bi-box-arrow-right" aria-hidden="true" />
                 </button>
             </section>
         </aside>
@@ -78,4 +79,3 @@ function UserSidebar({
 }
 
 export default UserSidebar;
-
