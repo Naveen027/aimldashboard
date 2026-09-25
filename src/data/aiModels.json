@@ -1,0 +1,59 @@
+{
+  "models": [
+    {
+      "id": 1,
+      "name": "GPT-4 Chatbot",
+      "description": "Advanced conversational AI powered by GPT-4. Perfect for answering questions, brainstorming, and detailed explanations.",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%234f46e5' width='400' height='300'/%3E%3Ctext x='50%' y='50%' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E🤖%3C/text%3E%3Ctext x='50%' y='70%' font-size='20' fill='white' text-anchor='middle'%3EGPT-4 Chatbot%3C/text%3E%3C/svg%3E",
+      "status": "active",
+      "apiLimit": 10000,
+      "features": ["Real-time responses", "Context awareness", "Multi-language support", "Code assistance"],
+      "category": "Conversational AI",
+      "pricing": "$20/month"
+    },
+    {
+      "id": 2,
+      "name": "Image Generation",
+      "description": "Create stunning AI-generated images from text descriptions. Supports various art styles and high-resolution outputs.",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%238b5cf6' width='400' height='300'/%3E%3Ctext x='50%' y='50%' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E🎨%3C/text%3E%3Ctext x='50%' y='70%' font-size='20' fill='white' text-anchor='middle'%3EImage Generation%3C/text%3E%3C/svg%3E",
+      "status": "active",
+      "apiLimit": 500,
+      "features": ["Text-to-image", "Style transfer", "High resolution (up to 1024x1024)", "Batch processing"],
+      "category": "Image AI",
+      "pricing": "$30/month"
+    },
+    {
+      "id": 3,
+      "name": "Code Generation",
+      "description": "AI-powered code assistant that writes, optimizes, and explains code across multiple programming languages.",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%2310b981' width='400' height='300'/%3E%3Ctext x='50%' y='50%' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E%3C%2Ftext%3E%3Ctext x='50%' y='70%' font-size='20' fill='white' text-anchor='middle'%3ECode Generation%3C/text%3E%3C/svg%3E",
+      "status": "active",
+      "apiLimit": 5000,
+      "features": ["Multi-language support", "Bug detection", "Code optimization", "Snippet generation"],
+      "category": "Developer Tools",
+      "pricing": "$25/month"
+    },
+    {
+      "id": 4,
+      "name": "Video Generation",
+      "description": "Transform text descriptions into engaging videos. Perfect for content creators and marketers.",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23f59e0b' width='400' height='300'/%3E%3Ctext x='50%' y='50%' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E🎬%3C/text%3E%3Ctext x='50%' y='70%' font-size='20' fill='white' text-anchor='middle'%3EVideo Generation%3C/text%3E%3C/svg%3E",
+      "status": "upcoming",
+      "apiLimit": 0,
+      "features": ["Text-to-video", "Scene composition", "Music integration", "4K support"],
+      "category": "Video AI",
+      "pricing": "$50/month (Coming Soon)"
+    },
+    {
+      "id": 5,
+      "name": "Speech Recognition & Synthesis",
+      "description": "Convert speech to text and generate natural-sounding speech from text. Multiple language support.",
+      "image": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23ef4444' width='400' height='300'/%3E%3Ctext x='50%' y='50%' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E🎤%3C/text%3E%3Ctext x='50%' y='70%' font-size='20' fill='white' text-anchor='middle'%3ESpeech AI%3C/text%3E%3C/svg%3E",
+      "status": "upcoming",
+      "apiLimit": 0,
+      "features": ["Speech-to-text", "Text-to-speech", "Voice cloning", "Real-time translation"],
+      "category": "Audio AI",
+      "pricing": "$15/month (Coming Soon)"
+    }
+  ]
+}

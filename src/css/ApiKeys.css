@@ -1,0 +1,64 @@
+.api-page,
+.support-page {
+    --page-bg: #f5f7fb;
+    min-height: 100vh;
+}
+
+.api-content,
+.support-content {
+    min-height: 100vh;
+    padding: 48px clamp(20px, 4vw, 56px);
+    background: var(--page-bg);
+}
+
+.api-eyebrow,
+.support-eyebrow {
+    color: #1ba098;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.api-heading h2,
+.support-heading h2 {
+    color: #1a2940;
+    font-weight: 700;
+}
+
+.api-card {
+    border-radius: 18px;
+}
+
+.api-key-value input {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.api-security-card {
+    background: linear-gradient(145deg, #1a2940, #263b5b);
+    color: white;
+}
+
+.api-security-card .text-secondary {
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.theme-dark .api-content,
+.theme-dark .support-content {
+    --page-bg: #111827;
+}
+
+.theme-dark .api-heading h2,
+.theme-dark .support-heading h2 {
+    color: #f3f4f6;
+}
+
+.theme-dark .api-content .text-secondary {
+    color: #c1c8d3 !important;
+}
+
+.theme-dark .api-card:not(.api-security-card) {
+    background: #1f2937;
+    color: #f3f4f6;
+}

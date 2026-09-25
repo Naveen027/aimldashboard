@@ -4,7 +4,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "../assets/logo (2).png";
+import logo from "../assets/logo.png";
 import "../css/signup.css";
 
 import { useAuth } from "../context/AuthContext";
@@ -301,7 +301,9 @@ function Signup() {
             setConfirmPassword("");
             setPhoneValidated(false);
             setPasswordStrength(0);
-            navigate("/");
+            window.setTimeout(() => {
+                navigate("/");
+            }, 1200);
 
         } catch (error) {
 
@@ -350,12 +352,12 @@ function Signup() {
 
                             <img
                                 src={logo}
-                                alt="AI Nexus Logo"
+                                alt="Karnataka Ai Logo"
                             />
 
                         </div>
 
-                        <h1>AI Nexus</h1>
+                        <h1>KARNATAKA AI</h1>
 
                     </div>
 

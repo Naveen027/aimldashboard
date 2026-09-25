@@ -38,6 +38,14 @@
       "password": "Hammer@027",
       "role": "user",
       "id": 5
+    },
+    {
+      "username": "hulk",
+      "gmail": "hulk@gmail.com",
+      "phone": "7896541232",
+      "password": "hulk@123",
+      "role": "user",
+      "id": 6
     }
   ],
   "admins": [

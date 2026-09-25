@@ -5,7 +5,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "../assets/logo (2).png";
+import logo from "../assets/logo.png";
 import "../css/login.css";
 
 import { useAuth } from "../context/AuthContext";
@@ -266,12 +266,12 @@ function Login() {
 
                             <img
                                 src={logo}
-                                alt="AI Nexus Logo"
+                                alt="Karnataka Ai Logo"
                             />
 
                         </div>
 
-                        <h1>AI Nexus</h1>
+                        <h1>KARNATAKA AI</h1>
 
                     </div>
 

@@ -1,0 +1,27 @@
+[
+    {
+        "name": "GPT-4",
+        "category": "Text Generation",
+        "description": "Advanced language generation for writing, analysis, and conversation."
+    },
+    {
+        "name": "DALL-E 3",
+        "category": "Image Generation",
+        "description": "Create detailed images from natural language descriptions."
+    },
+    {
+        "name": "Whisper",
+        "category": "Speech-to-Text",
+        "description": "Transcribe spoken audio accurately into written text."
+    },
+    {
+        "name": "Codex",
+        "category": "Code Assistance",
+        "description": "Generate, explain, and improve code across popular languages."
+    },
+    {
+        "name": "Stable Diffusion",
+        "category": "Open-Source Image",
+        "description": "Generate creative images with a flexible open-source model."
+    }
+]

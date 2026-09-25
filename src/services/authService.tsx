@@ -28,25 +28,23 @@ export interface SignupData {
     password: string;
 }
 
-const demoUser: Account = {
-    id: "demo-user",
+const HARDCODED_USER = {
     username: "user",
     password: "user@123",
-    gmail: "user@gmail.com",
-    phone: "9876543210",
-    role: "user",
-    modelsUsed: 0,
+    gmail: "user@example.com",
+    phone: "",
+    modelsUsed: 4,
     totalUsage: 0,
-};
+} as const;
 
-const demoAdmin: Account = {
-    id: "demo-admin",
+const HARDCODED_ADMIN = {
     username: "admin",
     password: "admin@123",
-    role: "admin",
-};
-
-const API_URL = "http://localhost:3001";
+    gmail: "admin@example.com",
+    phone: "",
+    modelsUsed: 0,
+    totalUsage: 0,
+} as const;
 
 const generateToken = (): string => {
     const characters =
@@ -68,41 +66,38 @@ export const loginUser = async (
     password: string
 ): Promise<LoginResponse> => {
     const normalizedUsername = username.trim();
-    const user =
-        demoUser.username === normalizedUsername &&
-        demoUser.password === password
-            ? demoUser
-            : null;
 
-    const isAdmin =
-        demoAdmin.username === normalizedUsername &&
-        demoAdmin.password === password;
-
-    if (user) {
+    if (
+        normalizedUsername === HARDCODED_USER.username &&
+        password === HARDCODED_USER.password
+    ) {
         return {
             status: 200,
             message: "Login successful",
             token: generateToken(),
             role: "user",
-            username: user.username,
-            gmail: user.gmail ?? null,
-            phone: user.phone ?? null,
-            modelsUsed: user.modelsUsed ?? 0,
-            totalUsage: user.totalUsage ?? 0,
+            username: HARDCODED_USER.username,
+            gmail: HARDCODED_USER.gmail,
+            phone: HARDCODED_USER.phone,
+            modelsUsed: HARDCODED_USER.modelsUsed,
+            totalUsage: HARDCODED_USER.totalUsage,
         };
     }
 
-    if (isAdmin) {
+    if (
+        normalizedUsername === HARDCODED_ADMIN.username &&
+        password === HARDCODED_ADMIN.password
+    ) {
         return {
             status: 200,
             message: "Login successful",
             token: generateToken(),
             role: "admin",
-            username: demoAdmin.username,
-            gmail: null,
-            phone: null,
-            modelsUsed: 0,
-            totalUsage: 0,
+            username: HARDCODED_ADMIN.username,
+            gmail: HARDCODED_ADMIN.gmail,
+            phone: HARDCODED_ADMIN.phone,
+            modelsUsed: HARDCODED_ADMIN.modelsUsed,
+            totalUsage: HARDCODED_ADMIN.totalUsage,
         };
     }
 
@@ -120,29 +115,7 @@ export const loginUser = async (
 };
 
 export const signupUser = async (
-    signupData: SignupData
+    _signupData: SignupData
 ): Promise<void> => {
-
-    const newUser = {
-        username: signupData.username,
-        gmail: signupData.gmail,
-        phone: signupData.phone,
-        password: signupData.password,
-        role: "user",
-    };
-
-    const response = await fetch(
-        `${API_URL}/users`,
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newUser),
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error("Signup failed");
-    }
+    // Signup is intentionally local-only; credentials are not persisted.
 };
