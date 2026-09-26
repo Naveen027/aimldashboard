@@ -184,7 +184,7 @@ body {
 }
 
 .sidebar-footer {
-    padding: 20px;
+    padding: 10px 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -769,7 +769,7 @@ body {
     .sidebar-footer {
         border-top: none;
         border-left: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 12px 16px;
+        padding: 5px 20px;
     }
 
     .main-content {
