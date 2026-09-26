@@ -30,7 +30,7 @@
   padding: 28px clamp(16px, 4vw, 48px) 64px;
   background: radial-gradient(circle at 15% 0%, rgba(0, 240, 255, 0.08), transparent 45%),
     radial-gradient(circle at 85% 20%, rgba(178, 107, 255, 0.08), transparent 40%),
-    linear-gradient(180deg, rgba(5, 8, 20, 0.84) 0%, rgba(10, 15, 36, 0.84) 100%);
+    linear-gradient(180deg, rgba(5, 8, 20, 0.2) 0%, rgba(10, 15, 36, 0.2) 100%);
   color: var(--text-primary);
   font-family: "Inter", "Segoe UI", sans-serif;
   overflow-x: hidden;
@@ -45,16 +45,15 @@
   --text-secondary: #53657b;
   --cyan: #087f8c;
   --line: rgba(23, 43, 77, 0.16);
-  background:
-    radial-gradient(circle at 15% 0%, rgba(0, 127, 140, 0.08), transparent 45%),
-    radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.07), transparent 40%),
-    linear-gradient(180deg, rgba(247, 250, 252, 0.94) 0%, rgba(230, 240, 246, 0.94) 100%);
+  background: transparent;
 }
 
 .theme-light .dashboard__grid {
-  background-image:
-    linear-gradient(rgba(23, 43, 77, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 43, 77, 0.035) 1px, transparent 1px);
+  display: none;
+}
+
+.theme-dark .dashboard__grid {
+  display: none;
 }
 
 .theme-light .stat-card,

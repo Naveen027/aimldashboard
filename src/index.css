@@ -2,12 +2,50 @@
 
 body {
   min-height: 100vh;
-  background-color: #f5f6fa;
+  background: #fff;
+}
+
+.theme-light,
+.theme-dark {
+  min-height: 100vh;
+}
+
+.theme-light {
+  background-color: #fff;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
-    url("./assets/bg.avif");
-  background-position: center, center;
-  background-size: cover, 75% auto;
-  background-repeat: no-repeat, no-repeat;
-  background-attachment: fixed, fixed;
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 31px,
+      rgba(55, 65, 81, 0.06) 31px,
+      rgba(55, 65, 81, 0.06) 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 31px,
+      rgba(55, 65, 81, 0.06) 31px,
+      rgba(55, 65, 81, 0.06) 32px
+    );
+  background-attachment: fixed;
+}
+
+.theme-dark {
+  background-color: #101827;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 31px,
+      rgba(243, 244, 246, 0.08) 31px,
+      rgba(243, 244, 246, 0.08) 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 31px,
+      rgba(243, 244, 246, 0.08) 31px,
+      rgba(243, 244, 246, 0.08) 32px
+    );
+  background-attachment: fixed;
 }
