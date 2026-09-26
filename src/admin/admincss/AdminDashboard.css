@@ -29,35 +29,35 @@
 
 .ain-sidebar {
   width: 240px;
+  flex: 0 0 240px;
   background: var(--ain-navy);
   color: #cfd3e0;
   padding: 22px 16px;
-  min-height: 100vh;
-  position: sticky;
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
   top: 0;
+  left: 0;
+  z-index: 30;
 }
 
 .ain-brand {
-  padding: 0 8px 24px 8px;
+  padding: 6px 0 24px;
 }
 
-.ain-brand-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #7c6ff0, #5b8dfb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 16px;
+.ain-brand-seal {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: contain;
 }
 
 .ain-brand-text {
   color: #fff;
-  font-weight: 700;
-  font-size: 1.05rem;
+  font-weight: 500;
+  font-size: 18px;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .ain-nav .nav-item {
@@ -138,6 +138,7 @@
 
 .ain-main {
   padding: 24px 32px 40px 32px;
+  margin-left: 240px;
   max-width: 100%;
   overflow-x: hidden;
 }
@@ -459,9 +460,11 @@
 @media (max-width: 991px) {
   .ain-sidebar {
     width: 200px;
+    flex-basis: 200px;
   }
   .ain-main {
     padding: 20px;
+    margin-left: 200px;
   }
 }
 
@@ -471,5 +474,6 @@
   }
   .ain-main {
     padding: 16px;
+    margin-left: 0;
   }
 }

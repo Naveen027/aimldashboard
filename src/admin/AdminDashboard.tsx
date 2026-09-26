@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import "../admin/admincss/AdminDashboard.css";
 import UserHeader from "../user/UserHeader";
+import seal from "../assets/Seal_of_Karnataka.svg";
 
 /**
  * AI Nexus — Admin Dashboard
@@ -146,10 +147,8 @@ const AdminDashboard: React.FC = () => {
       {/* Sidebar */}
       <aside className="ain-sidebar d-flex flex-column flex-shrink-0">
         <div className="ain-brand d-flex align-items-center gap-2">
-          <span className="ain-brand-icon">
-            <i className="bi bi-shield-fill-check" />
-          </span>
-          <span className="ain-brand-text">AI Nexus</span>
+          <img className="ain-brand-seal" src={seal} alt="Seal of Karnataka" />
+          <span className="ain-brand-text">KARNATAKA AI</span>
         </div>
 
         <nav className="ain-nav flex-grow-1">

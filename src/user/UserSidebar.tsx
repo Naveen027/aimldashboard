@@ -73,7 +73,7 @@ function UserSidebar({
                 </div>
                 <button
                     type="button"
-                    className="btn btn-logout w-100"
+                    className="btn btn-logout"
                     onClick={onLogout}
                 >
                     <span className="logout-icon-container">
