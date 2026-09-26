@@ -6,7 +6,7 @@
 .billing-content {
     min-height: 100vh;
     padding: 48px clamp(20px, 4vw, 56px);
-    background: var(--page-bg);
+    background: transparent;
 }
 
 .billing-eyebrow {

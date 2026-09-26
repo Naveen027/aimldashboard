@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+body {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
+    url("./assets/bg.avif");
+  background-position: center, center;
+  background-size: cover, 75% auto;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}

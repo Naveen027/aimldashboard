@@ -89,7 +89,7 @@ body {
 .dashboard-container {
     display: flex;
     min-height: 100vh;
-    background-color: var(--main-bg);
+    background-color: transparent;
 }
 
 /* ========== Sidebar ========== */

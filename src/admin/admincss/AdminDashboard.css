@@ -20,7 +20,7 @@
 
 .ain-app {
   min-height: 100vh;
-  background: var(--ain-bg);
+  background: transparent;
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   color: #1c2033;
 }
