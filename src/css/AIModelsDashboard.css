@@ -339,12 +339,22 @@
   font-family: var(--font-mono);
 }
 
+.theme-light .hud-tooltip {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(23, 43, 77, 0.24);
+  box-shadow: 0 8px 24px rgba(23, 43, 77, 0.18);
+}
+
 .hud-tooltip__head {
   font-size: 0.68rem;
   letter-spacing: 0.06em;
   color: var(--text-secondary);
   margin-bottom: 6px;
   white-space: nowrap;
+}
+
+.theme-light .hud-tooltip__head {
+  color: #53657b;
 }
 
 .hud-tooltip__row {
@@ -356,14 +366,26 @@
   white-space: nowrap;
 }
 
+.theme-light .hud-tooltip__row .dot {
+  outline: 1px solid rgba(23, 43, 77, 0.24);
+}
+
 .hud-tooltip__name {
   flex: 1;
   color: var(--text-primary);
 }
 
+.theme-light .hud-tooltip__name {
+  color: #172b4d;
+}
+
 .hud-tooltip__value {
   color: var(--gold);
   font-weight: 700;
+}
+
+.theme-light .hud-tooltip__value {
+  color: #805400;
 }
 
 /* Table ---------------------------------------------------------------*/
