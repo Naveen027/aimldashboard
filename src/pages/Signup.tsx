@@ -4,7 +4,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-import logo from "../assets/logo.png";
+import seal from "../assets/Seal_of_Karnataka.svg";
 import "../css/signup.css";
 
 import { useAuth } from "../context/AuthContext";
@@ -351,8 +351,8 @@ function Signup() {
                         <div className="signup-logo">
 
                             <img
-                                src={logo}
-                                alt="Karnataka Ai Logo"
+                                src={seal}
+                                alt="Seal of Karnataka"
                             />
 
                         </div>

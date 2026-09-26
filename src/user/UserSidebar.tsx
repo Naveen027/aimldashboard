@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+import seal from "../assets/Seal_of_Karnataka.svg";
+import logoutImage from "../assets/logout.png";
+import dashboardImage from "../assets/dashboard.png";
+import myProfileImage from "../assets/myprofile.png";
+import apiKeyImage from "../assets/apikey.png";
+import billingImage from "../assets/billing.png";
+import supportImage from "../assets/support.png";
 
 interface UserSidebarProps {
     userName: string;
@@ -18,7 +24,7 @@ function UserSidebar({
         <aside className="sidebar">
             <header className="sidebar-header">
                 <h1 className="sidebar-title">
-                    <img src={logo} alt="Karnataka Ai Logo" />
+                    <img src={seal} alt="Seal of Karnataka" />
                     KARNATAKA AI
                 </h1>
             </header>
@@ -31,7 +37,7 @@ function UserSidebar({
                     className="nav-link"
                     onClick={onDashboardClick}
                 >
-                    <span className="nav-icon">📊</span>
+                    <img className="nav-icon" src={dashboardImage} alt="" aria-hidden="true" />
                     Dashboard
                 </button>
                 <button
@@ -42,19 +48,19 @@ function UserSidebar({
                         onProfileClick();
                     }}
                 >
-                    <span className="nav-icon">👤</span>
+                    <img className="nav-icon" src={myProfileImage} alt="" aria-hidden="true" />
                     My Profile
                 </button>
                 <Link to="/api-keys" className="nav-link">
-                    <span className="nav-icon">🔑</span>
+                    <img className="nav-icon" src={apiKeyImage} alt="" aria-hidden="true" />
                     API Keys
                 </Link>
                 <Link to="/billing" className="nav-link">
-                    <span className="nav-icon">💳</span>
+                    <img className="nav-icon" src={billingImage} alt="" aria-hidden="true" />
                     Billing
                 </Link>
                 <Link to="/support" className="nav-link">
-                    <span className="nav-icon">❓</span>
+                    <img className="nav-icon" src={supportImage} alt="" aria-hidden="true" />
                     Support
                 </Link>
             </nav>
@@ -70,8 +76,15 @@ function UserSidebar({
                     className="btn btn-logout w-100"
                     onClick={onLogout}
                 >
+                    <span className="logout-icon-container">
+                        <img
+                            className="logout-icon"
+                            src={logoutImage}
+                            alt=""
+                            aria-hidden="true"
+                        />
+                    </span>
                     <span>Logout</span>
-                    <i className="bi bi-box-arrow-right" aria-hidden="true" />
                 </button>
             </section>
         </aside>

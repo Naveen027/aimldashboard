@@ -18,7 +18,7 @@ function UserHeader({
                 className="btn-notification"
                 aria-label="Notifications"
             >
-                <Bell aria-hidden="true" />
+                <Bell strokeWidth={1.5} aria-hidden="true" />
             </button>
             <div className="search-box">
                 <label

@@ -1,5 +1,7 @@
 /* ========== Root & General Styles ========== */
 :root {
+    --model-image-width: 56px;
+    --model-image-height: 58px;
     --sidebar-bg: #1a2940;
     --main-bg: #f5f6fa;
     --card-bg: #ffffff;
@@ -92,7 +94,7 @@ body {
 
 /* ========== Sidebar ========== */
 .sidebar {
-    width: 280px;
+    width: 260px;
     background-color: var(--sidebar-bg);
     color: white;
     display: flex;
@@ -108,7 +110,7 @@ body {
 }
 
 .sidebar-header {
-    padding: 24px 20px;
+    padding: 6px 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -125,8 +127,6 @@ body {
     width: 40px;
     height: 40px;
     object-fit: contain;
-    border-radius: 8px;
-    background-color:wheat;
 }
 
 .sidebar-nav {
@@ -170,9 +170,18 @@ body {
 }
 
 .nav-icon {
-    font-size: 18px;
+    display: block;
     width: 20px;
-    text-align: center;
+    height: 20px;
+    flex: 0 0 20px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.7;
+}
+
+.nav-link:hover .nav-icon,
+.nav-link:focus .nav-icon {
+    opacity: 1;
 }
 
 .sidebar-footer {
@@ -230,16 +239,31 @@ body {
 .btn-logout {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 12px;
     background-color: transparent;
     border: none;
     color: white;
-    padding: 8px 12px;
+    padding: 8px 0;
     font-size: 13px;
     font-weight: 500;
     border-radius: 4px;
     text-align: left;
     transition: all 0.3s ease;
+}
+
+.logout-icon-container {
+    display: flex;
+    align-items: center;
+    width: 40px;
+    flex: 0 0 40px;
+}
+
+.logout-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 .btn-logout:hover,
@@ -253,7 +277,7 @@ body {
 /* ========== Main Content ========== */
 .main-content {
     flex: 1;
-    margin-left: 280px;
+    margin-left: 260px;
     min-height: 100vh;
     background-color: transparent;
     position: relative;
@@ -262,10 +286,11 @@ body {
 
 /* ========== Top Header ========== */
 .top-header {
+    --notification-search-gap: 20px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 20px;
+    gap: 0;
     height: 54px;
     box-sizing: border-box;
     padding: 16px 32px;
@@ -284,7 +309,7 @@ body {
     background-color: var(--card-bg);
 }
 
-.theme-toggle {
+.top-header .theme-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -297,6 +322,7 @@ body {
     cursor: pointer;
     font-size: 18px;
     padding: 0;
+    margin-left: 20px;
     transition:
         background-color 300ms ease,
         transform 300ms ease;
@@ -317,7 +343,7 @@ body {
     border: none;
     color: var(--text-primary);
     cursor: pointer;
-    padding: 8px;
+    padding: 0px;
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
@@ -326,10 +352,11 @@ body {
     background-color: var(--main-bg);
 }
 
-.search-box {
+.top-header .search-box {
     position: relative;
     max-width: 300px;
     width: min(300px, 100%);
+    margin-left: var(--notification-search-gap);
 }
 
 .search-icon {
@@ -460,7 +487,7 @@ body {
     padding: 16px;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
-    height: auto;
+    height: 215px;
     display: flex;
     flex-direction: column;
 }
@@ -564,17 +591,17 @@ body {
 }
 
 .model-icon {
-    width: 56px;
-    height: 58px;
-    flex: 0 0 56px;
+    width: var(--model-image-width);
+    height: var(--model-image-height);
+    flex: 0 0 var(--model-image-width);
     border-radius: 10px;
     overflow: hidden;
 }
 
 .model-icon img {
     display: block;
-    width: 100%;
-    height: 100%;
+    width: 85%;
+    height: 85%;
     border-radius:15px;
     object-fit: cover;
 }
@@ -611,6 +638,8 @@ body {
     margin-bottom: 5px;
     margin-top: 0;
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .model-status {
@@ -754,6 +783,11 @@ body {
         padding: 16px 80px 16px 16px;
     }
 
+    .top-header .search-box,
+    .top-header .theme-toggle {
+        margin-left: 0;
+    }
+
     .search-box {
         max-width: 100%;
     }
@@ -784,6 +818,11 @@ body {
 }
 
 @media (max-width: 576px) {
+    :root {
+        --model-image-width: 48px;
+        --model-image-height: 48px;
+    }
+
     .sidebar-nav {
         padding: 0 8px;
     }
@@ -821,9 +860,7 @@ body {
     }
 
     .model-icon {
-        width: 48px;
-        height: 48px;
-        font-size: 24px;
+        flex-basis: var(--model-image-width);
     }
 
     .model-name {
