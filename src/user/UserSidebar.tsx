@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import seal from "../assets/Seal_of_Karnataka.svg";
 import logoutImage from "../assets/logout.png";
 import dashboardImage from "../assets/dashboard.png";
@@ -12,6 +12,7 @@ interface UserSidebarProps {
     onLogout: () => void;
     onProfileClick: () => void;
     onDashboardClick: () => void;
+    activeView?: "dashboard" | "profile";
 }
 
 function UserSidebar({
@@ -19,7 +20,11 @@ function UserSidebar({
     onLogout,
     onProfileClick,
     onDashboardClick,
+    activeView,
 }: UserSidebarProps) {
+    const { pathname } = useLocation();
+    const isDashboardRoute = pathname === "/user-dashboard";
+
     return (
         <aside className="sidebar">
             <header className="sidebar-header">
@@ -34,7 +39,16 @@ function UserSidebar({
             >
                 <button
                     type="button"
-                    className="nav-link"
+                    className={`nav-link ${
+                        isDashboardRoute && activeView !== "profile"
+                            ? "active"
+                            : ""
+                    }`}
+                    aria-current={
+                        isDashboardRoute && activeView !== "profile"
+                            ? "page"
+                            : undefined
+                    }
                     onClick={onDashboardClick}
                 >
                     <img className="nav-icon" src={dashboardImage} alt="" aria-hidden="true" />
@@ -42,7 +56,16 @@ function UserSidebar({
                 </button>
                 <button
                     type="button"
-                    className="nav-link"
+                    className={`nav-link ${
+                        isDashboardRoute && activeView === "profile"
+                            ? "active"
+                            : ""
+                    }`}
+                    aria-current={
+                        isDashboardRoute && activeView === "profile"
+                            ? "page"
+                            : undefined
+                    }
                     onClick={(event) => {
                         event.preventDefault();
                         onProfileClick();
@@ -51,18 +74,18 @@ function UserSidebar({
                     <img className="nav-icon" src={myProfileImage} alt="" aria-hidden="true" />
                     My Profile
                 </button>
-                <Link to="/api-keys" className="nav-link">
+                <NavLink to="/api-keys" className="nav-link">
                     <img className="nav-icon" src={apiKeyImage} alt="" aria-hidden="true" />
                     API Keys
-                </Link>
-                <Link to="/billing" className="nav-link">
+                </NavLink>
+                <NavLink to="/billing" className="nav-link">
                     <img className="nav-icon" src={billingImage} alt="" aria-hidden="true" />
                     Billing
-                </Link>
-                <Link to="/support" className="nav-link">
+                </NavLink>
+                <NavLink to="/support" className="nav-link">
                     <img className="nav-icon" src={supportImage} alt="" aria-hidden="true" />
                     Support
-                </Link>
+                </NavLink>
             </nav>
             <section className="sidebar-footer">
                 <div className="user-info">

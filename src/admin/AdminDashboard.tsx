@@ -10,8 +10,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import "../admin/admincss/AdminDashboard.css";
-import UserHeader from "../user/UserHeader";
+import AdminHeader from "./AdminHeader.tsx";
 import seal from "../assets/Seal_of_Karnataka.svg";
+import logoutImage from "../assets/logout.png";
 
 /**
  * AI Nexus — Admin Dashboard
@@ -171,19 +172,21 @@ const AdminDashboard: React.FC = () => {
 
         <div className="ain-sidebar-footer">
           <div className="d-flex align-items-center gap-2 ain-user-chip">
-            <span className="ain-avatar-sm">AJ</span>
+            <span className="ain-avatar-sm">S</span>
             <span className="ain-user-name">Sarah Chen (Admin)</span>
           </div>
           <a href="#!" className="ain-logout d-flex align-items-center gap-2">
+            <span className="ain-logout-icon-container">
+              <img src={logoutImage} alt="" aria-hidden="true" />
+            </span>
             <span>Logout</span>
-            <i className="bi bi-box-arrow-right" />
           </a>
         </div>
       </aside>
 
       {/* Main content */}
       <main className="ain-main flex-grow-1">
-        <UserHeader
+        <AdminHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />

@@ -162,7 +162,8 @@ body {
 }
 
 .nav-link:hover,
-.nav-link:focus {
+.nav-link:focus,
+.nav-link.active {
     width: calc(100% - 24px);
     color: white;
     background-color: rgba(255, 255, 255, 0.1);
@@ -182,7 +183,8 @@ body {
 }
 
 .nav-link:hover .nav-icon,
-.nav-link:focus .nav-icon {
+.nav-link:focus .nav-icon,
+.nav-link.active .nav-icon {
     opacity: 1;
 }
 
@@ -748,7 +750,8 @@ body {
     }
 
     .nav-link:hover,
-    .nav-link:focus {
+    .nav-link:focus,
+    .nav-link.active {
         width: auto;
         margin: 0;
         border-radius: 8px;
@@ -820,6 +823,10 @@ body {
         width: auto;
         padding: 8px 10px;
         font-size: 12px;
+    }
+
+    .nav-link.active {
+        width: auto;
     }
 
     .search-input {

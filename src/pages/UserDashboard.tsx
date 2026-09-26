@@ -47,6 +47,9 @@ function UserDashboard() {
                 onDashboardClick={() =>
                     setShowAIModelsDashboard(false)
                 }
+                activeView={
+                    showAIModelsDashboard ? "profile" : "dashboard"
+                }
             />
             <main className="main-content">
                 <UserHeader
