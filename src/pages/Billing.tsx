@@ -8,9 +8,9 @@ import { useDashboardTheme } from "../user/ThemeToggle";
 import "../css/Billing.css";
 
 const invoices = [
-    { date: "Sep 01, 2026", number: "INV-2026-09", amount: "$49.00", status: "Paid" },
-    { date: "Aug 01, 2026", number: "INV-2026-08", amount: "$49.00", status: "Paid" },
-    { date: "Jul 01, 2026", number: "INV-2026-07", amount: "$49.00", status: "Paid" },
+    { date: "Sep 01, 2026", number: "INV-2026-09", amount: "₹4,690", status: "Paid" },
+    { date: "Aug 01, 2026", number: "INV-2026-08", amount: "₹4,690", status: "Paid" },
+    { date: "Jul 01, 2026", number: "INV-2026-07", amount: "₹4,690", status: "Paid" },
 ];
 
 function Billing() {
@@ -53,7 +53,7 @@ function Billing() {
                 "Billing period: September 2026",
                 "Monthly subscription: $49.00",
                 "Usage: 72 / 100 requests",
-                "Amount paid: $49.00",
+                "Amount paid: ₹4,690",
                 "Status: Paid",
             ],
             "ai-nexus-billing-statement.pdf"
@@ -123,7 +123,7 @@ function Billing() {
                                             </p>
                                         </div>
                                         <div className="text-end">
-                                            <strong className="billing-price">$49</strong>
+                                            <strong className="billing-price">₹4,690</strong>
                                             <span className="text-secondary"> / month</span>
                                         </div>
                                     </div>
