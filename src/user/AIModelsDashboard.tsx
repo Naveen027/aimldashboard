@@ -40,9 +40,7 @@ ChartJS.register(
   Filler
 );
 
-/* ------------------------------------------------------------------ */
-/*  Source data (as supplied)                                          */
-/* ------------------------------------------------------------------ */
+
 
 interface ModelMeta {
   id: string;
@@ -172,6 +170,7 @@ function StatCard({
   suffix,
   accent,
   textValue,
+  valueColor,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -179,6 +178,7 @@ function StatCard({
   suffix?: string;
   accent: string;
   textValue?: string;
+  valueColor?: string;
 }) {
   const animated = useCountUp(value ?? 0);
   return (
@@ -186,7 +186,10 @@ function StatCard({
       <div className="stat-card__icon">{icon}</div>
       <div className="stat-card__body">
         <span className="stat-card__label">{label}</span>
-        <span className="stat-card__value">
+        <span
+          className="stat-card__value"
+          style={valueColor ? { color: valueColor } : undefined}
+        >
           {textValue ? (
             <span className="stat-card__value--text">{textValue}</span>
           ) : (
@@ -450,7 +453,7 @@ export default function AIModelsDashboard() {
           <span className="eyebrow">
             <Radio size={12} className="pulse-icon" /> LIVE TELEMETRY
           </span>
-          <h1>AI Model Command Deck</h1>
+          <h2 className="eyebrowh2">AI Model Command Deck</h2>
           <p>Usage across all connected models, updated in real time.</p>
         </div>
         <div className="dashboard__clock">{clock.toLocaleTimeString([], { hour12: false })}</div>
@@ -458,7 +461,7 @@ export default function AIModelsDashboard() {
 
       <section className="stat-strip">
         <StatCard icon={<Zap size={18} />} label="Total tokens processed" value={totalTokens} suffix="K" accent="#00f0ff" />
-        <StatCard icon={<Activity size={18} />} label="Total requests" value={totalRequests} accent="#39ff88" />
+        <StatCard icon={<Activity size={18} />} label="Total requests" value={totalRequests} accent="#39ff88" valueColor="#17c717" />
         <StatCard icon={<CalendarDays size={18} />} label="Days monitored" value={daysMonitored} accent="#ffb020" />
         <StatCard icon={topModel.meta.icon} label="Most used model" textValue={topModel.meta.name} accent={topModel.meta.color} />
       </section>

@@ -321,9 +321,16 @@ body{
 
 /* ---------- Table card ---------- */
 
+.mb-2 {
+    margin-bottom: 0.5rem !important;
+    height: 30px;
+}
+
 .ain-table-card {
   padding: 16px;
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ain-table-title {
@@ -417,6 +424,8 @@ body{
 .ain-chart-card {
   padding: 18px;
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ain-dots {
@@ -437,6 +446,8 @@ body{
 
 .ain-chart-wrap {
   width: 100%;
+  flex: 1;
+  min-height: 220px;
 }
 
 /* ---------- Animations ---------- */

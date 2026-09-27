@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,12 +15,7 @@ import AdminHeader from "./AdminHeader.tsx";
 import seal from "../assets/Seal_of_Karnataka.svg";
 import logoutImage from "../assets/logout.png";
 
-/**
- * AI Nexus — Admin Dashboard
- * Requires Bootstrap 5 CSS + JS to be loaded globally in your app
- * (e.g. import "bootstrap/dist/css/bootstrap.min.css" in your entry file),
- * and `recharts` to be installed (npm i recharts).
- */
+
 
 interface NavItem {
   label: string;
@@ -323,7 +319,7 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="ain-chart-wrap">
                   <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={chartData} barGap={6}>
+                    <ComposedChart data={chartData} barGap={6}>
                       <CartesianGrid vertical={false} stroke="#eef0f4" />
                       <XAxis
                         dataKey="name"
@@ -351,6 +347,7 @@ const AdminDashboard: React.FC = () => {
                         dataKey="GPT-4"
                         fill="#5ec8d8"
                         radius={[4, 4, 0, 0]}
+                        barSize={18}
                         isAnimationActive
                         animationDuration={900}
                         animationEasing="ease-out"
@@ -359,6 +356,7 @@ const AdminDashboard: React.FC = () => {
                         dataKey="DALL-E 3"
                         fill="#8b7cf6"
                         radius={[4, 4, 0, 0]}
+                        barSize={18}
                         isAnimationActive
                         animationDuration={900}
                         animationEasing="ease-out"
@@ -368,12 +366,23 @@ const AdminDashboard: React.FC = () => {
                         dataKey="Whisper"
                         fill="#3fae6a"
                         radius={[4, 4, 0, 0]}
+                        barSize={18}
                         isAnimationActive
                         animationDuration={900}
                         animationEasing="ease-out"
                         animationBegin={240}
                       />
-                    </BarChart>
+                      <Line
+                        type="monotone"
+                        dataKey="Whisper"
+                        stroke="#1f9d72"
+                        strokeWidth={2.5}
+                        dot={{ r: 0 }}
+                        activeDot={{ r: 5 }}
+                        isAnimationActive
+                        animationDuration={900}
+                      />
+                    </ComposedChart>
                   </ResponsiveContainer>
                 </div>
               </div>

@@ -85,16 +85,15 @@ function UserDashboard() {
                                 value="5 mins ago"
                             />
                         </div>
-                        
                     </section>
                     <section className="models-section">
-                        <h3 className="section-title">
-                            Available AI Models
-                        </h3>
+                        <h2 className="section-title">
+                            Karnataka AI Models
+                        </h2>
                         <div className="row">
                             {filteredModels.map((model) => (
                                 <AiModelCard
-                                    key={model.name}
+                                    key={model.category}
                                     model={model}
                                 />
                             ))}

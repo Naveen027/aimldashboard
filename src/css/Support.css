@@ -1,3 +1,9 @@
+.support-heading h2{
+    font-size:25px;
+}
+.support-content{
+    padding:15px;
+}
 .support-option,
 .support-form {
     border-radius: 18px;

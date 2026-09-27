@@ -91,11 +91,18 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  color: var(--cyan);
   margin-bottom: 8px;
+  color: #1ba098 !important;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 0;
+  /* letter-spacing: 0.12em; */
+  text-transform: uppercase;
+}
+
+.eyebrowh2 {
+  font-size: 25px;
+  font-weight: 700;
 }
 
 .pulse-icon {
@@ -103,8 +110,17 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 4px var(--cyan)); }
-  50% { opacity: 0.4; filter: drop-shadow(0 0 0 transparent); }
+
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--cyan));
+  }
+
+  50% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 0 transparent);
+  }
 }
 
 .dashboard__header h1 {
@@ -218,8 +234,13 @@
 }
 
 @keyframes sweep {
-  0% { left: -60%; }
-  100% { left: 120%; }
+  0% {
+    left: -60%;
+  }
+
+  100% {
+    left: 120%;
+  }
 }
 
 /* Panels ------------------------------------------------------------*/
@@ -294,7 +315,9 @@
 }
 
 @keyframes rotate {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .radar-legend {
@@ -495,6 +518,7 @@
   .panel-row {
     grid-template-columns: 1fr;
   }
+
   .stat-strip {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -504,6 +528,7 @@
   .stat-strip {
     grid-template-columns: 1fr;
   }
+
   .dashboard__header {
     flex-direction: column;
   }

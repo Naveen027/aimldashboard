@@ -30,7 +30,7 @@ function UserSidebar({
             <header className="sidebar-header">
                 <h1 className="sidebar-title">
                     <img src={seal} alt="Seal of Karnataka" />
-                    KARNATAKA AI
+                    KARNATAKA AI CELL
                 </h1>
             </header>
             <nav

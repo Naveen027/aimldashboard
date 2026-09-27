@@ -66,10 +66,7 @@ function AiModelCard({ model }: AiModelCardProps) {
                         <img src={model.image} alt="" />
                     </div>
                     <h5 className="model-name">
-                        {model.name}{" "}
-                        <span className="model-category">
-                            ({model.category})
-                        </span>
+                        {model.category}
                     </h5>
                 </div>
                 <p className="model-description">{model.description}</p>

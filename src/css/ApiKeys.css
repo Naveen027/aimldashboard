@@ -3,24 +3,28 @@
     --page-bg: #f5f7fb;
     min-height: 100vh;
 }
-
+.api-content{
+    padding:15px;
+}
 .api-content,
 .support-content {
     min-height: 100vh;
-    padding: 48px clamp(20px, 4vw, 56px);
+    /* padding: 48px clamp(20px, 4vw, 56px); */
     background: transparent;
 }
 
 .api-eyebrow,
 .support-eyebrow {
     color: #1ba098;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    font-size: 15px;
+    font-weight: 600;
+    /* letter-spacing: 0.12em; */
     margin-bottom: 0.5rem;
     text-transform: uppercase;
 }
-
+.api-heading h2{
+    font-size:25px
+}
 .api-heading h2,
 .support-heading h2 {
     color: #1a2940;
