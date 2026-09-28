@@ -373,7 +373,7 @@ const ModelControl: React.FC = () => {
         <h2>Active Models</h2>
         <div className="mc-grid">
           {models.map(model => (
-            <div key={model.id} className={`model-card ${model.status}`}>
+            <div key={model.id} className={`model-card1 ${model.status}`}>
               <div className="model-header">
                 <div>
                   <h3>{model.name}</h3>
