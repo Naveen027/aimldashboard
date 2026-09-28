@@ -270,13 +270,13 @@ function Login() {
                             />
 
                         </div>
-
+                        
                         <h1>KARNATAKA AI</h1>
 
                     </div>
-
+                    <br />
                     <h2>
-                        Login to your Account
+                        Login
                     </h2>
 
                     <form
@@ -409,7 +409,7 @@ function Login() {
                                     {showPassword
                                         ? "👁️"
                                         : "🙈"}
-                                        
+
                                 </button>
 
                                 {showPasswordTooltip && (

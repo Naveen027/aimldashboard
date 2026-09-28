@@ -23,16 +23,16 @@
 
 .signup-header {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 10px;
     margin-top: 15px;
 }
 
 .brand {
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 10px;
 }
 
 .signup-logo {
@@ -57,7 +57,7 @@
 .signup-header h2 {
     margin: 0;
     color: #111827;
-    font-size: 30px;
+    font-size: 25px;
     
 }
 .signup-content {
