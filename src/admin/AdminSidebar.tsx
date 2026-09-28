@@ -28,7 +28,7 @@ function AdminSidebar({ adminUsername, onLogout }: AdminSidebarProps) {
     <aside className="ain-sidebar d-flex flex-column flex-shrink-0">
       <div className="ain-brand d-flex align-items-center gap-2">
         <img className="ain-brand-seal" src={seal} alt="Seal of Karnataka" />
-        <span className="ain-brand-text">KARNATAKA AI</span>
+        <span className="ain-brand-text">KARNATAKA AI CELL</span>
       </div>
 
       <nav className="ain-nav flex-grow-1">

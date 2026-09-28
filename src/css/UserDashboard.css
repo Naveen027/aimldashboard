@@ -392,6 +392,13 @@ body {
     transition: all 0.3s ease;
 }
 
+.dashboard-container.theme-dark .top-header .search-box > .search-input,
+.dashboard-container.theme-dark .top-header .search-box > .search-input:focus {
+    background-color: #111827;
+    color: #f3f4f6;
+    border-color: #374151;
+}
+
 .top-header .search-box > .search-input {
     padding-left: 42px;
 }
@@ -410,11 +417,6 @@ body {
     border-color: var(--accent-teal);
     box-shadow: 0 0 0 3px rgba(27, 160, 152, 0.1);
     background-color: white;
-}
-
-.theme-dark .search-input:focus {
-    background-color: var(--card-bg);
-    color: var(--text-primary);
 }
 
 /* ========== Content Wrapper ========== */
