@@ -368,7 +368,74 @@
   .logs-table th:last-child {
     display: none;
   }
+}
 
+.ain-app.theme-dark .system-logs {
+  color: #f3f4f6;
+  background: transparent;
+}
+
+.ain-app.theme-dark .system-logs .sl-header h1,
+.ain-app.theme-dark .system-logs .stat-value,
+.ain-app.theme-dark .system-logs .user,
+.ain-app.theme-dark .system-logs .action {
+  color: #f3f4f6;
+}
+
+.ain-app.theme-dark .system-logs .sl-header p,
+.ain-app.theme-dark .system-logs .stat-label,
+.ain-app.theme-dark .system-logs .logs-table th,
+.ain-app.theme-dark .system-logs .logs-table td,
+.ain-app.theme-dark .system-logs .resource,
+.ain-app.theme-dark .system-logs .date-separator,
+.ain-app.theme-dark .system-logs .sl-footer small {
+  color: #c1c8d3;
+}
+
+.ain-app.theme-dark .system-logs .sl-stats .stat-card,
+.ain-app.theme-dark .system-logs .sl-controls,
+.ain-app.theme-dark .system-logs .sl-logs-container {
+  color: #f3f4f6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .system-logs .search-input,
+.ain-app.theme-dark .system-logs .filter-select,
+.ain-app.theme-dark .system-logs .date-input {
+  color: #f3f4f6;
+  background: #111827;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .system-logs .search-input::placeholder {
+  color: #9ca3af;
+}
+
+.ain-app.theme-dark .system-logs .logs-table thead {
+  background: #273449;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .system-logs .logs-table td {
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .system-logs .logs-table tbody tr:hover {
+  background: #273449;
+}
+
+.ain-app.theme-dark .system-logs .btn-secondary {
+  color: #e5e7eb;
+  background: #273449;
+  border-color: #4b5563;
+}
+
+.ain-app.theme-dark .system-logs .btn-secondary:hover {
+  background: #374151;
+}
+
+@media (max-width: 768px) {
   .logs-table th:nth-child(6),
   .logs-table td:nth-child(6) {
     display: none;

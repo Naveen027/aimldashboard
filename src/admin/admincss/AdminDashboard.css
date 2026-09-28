@@ -180,9 +180,11 @@ body {
 }
 
 .ain-welcome {
-  font-weight: 700;
-  font-size: 1.4rem;
-  color: var(--ain-text);
+  text-transform: uppercase;
+  margin-bottom: 0px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(27, 160, 152) !important;
 }
 
 .ain-search {
@@ -242,11 +244,12 @@ body {
 }
 
 .ain-section-title {
+  margin-top: 20px;
+  margin-bottom: 13px;
+  font-size: 25px;
   font-weight: 700;
-  font-size: 1rem;
-  color: var(--ain-text);
-  margin-bottom: 1rem !important;
 }
+
 
 .ain-alert-pill {
   background: var(--ain-alert-bg);
@@ -273,8 +276,8 @@ body {
   margin-bottom: 24px;
 }
 
-.ain-stat-grid > [class*="col-"],
-.ain-dashboard-panels > [class*="col-"] {
+.ain-stat-grid>[class*="col-"],
+.ain-dashboard-panels>[class*="col-"] {
   min-width: 0;
 }
 
@@ -285,7 +288,7 @@ body {
 
 .ain-stat-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  background:var(--ain-surface);
+  background: var(--ain-surface);
 }
 
 .ain-stat-card:hover {
@@ -331,7 +334,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 0px;
-  border:0px
+  border: 0px
 }
 
 .ain-panel-title {
@@ -503,7 +506,7 @@ body {
 
 .ain-delay-1 {
   animation-delay: 0.05s;
-  margin-bottom:0px;
+  margin-bottom: 0px;
 }
 
 .ain-delay-2 {

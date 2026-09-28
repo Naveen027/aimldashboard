@@ -24,8 +24,8 @@ interface SystemConfig {
 
 const GlobalSettings: React.FC = () => {
   const [config, setConfig] = useState<SystemConfig>({
-    siteName: 'AI Nexus',
-    siteUrl: 'https://ainexus.ai',
+    siteName: 'Karnataka AI Cell',
+    siteUrl: 'https://karnatakaaicell.ai',
     emailNotifications: true,
     maintenanceMode: false,
     maxApiCalls: 10000000,

@@ -119,7 +119,7 @@ const BillingAdmin: React.FC = () => {
   const overdueRevenue = userBillings.filter(u => u.status === 'overdue').reduce((sum, u) => sum + u.totalCost, 0);
 
   const handleSendInvoice = (userId: string) => {
-    alert(`Invoice sent to user ${userId}`);
+    alert(`Invoice sent to user ₹₹{userId}`);
   };
 
   const handleExportReport = () => {
@@ -132,7 +132,7 @@ const BillingAdmin: React.FC = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `billing-report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `billing-report-₹{new Date().toISOString().split('T')[0]}.csv`;
     a.click();
   };
 
@@ -156,25 +156,25 @@ const BillingAdmin: React.FC = () => {
       <div className="ba-overview">
         <div className="overview-card primary">
           <div className="card-label">Total Revenue</div>
-          <div className="card-value">${billingData.totalCost.toFixed(2)}</div>
+          <div className="card-value">₹{billingData.totalCost.toFixed(2)}</div>
           <div className="card-meta">{billingData.apiCalls.toLocaleString()} API calls</div>
         </div>
 
         <div className="overview-card success">
           <div className="card-label">Paid</div>
-          <div className="card-value">${paidRevenue.toFixed(2)}</div>
+          <div className="card-value">₹{paidRevenue.toFixed(2)}</div>
           <div className="card-meta">{userBillings.filter(u => u.status === 'paid').length} users</div>
         </div>
 
         <div className="overview-card warning">
           <div className="card-label">Pending</div>
-          <div className="card-value">${pendingRevenue.toFixed(2)}</div>
+          <div className="card-value">₹{pendingRevenue.toFixed(2)}</div>
           <div className="card-meta">{userBillings.filter(u => u.status === 'pending').length} users</div>
         </div>
 
         <div className="overview-card danger">
           <div className="card-label">Overdue</div>
-          <div className="card-value">${overdueRevenue.toFixed(2)}</div>
+          <div className="card-value">₹{overdueRevenue.toFixed(2)}</div>
           <div className="card-meta">{userBillings.filter(u => u.status === 'overdue').length} users</div>
         </div>
       </div>
@@ -211,13 +211,13 @@ const BillingAdmin: React.FC = () => {
             </thead>
             <tbody>
               {filteredUsers.map(user => (
-                <tr key={user.userId} className={`row-${user.status}`}>
+                <tr key={user.userId} className={`row-₹{user.status}`}>
                   <td className="user-name">{user.userName}</td>
                   <td>{user.email}</td>
                   <td className="api-calls">{user.apiCalls.toLocaleString()}</td>
-                  <td className="cost">${user.totalCost.toFixed(2)}</td>
+                  <td className="cost">₹{user.totalCost.toFixed(2)}</td>
                   <td>
-                    <span className={`status-badge ${user.status}`}>
+                    <span className={`status-badge ₹{user.status}`}>
                       {user.status === 'paid' && '✓'}
                       {user.status === 'pending' && '⏳'}
                       {user.status === 'overdue' && '⚠️'}
@@ -257,7 +257,7 @@ const BillingAdmin: React.FC = () => {
                   <h3>{invoice.id}</h3>
                   <p className="invoice-date">{invoice.date}</p>
                 </div>
-                <span className={`invoice-status ${invoice.status}`}>
+                <span className={`invoice-status ₹{invoice.status}`}>
                   {invoice.status === 'paid' && '✓'}
                   {invoice.status === 'sent' && '→'}
                   {invoice.status === 'draft' && '✎'}
@@ -267,7 +267,7 @@ const BillingAdmin: React.FC = () => {
 
               <div className="invoice-amount">
                 <div className="label">Amount</div>
-                <div className="value">${invoice.amount.toFixed(2)}</div>
+                <div className="value">₹{invoice.amount.toFixed(2)}</div>
               </div>
 
               <div className="invoice-meta">
@@ -289,7 +289,7 @@ const BillingAdmin: React.FC = () => {
           <div className="breakdown-item">
             <div className="item-info">
               <span className="item-label">Cost per API Call</span>
-              <span className="item-value">${billingData.costPerCall.toFixed(6)}</span>
+              <span className="item-value">₹{billingData.costPerCall.toFixed(6)}</span>
             </div>
           </div>
           <div className="breakdown-item">

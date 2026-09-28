@@ -467,7 +467,83 @@
   .model-stats {
     grid-template-columns: 1fr;
   }
+}
 
+.ain-app.theme-dark .model-control {
+  color: #f3f4f6;
+  background: transparent;
+}
+
+.ain-app.theme-dark .model-control .mc-header h1,
+.ain-app.theme-dark .model-control .mc-section h2,
+.ain-app.theme-dark .model-control .mc-form h2,
+.ain-app.theme-dark .model-control .model-header h3,
+.ain-app.theme-dark .model-control .model-stats .stat-value,
+.ain-app.theme-dark .model-control .latency {
+  color: #f3f4f6;
+}
+
+.ain-app.theme-dark .model-control .mc-header p,
+.ain-app.theme-dark .model-control .stat-label,
+.ain-app.theme-dark .model-control .form-group label,
+.ain-app.theme-dark .model-control .model-provider,
+.ain-app.theme-dark .model-control .model-stats .stat-label,
+.ain-app.theme-dark .model-control .model-meta,
+.ain-app.theme-dark .model-control .endpoints-table th,
+.ain-app.theme-dark .model-control .endpoints-table td {
+  color: #c1c8d3;
+}
+
+.ain-app.theme-dark .model-control .mc-stats .stat-card,
+.ain-app.theme-dark .model-control .mc-form,
+.ain-app.theme-dark .model-control .model-card1,
+.ain-app.theme-dark .model-control .endpoints-table-container {
+  color: #f3f4f6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .model-control .model-card1.disabled {
+  background: #273449;
+}
+
+.ain-app.theme-dark .model-control .model-stats {
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .model-control .endpoints-table thead {
+  background: #273449;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .model-control .endpoints-table td {
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .model-control .endpoints-table tbody tr:hover {
+  background: #273449;
+}
+
+.ain-app.theme-dark .model-control .form-group input,
+.ain-app.theme-dark .model-control .form-group select {
+  color: #f3f4f6;
+  background: #111827;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .model-control .btn-secondary,
+.ain-app.theme-dark .model-control .action-btn {
+  color: #e5e7eb;
+  background: #273449;
+  border-color: #4b5563;
+}
+
+.ain-app.theme-dark .model-control .btn-secondary:hover,
+.ain-app.theme-dark .model-control .action-btn:hover {
+  background: #374151;
+}
+
+@media (max-width: 768px) {
   .mc-form {
     width: 95%;
     padding: 24px;

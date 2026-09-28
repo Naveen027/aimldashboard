@@ -109,3 +109,86 @@
 .theme-dark .billing-card .btn-link {
     color: #67e8f9;
 }
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) {
+    background-color: #111827;
+    color: #f3f4f6;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header {
+    background-color: #1f2937;
+    border-bottom-color: #374151;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .btn-notification {
+    color: #f3f4f6;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .search-icon {
+    color: #c1c8d3;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .search-input,
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .search-input:focus {
+    background-color: #111827;
+    color: #f3f4f6;
+    border-color: #374151;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .search-input::placeholder {
+    color: #c1c8d3;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .theme-toggle {
+    color: #f3f4f6;
+    background-color: transparent;
+    border-color: #374151;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .theme-toggle:hover,
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .top-header .theme-toggle:focus {
+    background-color: #374151;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header {
+    background-color: #ffffff;
+    border-bottom-color: #e0e6ed;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .btn-notification {
+    color: #2c3e50;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .search-icon {
+    color: #5f6b7a;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .search-input {
+    background-color: #f5f6fa;
+    color: #2c3e50;
+    border-color: #e0e6ed;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .search-input::placeholder {
+    color: #5f6b7a;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .theme-toggle {
+    color: #2c3e50;
+    background-color: transparent;
+    border-color: #e0e6ed;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .theme-toggle:hover,
+.billing-page:has(.theme-toggle[aria-label="Switch to dark mode"]) .top-header .theme-toggle:focus {
+    background-color: #f5f6fa;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .billing-heading h2 {
+    color: #f3f4f6;
+}
+
+.billing-page:has(.theme-toggle[aria-label="Switch to light mode"]) .billing-card {
+    background-color: #1f2937;
+    color: #f3f4f6;
+}

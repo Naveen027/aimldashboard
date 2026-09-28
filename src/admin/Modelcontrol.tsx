@@ -35,7 +35,7 @@ const ModelControl: React.FC = () => {
   const [models, setModels] = useState<Model[]>([
     {
       id: '1',
-      name: 'GPT-4 (Text Generation)',
+      name: 'Text Generation',
       type: 'llm',
       provider: 'OpenAI',
       status: 'active',
@@ -47,7 +47,7 @@ const ModelControl: React.FC = () => {
     },
     {
       id: '2',
-      name: 'DALL-E 3',
+      name: 'Image Generation',
       type: 'vision',
       provider: 'OpenAI',
       status: 'active',
@@ -59,7 +59,7 @@ const ModelControl: React.FC = () => {
     },
     {
       id: '3',
-      name: 'Whisper',
+      name: 'Speech-to-Text',
       type: 'other',
       provider: 'OpenAI',
       status: 'active',
@@ -71,7 +71,19 @@ const ModelControl: React.FC = () => {
     },
     {
       id: '4',
-      name: 'Claude 3.5 Sonnet',
+      name: 'Code Assistance',
+      type: 'llm',
+      provider: 'Anthropic',
+      status: 'active',
+      usagePercentage: 14.7,
+      lastUpdated: '2024-09-22',
+      rpmLimit: 8000,
+      costPerMRequest: 0.025,
+      version: '3.5',
+    },
+     {
+      id: '5',
+      name: 'Open Source Image',
       type: 'llm',
       provider: 'Anthropic',
       status: 'active',
@@ -373,13 +385,13 @@ const ModelControl: React.FC = () => {
         <h2>Active Models</h2>
         <div className="mc-grid">
           {models.map(model => (
-            <div key={model.id} className={`model-card1 ${model.status}`}>
+            <div key={model.id} className={`model-card1 ₹{model.status}`}>
               <div className="model-header">
                 <div>
                   <h3>{model.name}</h3>
                   <p className="model-provider">{model.provider} • v{model.version}</p>
                 </div>
-                <span className={`status-badge ${model.status}`}>
+                <span className={`status-badge ₹{model.status}`}>
                   {model.status === 'active' ? '✓' : '○'} {model.status}
                 </span>
               </div>
@@ -395,7 +407,7 @@ const ModelControl: React.FC = () => {
                   <div className="progress-bar">
                     <div 
                       className="progress-fill" 
-                      style={{ width: `${Math.min(model.usagePercentage, 100)}%` }}
+                      style={{ width: `₹{Math.min(model.usagePercentage, 100)}%` }}
                     ></div>
                   </div>
                 </div>
@@ -405,7 +417,7 @@ const ModelControl: React.FC = () => {
                 </div>
                 <div className="stat">
                   <div className="stat-label">Cost/1M</div>
-                  <div className="stat-value">${model.costPerMRequest.toFixed(3)}</div>
+                  <div className="stat-value">₹{model.costPerMRequest.toFixed(3)}</div>
                 </div>
               </div>
 
@@ -415,7 +427,7 @@ const ModelControl: React.FC = () => {
 
               <div className="model-actions">
                 <button 
-                  className={`action-btn ${model.status === 'active' ? 'active' : 'inactive'}`}
+                  className={`action-btn ₹{model.status === 'active' ? 'active' : 'inactive'}`}
                   onClick={() => handleToggleModel(model.id)}
                   title={model.status === 'active' ? 'Disable' : 'Enable'}
                 >
@@ -465,7 +477,7 @@ const ModelControl: React.FC = () => {
                     <td>{endpoint.region}</td>
                     <td className="latency">{endpoint.latency}ms</td>
                     <td>
-                      <span className={`uptime ${endpoint.uptime > 99.9 ? 'excellent' : 'good'}`}>
+                      <span className={`uptime ₹{endpoint.uptime > 99.9 ? 'excellent' : 'good'}`}>
                         {endpoint.uptime}%
                       </span>
                     </td>

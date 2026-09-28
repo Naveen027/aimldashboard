@@ -448,7 +448,91 @@
   .settings-form {
     max-width: 100%;
   }
+}
 
+.ain-app.theme-dark .global-settings {
+  color: #f3f4f6;
+  background: transparent;
+}
+
+.ain-app.theme-dark .global-settings .gs-header h1,
+.ain-app.theme-dark .global-settings .gs-section h2,
+.ain-app.theme-dark .global-settings .gs-section h3,
+.ain-app.theme-dark .global-settings .item-header h3 {
+  color: #f3f4f6;
+}
+
+.ain-app.theme-dark .global-settings .gs-header p,
+.ain-app.theme-dark .global-settings .form-group label,
+.ain-app.theme-dark .global-settings .toggle-group label,
+.ain-app.theme-dark .global-settings .notification-item label {
+  color: #c1c8d3;
+}
+
+.ain-app.theme-dark .global-settings .gs-tabs,
+.ain-app.theme-dark .global-settings .gs-section {
+  color: #f3f4f6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .global-settings .tab {
+  color: #c1c8d3;
+}
+
+.ain-app.theme-dark .global-settings .tab:hover {
+  color: #f3f4f6;
+}
+
+.ain-app.theme-dark .global-settings .form-group input,
+.ain-app.theme-dark .global-settings .form-group textarea,
+.ain-app.theme-dark .global-settings .key-value code {
+  color: #f3f4f6;
+  background: #111827;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .global-settings .form-group small,
+.ain-app.theme-dark .global-settings .toggle-group small,
+.ain-app.theme-dark .global-settings .notification-item small,
+.ain-app.theme-dark .global-settings .security-item p,
+.ain-app.theme-dark .global-settings .key-meta {
+  color: #9ca3af;
+}
+
+.ain-app.theme-dark .global-settings .form-card,
+.ain-app.theme-dark .global-settings .api-key-card,
+.ain-app.theme-dark .global-settings .notification-item,
+.ain-app.theme-dark .global-settings .security-item {
+  color: #f3f4f6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .global-settings .divider {
+  background: #374151;
+}
+
+.ain-app.theme-dark .global-settings .status-btn,
+.ain-app.theme-dark .global-settings .delete-btn,
+.ain-app.theme-dark .global-settings .btn-secondary {
+  color: #e5e7eb;
+  background: #273449;
+  border-color: #4b5563;
+}
+
+.ain-app.theme-dark .global-settings .status-btn:hover,
+.ain-app.theme-dark .global-settings .delete-btn:hover,
+.ain-app.theme-dark .global-settings .btn-secondary:hover {
+  background: #374151;
+}
+
+.ain-app.theme-dark .global-settings .badge:not(.enabled) {
+  color: #e5e7eb;
+  background: #374151;
+}
+
+@media (max-width: 768px) {
   .notifications-grid {
     grid-template-columns: 1fr;
   }

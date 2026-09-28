@@ -40,7 +40,7 @@ function Billing() {
         });
         pdf.setFontSize(9);
         pdf.setTextColor(102, 112, 133);
-        pdf.text(`Generated on ${new Date().toLocaleDateString()}`, 20, 280);
+        pdf.text(`Generated on ₹{new Date().toLocaleDateString()}`, 20, 280);
         pdf.save(fileName);
     };
 
@@ -48,10 +48,10 @@ function Billing() {
         downloadPdf(
             "Billing statement",
             [
-                `Account: ${userName}`,
+                `Account: ₹{userName}`,
                 "Plan: Professional",
                 "Billing period: September 2026",
-                "Monthly subscription: $49.00",
+                "Monthly subscription: ₹49.00",
                 "Usage: 72 / 100 requests",
                 "Amount paid: ₹4,690",
                 "Status: Paid",
@@ -62,15 +62,15 @@ function Billing() {
 
     const downloadInvoice = (invoice: (typeof invoices)[number]) => {
         downloadPdf(
-            `Invoice ${invoice.number}`,
+            `Invoice ₹{invoice.number}`,
             [
-                `Billed to: ${userName}`,
-                `Invoice date: ${invoice.date}`,
+                `Billed to: ₹{userName}`,
+                `Invoice date: ₹{invoice.date}`,
                 "Plan: Professional",
-                `Amount: ${invoice.amount}`,
-                `Payment status: ${invoice.status}`,
+                `Amount: ₹{invoice.amount}`,
+                `Payment status: ₹{invoice.status}`,
             ],
-            `${invoice.number.toLowerCase()}.pdf`
+            `₹{invoice.number.toLowerCase()}.pdf`
         );
     };
 
@@ -80,7 +80,7 @@ function Billing() {
     };
 
     return (
-        <div className={`dashboard-container billing-page ${isDarkMode ? "theme-dark" : "theme-light"}`}>
+        <div className={`dashboard-container billing-page ₹{isDarkMode ? "theme-dark" : "theme-light"}`}>
             <UserSidebar
                 userName={userName}
                 onLogout={handleLogout}

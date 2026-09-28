@@ -362,3 +362,70 @@
     flex-direction: column;
   }
 }
+
+  .ain-app.theme-dark .user-management {
+    color: #f3f4f6;
+    background: transparent;
+  }
+
+  .ain-app.theme-dark .user-management .um-header h1,
+  .ain-app.theme-dark .user-management .um-form h2,
+  .ain-app.theme-dark .user-management .stat-value,
+  .ain-app.theme-dark .user-management .um-table .user-name {
+    color: #f3f4f6;
+  }
+
+  .ain-app.theme-dark .user-management .um-header p,
+  .ain-app.theme-dark .user-management .stat-label,
+  .ain-app.theme-dark .user-management .um-table th,
+  .ain-app.theme-dark .user-management .um-table td,
+  .ain-app.theme-dark .user-management .form-group label {
+    color: #c1c8d3;
+  }
+
+  .ain-app.theme-dark .user-management .stat-card,
+  .ain-app.theme-dark .user-management .um-form,
+  .ain-app.theme-dark .user-management .um-table-container {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .ain-app.theme-dark .user-management .um-table thead {
+    background: #273449;
+    border-color: #374151;
+  }
+
+  .ain-app.theme-dark .user-management .um-table td {
+    border-color: #374151;
+  }
+
+  .ain-app.theme-dark .user-management .um-table tbody tr:hover {
+    background: #273449;
+  }
+
+  .ain-app.theme-dark .user-management .search-input,
+  .ain-app.theme-dark .user-management .filter-select,
+  .ain-app.theme-dark .user-management .form-group input,
+  .ain-app.theme-dark .user-management .form-group select {
+    color: #f3f4f6;
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .ain-app.theme-dark .user-management .search-input::placeholder {
+    color: #9ca3af;
+  }
+
+  .ain-app.theme-dark .user-management .btn-secondary {
+    color: #e5e7eb;
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  .ain-app.theme-dark .user-management .btn-secondary:hover {
+    background: #4b5563;
+  }
+
+  .ain-app.theme-dark .user-management .action-btn:hover {
+    background: #374151;
+  }

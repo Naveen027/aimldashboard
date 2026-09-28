@@ -137,7 +137,7 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="ain-summary-header ain-fade-in ain-delay-1">
-          <h5 className="mb-0 ain-section-title">System-wide Summary</h5>
+          <h2 className="mb-0 ain-section-title">System-wide Summary</h2>
         </div>
 
         {/* Stat cards */}

@@ -460,7 +460,79 @@
   .actions {
     flex-direction: column;
   }
+}
 
+.ain-app.theme-dark .billing-admin {
+  color: #f3f4f6;
+  background: transparent;
+}
+
+.ain-app.theme-dark .billing-admin .ba-header h1,
+.ain-app.theme-dark .billing-admin .ba-section h2,
+.ain-app.theme-dark .billing-admin .invoice-header h3,
+.ain-app.theme-dark .billing-admin .invoice-amount .value,
+.ain-app.theme-dark .billing-admin .item-value,
+.ain-app.theme-dark .billing-admin .billing-table .user-name,
+.ain-app.theme-dark .billing-admin .billing-table .api-calls,
+.ain-app.theme-dark .billing-admin .billing-table .cost {
+  color: #f3f4f6;
+}
+
+.ain-app.theme-dark .billing-admin .ba-header p,
+.ain-app.theme-dark .billing-admin .ba-period h3,
+.ain-app.theme-dark .billing-admin .billing-table td,
+.ain-app.theme-dark .billing-admin .billing-table th,
+.ain-app.theme-dark .billing-admin .invoice-date,
+.ain-app.theme-dark .billing-admin .invoice-amount .label,
+.ain-app.theme-dark .billing-admin .invoice-meta,
+.ain-app.theme-dark .billing-admin .item-label {
+  color: #c1c8d3;
+}
+
+.ain-app.theme-dark .billing-admin .billing-table-container,
+.ain-app.theme-dark .billing-admin .invoice-card,
+.ain-app.theme-dark .billing-admin .cost-breakdown {
+  color: #f3f4f6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .billing-admin .billing-table {
+  color: #e5e7eb;
+}
+
+.ain-app.theme-dark .billing-admin .billing-table thead {
+  background: #273449;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .billing-admin .billing-table td {
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .billing-admin .billing-table tbody tr:hover {
+  background: #273449;
+}
+
+.ain-app.theme-dark .billing-admin .breakdown-item {
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .billing-admin .action-btn,
+.ain-app.theme-dark .billing-admin .invoice-actions .action-btn,
+.ain-app.theme-dark .billing-admin .filter-select {
+  color: #e5e7eb;
+  background: #111827;
+  border-color: #374151;
+}
+
+.ain-app.theme-dark .billing-admin .action-btn:hover,
+.ain-app.theme-dark .billing-admin .invoice-actions .action-btn:hover {
+  background: #273449;
+  border-color: #4b5563;
+}
+
+@media (max-width: 768px) {
   .invoice-actions {
     flex-direction: column;
   }
