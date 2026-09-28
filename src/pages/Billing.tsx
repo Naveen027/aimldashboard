@@ -86,7 +86,7 @@ function Billing() {
                 onLogout={handleLogout}
             />
             <main className="main-content">
-                <UserHeader
+                <UserHeader  
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                 />
