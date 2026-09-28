@@ -33,8 +33,6 @@ function ApiKeys() {
             <UserSidebar
                 userName={userName}
                 onLogout={handleLogout}
-                onProfileClick={() => navigate("/user-dashboard")}
-                onDashboardClick={() => navigate("/user-dashboard")}
             />
             <main className="main-content">
                 <UserHeader

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import seal from "../assets/Seal_of_Karnataka.svg";
 import logoutImage from "../assets/logout.png";
 import dashboardImage from "../assets/dashboard.png";
@@ -10,21 +10,12 @@ import supportImage from "../assets/support.png";
 interface UserSidebarProps {
     userName: string;
     onLogout: () => void;
-    onProfileClick: () => void;
-    onDashboardClick: () => void;
-    activeView?: "dashboard" | "profile";
 }
 
 function UserSidebar({
     userName,
     onLogout,
-    onProfileClick,
-    onDashboardClick,
-    activeView,
 }: UserSidebarProps) {
-    const { pathname } = useLocation();
-    const isDashboardRoute = pathname === "/user-dashboard";
-
     return (
         <aside className="sidebar">
             <header className="sidebar-header">
@@ -37,43 +28,14 @@ function UserSidebar({
                 aria-label="Main navigation"
                 className="sidebar-nav"
             >
-                <button
-                    type="button"
-                    className={`nav-link ${
-                        isDashboardRoute && activeView !== "profile"
-                            ? "active"
-                            : ""
-                    }`}
-                    aria-current={
-                        isDashboardRoute && activeView !== "profile"
-                            ? "page"
-                            : undefined
-                    }
-                    onClick={onDashboardClick}
-                >
+                <NavLink to="/user-dashboard" end className="nav-link">
                     <img className="nav-icon" src={dashboardImage} alt="" aria-hidden="true" />
                     Dashboard
-                </button>
-                <button
-                    type="button"
-                    className={`nav-link ${
-                        isDashboardRoute && activeView === "profile"
-                            ? "active"
-                            : ""
-                    }`}
-                    aria-current={
-                        isDashboardRoute && activeView === "profile"
-                            ? "page"
-                            : undefined
-                    }
-                    onClick={(event) => {
-                        event.preventDefault();
-                        onProfileClick();
-                    }}
-                >
+                </NavLink>
+                <NavLink to="/my-profile" end className="nav-link">
                     <img className="nav-icon" src={myProfileImage} alt="" aria-hidden="true" />
                     My Profile
-                </button>
+                </NavLink>
                 <NavLink to="/api-keys" className="nav-link">
                     <img className="nav-icon" src={apiKeyImage} alt="" aria-hidden="true" />
                     API Keys

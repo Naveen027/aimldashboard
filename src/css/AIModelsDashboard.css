@@ -61,6 +61,15 @@
   background: rgba(255, 255, 255, 0.78);
 }
 
+.theme-dark .dashboard .stat-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.theme-dark .dashboard .stat-card__label {
+  color: #c1c8d3;
+}
+
 /* Ambient grid ---------------------------------------------------- */
 
 .dashboard__grid {

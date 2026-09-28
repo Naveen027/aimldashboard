@@ -365,8 +365,21 @@ body {
     top: 50%;
     left: 12px;
     color: var(--text-secondary);
+    width: 18px;
+    height: 18px;
+    z-index: 3;
     pointer-events: none;
     transform: translateY(-50%);
+}
+
+.dashboard-container.theme-light .top-header .search-icon {
+    color: #5f6b7a;
+    stroke: currentColor;
+}
+
+.dashboard-container.theme-dark .top-header .search-icon {
+    color: #c1c8d3;
+    stroke: currentColor;
 }
 
 .search-input {
@@ -377,6 +390,10 @@ body {
     background-color: var(--main-bg);
     color: var(--text-primary);
     transition: all 0.3s ease;
+}
+
+.top-header .search-box > .search-input {
+    padding-left: 42px;
 }
 
 .search-input::placeholder {
@@ -515,6 +532,23 @@ body {
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
     border: 2px solid var(--accent-teal);
+}
+
+.dashboard-container.theme-dark .model-card {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+.dashboard-container.theme-dark .model-name,
+.dashboard-container.theme-dark .model-category,
+.dashboard-container.theme-dark .model-description,
+.dashboard-container.theme-dark .model-status p {
+    color: #c1c8d3;
+}
+
+.dashboard-container.theme-dark .model-name {
+    color: #f3f4f6;
 }
 
 .model-modal-backdrop {
@@ -848,7 +882,7 @@ body {
 
     .search-input {
         font-size: 12px;
-        padding: 6px 10px;
+        padding: 6px 10px 6px 42px;
     }
 
     .content-wrapper {

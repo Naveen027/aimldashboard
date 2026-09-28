@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../css/UserDashboard.css";
 import AiModelCard, {
@@ -13,9 +14,9 @@ import { useDashboardTheme } from "../user/ThemeToggle";
 function UserDashboard() {
     const { authResponse, logout } = useAuth();
     const { isDarkMode } = useDashboardTheme();
+    const { pathname } = useLocation();
     const [searchQuery, setSearchQuery] = useState("");
-    const [showAIModelsDashboard, setShowAIModelsDashboard] =
-        useState(false);
+    const showAIModelsDashboard = pathname === "/my-profile";
     const userName = authResponse?.username ?? "Alex Johnson";
     const firstName = userName.split(" ")[0];
     const availableModels = aiModels;
@@ -41,15 +42,6 @@ function UserDashboard() {
             <UserSidebar
                 userName={userName}
                 onLogout={logout}
-                onProfileClick={() =>
-                    setShowAIModelsDashboard(true)
-                }
-                onDashboardClick={() =>
-                    setShowAIModelsDashboard(false)
-                }
-                activeView={
-                    showAIModelsDashboard ? "profile" : "dashboard"
-                }
             />
             <main className="main-content">
                 <UserHeader

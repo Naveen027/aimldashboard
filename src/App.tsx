@@ -41,6 +41,7 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRole="user" />}>
             <Route path="/user-dashboard" element={<UserDashboard />} />
+            <Route path="/my-profile" element={<UserDashboard />} />
             <Route path="/api-keys" element={<ApiKeys />} />
             <Route path="/support" element={<Support />} />
             <Route path="/billing" element={<Billing />} />
