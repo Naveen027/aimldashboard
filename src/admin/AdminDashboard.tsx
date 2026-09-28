@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  ComposedChart,
+  BarChart,
   Bar,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,18 +9,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import "../admin/admincss/AdminDashboard.css";
-import AdminHeader from "./AdminHeader.tsx";
-import seal from "../assets/Seal_of_Karnataka.svg";
-import logoutImage from "../assets/logout.png";
+import AdminLayout from "./AdminLayout";
+import { useAuth } from "../context/AuthContext";
 
 
-
-interface NavItem {
-  label: string;
-  icon: string;
-  active?: boolean;
-}
 
 interface UsageRow {
   id: number;
@@ -33,15 +24,6 @@ interface UsageRow {
   usage: string;
   usagePct: number;
 }
-
-const navItems: NavItem[] = [
-  { label: "System Overview", icon: "bi-grid-1x2-fill", active: true },
-  { label: "User Management", icon: "bi-person" },
-  { label: "Model Control", icon: "bi-gear" },
-  { label: "Billing Admin", icon: "bi-receipt" },
-  { label: "Global Settings", icon: "bi-sliders" },
-  { label: "System Logs", icon: "bi-file-earmark-text" },
-];
 
 const usageRows: UsageRow[] = [
   {
@@ -137,73 +119,31 @@ const statCards = [
 ];
 
 const AdminDashboard: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { authResponse } = useAuth();
+  const adminUsername = authResponse?.username || "Admin";
 
   return (
-    <div className="ain-app d-flex">
-      {/* Sidebar */}
-      <aside className="ain-sidebar d-flex flex-column flex-shrink-0">
-        <div className="ain-brand d-flex align-items-center gap-2">
-          <img className="ain-brand-seal" src={seal} alt="Seal of Karnataka" />
-          <span className="ain-brand-text">KARNATAKA AI</span>
-        </div>
-
-        <nav className="ain-nav flex-grow-1">
-          <ul className="nav flex-column">
-            {navItems.map((item) => (
-              <li className="nav-item" key={item.label}>
-                <a
-                  href="#!"
-                  className={`nav-link ain-nav-link d-flex align-items-center gap-2 ${
-                    item.active ? "active" : ""
-                  }`}
-                >
-                  <i className={`bi ${item.icon}`} />
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="ain-sidebar-footer">
-          <div className="d-flex align-items-center gap-2 ain-user-chip">
-            <span className="ain-avatar-sm">S</span>
-            <span className="ain-user-name">Sarah Chen (Admin)</span>
-          </div>
-          <a href="#!" className="ain-logout d-flex align-items-center gap-2">
-            <span className="ain-logout-icon-container">
-              <img src={logoutImage} alt="" aria-hidden="true" />
-            </span>
-            <span>Logout</span>
-          </a>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="ain-main flex-grow-1">
-        <AdminHeader
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+    <AdminLayout>
         <div className="ain-topbar">
           <div className="ain-fade-in">
-            <h3 className="ain-welcome mb-1">Welcome Admin, Sarah!</h3>
+            <h3 className="ain-welcome mb-1">
+              Welcome, {adminUsername}!
+            </h3>
           </div>
-        </div>
-
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 ain-summary-header ain-fade-in ain-delay-1">
-          <h5 className="mb-0 ain-section-title">System-wide Summary</h5>
           <span className="ain-alert-pill d-flex align-items-center gap-2">
             <i className="bi bi-exclamation-triangle-fill" />
             System-wide notifications
           </span>
         </div>
 
+        <div className="ain-summary-header ain-fade-in ain-delay-1">
+          <h5 className="mb-0 ain-section-title">System-wide Summary</h5>
+        </div>
+
         {/* Stat cards */}
-        <div className="row g-3 ain-fade-in ain-delay-2">
+        <div className="row g-3 ain-stat-grid ain-fade-in ain-delay-2">
           {statCards.map((card) => (
-            <div className="col-12 col-sm-6 col-xl-3" key={card.label}>
+            <div className="col-12 col-sm-6 col-xl-3 d-flex" key={card.label}>
               <div className="ain-card ain-stat-card">
                 <div className="d-flex align-items-center justify-content-between">
                   <span className="ain-stat-label">{card.label}</span>
@@ -222,13 +162,13 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Bottom row: table + chart */}
-        <div className="row g-3 ain-fade-in ain-delay-3">
+        <div className="row g-3 align-items-stretch ain-dashboard-panels ain-fade-in ain-delay-3">
           {/* User usage table */}
-          <div className="col-12 col-xl-7">
-            <div className="ain-card h-100">
-              <h5 className="ain-section-title mb-3">User Usage Overview</h5>
-              <div className="ain-card ain-table-card">
-                <div className="d-flex align-items-center justify-content-between mb-2">
+          <div className="col-12 col-xl-7 d-flex">
+            <div className="ain-card ain-panel-card">
+              <h5 className="ain-section-title ain-panel-title">User Usage Overview</h5>
+              <div className="ain-card ain-table-card ain-panel-content">
+                <div className="d-flex align-items-center justify-content-between ain-table-toolbar">
                   <span className="ain-table-title">All Activity</span>
                   <button className="ain-filter-btn d-flex align-items-center gap-2">
                     <i className="bi bi-funnel" />
@@ -236,7 +176,7 @@ const AdminDashboard: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="table-responsive">
+                <div className="table-responsive ain-table-responsive">
                   <table className="table ain-table align-middle mb-0">
                     <thead>
                       <tr>
@@ -291,12 +231,10 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Model performance chart */}
-          <div className="col-12 col-xl-5">
-            <div className="ain-card h-100">
-              <div className="d-flex align-items-center justify-content-between mb-1">
-                <h5 className="ain-section-title mb-0">Model Performance</h5>
-              </div>
-              <div className="ain-card ain-chart-card h-100">
+          <div className="col-12 col-xl-5 d-flex">
+            <div className="ain-card ain-panel-card">
+              <h5 className="ain-section-title ain-panel-title">Model Performance</h5>
+              <div className="ain-card ain-chart-card ain-panel-content">
                 <div className="d-flex align-items-center justify-content-between mb-3">
                   <span className="ain-table-title">Real-time metrics chart</span>
                   <i className="bi bi-three-dots ain-dots" />
@@ -319,29 +257,38 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="ain-chart-wrap">
                   <ResponsiveContainer width="100%" height={220}>
-                    <ComposedChart data={chartData} barGap={6}>
-                      <CartesianGrid vertical={false} stroke="#eef0f4" />
+                    <BarChart data={chartData} barGap={6}>
+                      <CartesianGrid
+                        vertical={false}
+                        stroke="var(--ain-chart-grid)"
+                      />
                       <XAxis
                         dataKey="name"
                         tickLine={false}
                         axisLine={false}
-                        tick={{ fill: "#8a90a2", fontSize: 12 }}
+                        tick={{ fill: "var(--ain-text-muted)", fontSize: 12 }}
                       />
                       <YAxis
                         tickLine={false}
                         axisLine={false}
-                        tick={{ fill: "#8a90a2", fontSize: 12 }}
+                        tick={{ fill: "var(--ain-text-muted)", fontSize: 12 }}
                       />
                       <Tooltip
-                        cursor={{ fill: "rgba(0,0,0,0.03)" }}
+                        cursor={{ fill: "var(--ain-chart-cursor)" }}
                         contentStyle={{
                           borderRadius: 10,
-                          border: "1px solid #eef0f4",
+                          border: "1px solid var(--ain-border)",
+                          backgroundColor: "var(--ain-surface)",
+                          color: "var(--ain-text)",
                         }}
                       />
                       <Legend
                         iconType="circle"
-                        wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+                        wrapperStyle={{
+                          fontSize: 12,
+                          paddingTop: 8,
+                          color: "var(--ain-text)",
+                        }}
                       />
                       <Bar
                         dataKey="GPT-4"
@@ -372,25 +319,14 @@ const AdminDashboard: React.FC = () => {
                         animationEasing="ease-out"
                         animationBegin={240}
                       />
-                      <Line
-                        type="monotone"
-                        dataKey="Whisper"
-                        stroke="#1f9d72"
-                        strokeWidth={2.5}
-                        dot={{ r: 0 }}
-                        activeDot={{ r: 5 }}
-                        isAnimationActive
-                        animationDuration={900}
-                      />
-                    </ComposedChart>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+    </AdminLayout>
   );
 };
 

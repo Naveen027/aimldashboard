@@ -1,0 +1,150 @@
+.ain-sidebar {
+  width: 260px;
+  flex: 0 0 260px;
+  background: var(--ain-navy);
+  color: #cfd3e0;
+  padding: 0;
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+}
+
+.ain-brand {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ain-brand-seal {
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  object-fit: contain;
+}
+
+.ain-brand-text {
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.ain-nav .nav-item {
+  margin-bottom: 0;
+}
+
+.ain-nav {
+  padding: 20px 0;
+}
+
+.ain-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 24px);
+  margin: 4px 12px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.ain-nav-link i {
+  flex: 0 0 20px;
+  width: 20px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.ain-nav-link:hover,
+.ain-nav-link:focus {
+  width: calc(100% - 24px);
+  margin: 4px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff !important;
+  outline: none;
+}
+
+.ain-nav-link.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff !important;
+}
+
+.ain-sidebar-footer {
+  padding: 16px 20px 5px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ain-user-chip {
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.ain-user-name {
+  font-size: 0.85rem;
+  color: #e5e7f0;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.ain-logout {
+  color: #aeb4c7;
+  font-size: 0.85rem;
+  font-weight: 400;
+  gap: 8px;
+  padding: 6px 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.ain-logout:hover {
+  color: #fff;
+}
+
+.ain-logout-icon-container {
+  display: flex;
+  align-items: center;
+  width: 18px;
+  flex: 0 0 18px;
+}
+
+.ain-logout-icon-container img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+@media (max-width: 991px) {
+  .ain-sidebar {
+    width: 240px;
+    flex-basis: 240px;
+  }
+}
+
+@media (max-width: 767px) {
+  .ain-sidebar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ain-nav-link {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -9,6 +9,11 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./admin/AdminDashboard.tsx";
+import Usermanagement from "./admin/Usermanagement";
+import Modelcontrol from "./admin/Modelcontrol";
+import Adminbilling from "./admin/Adminbilling";
+import Globalsettings from "./admin/Globalsettings";
+import Systemlogs from "./admin/Systemlogs";
 import ApiKeys from "./pages/ApiKeys";
 import Support from "./pages/Support";
 import Billing from "./pages/Billing";
@@ -45,6 +50,11 @@ function App() {
 
           <Route element={<ProtectedRoute allowedRole="admin" />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/user-management" element={<Usermanagement />} />
+            <Route path="/admin/model-control" element={<Modelcontrol />} />
+            <Route path="/admin/billing" element={<Adminbilling />} />
+            <Route path="/admin/global-settings" element={<Globalsettings />} />
+            <Route path="/admin/system-logs" element={<Systemlogs />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
