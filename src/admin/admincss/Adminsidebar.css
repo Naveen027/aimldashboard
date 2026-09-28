@@ -1,7 +1,7 @@
 .ain-sidebar {
   width: 260px;
   flex: 0 0 260px;
-  background: var(--ain-navy);
+  background: #131b2e;
   color: #cfd3e0;
   padding: 0;
   height: 100vh;
