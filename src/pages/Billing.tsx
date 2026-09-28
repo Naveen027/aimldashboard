@@ -80,7 +80,7 @@ function Billing() {
     };
 
     return (
-        <div className={`dashboard-container billing-page ₹{isDarkMode ? "theme-dark" : "theme-light"}`}>
+        <div className={`dashboard-container billing-page ${isDarkMode ? "theme-dark" : "theme-light"}`}>
             <UserSidebar
                 userName={userName}
                 onLogout={handleLogout}

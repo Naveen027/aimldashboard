@@ -480,7 +480,11 @@
 .ain-app.theme-dark .model-control .model-header h3,
 .ain-app.theme-dark .model-control .model-stats .stat-value,
 .ain-app.theme-dark .model-control .latency {
-  color: #f3f4f6;
+  color: #ffffff;
+}
+
+.ain-app.theme-dark .stat-value{
+  color: #ffffff;
 }
 
 .ain-app.theme-dark .model-control .mc-header p,
