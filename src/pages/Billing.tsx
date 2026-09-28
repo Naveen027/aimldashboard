@@ -62,15 +62,15 @@ function Billing() {
 
     const downloadInvoice = (invoice: (typeof invoices)[number]) => {
         downloadPdf(
-            `Invoice ₹{invoice.number}`,
+            `Invoice ${invoice.number}`,
             [
-                `Billed to: ₹{userName}`,
-                `Invoice date: ₹{invoice.date}`,
+                `Billed to: ${userName}`,
+                `Invoice date: ${invoice.date}`,
                 "Plan: Professional",
-                `Amount: ₹{invoice.amount}`,
-                `Payment status: ₹{invoice.status}`,
+                `Amount: ${invoice.amount}`,
+                `Payment status: ${invoice.status}`,
             ],
-            `₹{invoice.number.toLowerCase()}.pdf`
+            `${invoice.number.toLowerCase()}.pdf`
         );
     };
 

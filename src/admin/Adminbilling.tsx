@@ -119,7 +119,7 @@ const BillingAdmin: React.FC = () => {
   const overdueRevenue = userBillings.filter(u => u.status === 'overdue').reduce((sum, u) => sum + u.totalCost, 0);
 
   const handleSendInvoice = (userId: string) => {
-    alert(`Invoice sent to user ₹₹{userId}`);
+    alert(`Invoice sent to user ${userId}`);
   };
 
   const handleExportReport = () => {
