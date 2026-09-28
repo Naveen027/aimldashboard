@@ -30,7 +30,7 @@ function AdminLayout({ children }: AdminLayoutProps) {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
-        {children}
+        <div className="ain-content-wrapper">{children}</div>
       </main>
     </div>
   );

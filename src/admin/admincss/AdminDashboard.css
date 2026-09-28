@@ -71,13 +71,17 @@ body {
 /* ---------- Main --------------------------------------------------- */
 .ain-main {
   --admin-header-height: 54px;
-  padding: calc(24px + var(--admin-header-height)) clamp(16px, 2.5vw, 32px) 40px;
+  padding-top: var(--admin-header-height);
   margin-left: 260px;
   max-width: 100%;
   min-width: 0;
   background: var(--ain-bg);
   color: var(--ain-text);
   transition: background-color 300ms ease, color 300ms ease;
+}
+
+.ain-content-wrapper {
+  padding: 15px;
 }
 
 .ain-main>.ain-admin-header {
@@ -567,7 +571,7 @@ body {
 
 @media (max-width: 991px) {
   .ain-main {
-    padding: calc(20px + var(--admin-header-height)) 20px 40px;
+    padding: var(--admin-header-height) 20px 40px;
     margin-left: 240px;
   }
 
@@ -578,7 +582,7 @@ body {
 
 @media (max-width: 767px) {
   .ain-main {
-    padding: calc(16px + var(--admin-header-height)) 16px 40px;
+    padding: var(--admin-header-height) 16px 40px;
     margin-left: 0;
   }
 
