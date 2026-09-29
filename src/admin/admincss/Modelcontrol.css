@@ -12,8 +12,8 @@
 }
 
 .mc-header h1 {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 25px;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 8px 0;
 }
@@ -37,11 +37,33 @@
 }
 
 .stat-card {
-  background: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 1st card - Total Models */
+.stat-card:nth-child(1) {
+  background: #c2d4f6;
   border-left: 4px solid #667eea;
+}
+
+/* 2nd card - Active Models */
+.stat-card:nth-child(2) {
+  background: #c8f5d9;
+  border-left: 4px solid #28a745;
+}
+
+/* 3rd card - Endpoints */
+.stat-card:nth-child(3) {
+  background: #fce5c4;
+  border-left: 4px solid #ff9800;
+}
+
+/* 4th card - Total Usage */
+.stat-card:nth-child(4) {
+  background: #e6cbff;
+  border-left: 4px solid #9c27b0;
 }
 
 .stat-value {

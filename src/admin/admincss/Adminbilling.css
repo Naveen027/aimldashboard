@@ -12,8 +12,8 @@
 }
 
 .ba-header h1 {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 25px;
+  font-weight: 700;
   color: #1a1a1a;
   margin: 0 0 8px 0;
 }
@@ -71,7 +71,7 @@
 }
 
 .overview-card.success {
-  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+  background: linear-gradient(135deg, #fa8984 0%, #8fd3f4 100%);
 }
 
 .overview-card.warning {

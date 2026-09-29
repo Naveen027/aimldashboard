@@ -188,7 +188,8 @@ body {
   margin-bottom: 0px;
   font-size: 15px;
   font-weight: 600;
-  color: rgb(27, 160, 152) !important;
+  color: #1ba098 !important;
+  margin-left:5px;
 }
 
 .ain-search {
@@ -252,6 +253,7 @@ body {
   margin-bottom: px;
   font-size: 25px;
   font-weight: 700;
+  margin-left:5px;
 }
 
 
@@ -295,6 +297,29 @@ body {
   background: var(--ain-surface);
 }
 
+/* 1st card */
+.ain-stat-grid > div:nth-child(1) .ain-stat-card {
+  background: #cbdbfa !important;
+  border-left:4px solid #4285f4;
+}
+
+/* 2nd card */
+.ain-stat-grid > div:nth-child(2) .ain-stat-card {
+  background: #caf7dd !important;
+  border-left:4px solid #34a853;
+}
+
+/* 3rd card */
+.ain-stat-grid > div:nth-child(3) .ain-stat-card {
+  background: #fde9cc !important;
+  border-left:4px solid #fbbc04;
+}
+
+/* 4th card */
+.ain-stat-grid > div:nth-child(4) .ain-stat-card {
+  background: #fed7ec !important;
+  border-left:4px solid #ea4335;
+}
 .ain-stat-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--ain-shadow);
