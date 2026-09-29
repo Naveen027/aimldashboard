@@ -57,7 +57,7 @@ function AdminSidebar({ adminUsername, onLogout }: AdminSidebarProps) {
           <span className="ain-avatar-sm">
             {adminUsername.charAt(0).toUpperCase()}
           </span>
-          <span className="ain-user-name">{adminUsername} (Admin)</span>
+          <span className="ain-user-name">{adminUsername}</span>
         </div>
         <a
           href="/"
