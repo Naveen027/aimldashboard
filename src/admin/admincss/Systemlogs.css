@@ -392,7 +392,7 @@
   color: #c1c8d3;
 }
 
-.ain-app.theme-dark .system-logs .sl-stats .stat-card,
+.ain-app.theme-dark .system-logs .sl-stats,
 .ain-app.theme-dark .system-logs .sl-controls,
 .ain-app.theme-dark .system-logs .sl-logs-container {
   color: #f3f4f6;
