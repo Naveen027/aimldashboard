@@ -105,7 +105,7 @@ body {
 /* ========== Sidebar ========== */
 .sidebar {
     width: 260px;
-    background-color: var(--sidebar-bg);
+    background-color:#131b2e;
     color: white;
     display: flex;
     flex-direction: column;
