@@ -180,7 +180,7 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 0px;
 }
 
 .ain-welcome {
@@ -248,8 +248,8 @@ body {
 }
 
 .ain-section-title {
-  margin-top: 20px;
-  margin-bottom: 13px;
+  margin-top: 0px;
+  margin-bottom: px;
   font-size: 25px;
   font-weight: 700;
 }
@@ -510,7 +510,7 @@ body {
 
 .ain-delay-1 {
   animation-delay: 0.05s;
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
 
 .ain-delay-2 {
