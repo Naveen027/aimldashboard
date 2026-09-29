@@ -520,7 +520,7 @@
   color: #c1c8d3;
 }
 
-.ain-app.theme-dark .model-control .mc-stats .stat-card,
+.ain-app.theme-dark .model-control .mc-stats,
 .ain-app.theme-dark .model-control .mc-form,
 .ain-app.theme-dark .model-control .model-card1,
 .ain-app.theme-dark .model-control .endpoints-table-container {
@@ -528,6 +528,11 @@
   background: #1f2937;
   border-color: #374151;
 }
+
+.ain-app.theme-dark .model-control .stat-card{
+  /* background: #1f2937 !important; */
+}
+
 
 .ain-app.theme-dark .model-control .model-card1.disabled {
   background: #273449;

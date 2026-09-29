@@ -173,6 +173,10 @@ body {
   transform: rotate(18deg) scale(1.08);
   outline: none;
 }
+.ain-admin-theme-toggle .theme-toggle .ain-stat-label{
+  color:#101827 !important;
+
+}
 
 .ain-topbar {
   display: flex;
@@ -326,7 +330,7 @@ body {
 }
 
 .ain-stat-label {
-  color: var(--ain-text-muted);
+  color: #131b2e;
   font-size: 0.82rem;
   font-weight: 500;
 }
@@ -343,16 +347,16 @@ body {
   font-size: 0.85rem;
 }
 
-.ain-stat-icon-success {
+/* .ain-stat-icon-success {
   background: #e6f7ec;
   color: #2fa860;
-}
+} */
 
 .ain-stat-value {
   font-size: 1.7rem;
   font-weight: 700;
   margin-top: 8px;
-  color: var(--ain-text);
+  color:#1c2033;
 }
 
 /* ---------- Table and chart panels ---------- */
