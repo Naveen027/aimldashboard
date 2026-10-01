@@ -5,8 +5,7 @@ import {
   Routes,
 } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import AuthPage from "./pages/AuthPage";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./admin/AdminDashboard.tsx";
 import Usermanagement from "./admin/Usermanagement";
@@ -29,14 +28,8 @@ function App() {
     <div className={isDarkMode ? "theme-dark" : "theme-light"}>
     <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={<Login />}
-          />
-          <Route
-            path="/signup"
-            element={<Signup />}
-          />
+          <Route path="/" element={<AuthPage mode="login" />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
 
 
           <Route element={<ProtectedRoute allowedRole="user" />}>

@@ -4,8 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import UserSidebar from "../user/UserSidebar";
 import UserHeader from "../user/UserHeader";
 import { useDashboardTheme } from "../user/ThemeToggle";
-import "../css/ApiKeys.css";
-
 function ApiKeys() {
     const { authResponse, logout } = useAuth();
     const navigate = useNavigate();
@@ -28,23 +26,23 @@ function ApiKeys() {
     };
 
     return (
-        <div className={`dashboard-container api-page ${isDarkMode ? "theme-dark" : "theme-light"}`}>
+        <div className={`dashboard-container api-page min-h-screen [--page-bg:#f5f7fb] ${isDarkMode ? "theme-dark" : "theme-light"}`}>
          
             <UserSidebar
                 userName={userName}
                 onLogout={handleLogout}
             />
-            <main className="main-content">
+            <main className="main-content min-h-screen min-w-0 flex-1 bg-transparent ml-[260px] max-[991px]:ml-[240px] max-[767px]:ml-0">
                 <UserHeader
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                 />
-                <div className="api-content container-fluid">
+                <div className={`api-content container-fluid min-h-screen bg-transparent p-[15px] ${isDarkMode ? "[--page-bg:#111827]" : ""}`}>
                     <div className="api-heading d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
-                            <p className="api-eyebrow">Developer settings</p>
-                            <h2 className="mb-1">API Keys</h2>
-                            <p className="text-secondary mb-0">
+                            <p className="api-eyebrow mb-2 text-[15px] font-semibold uppercase text-[#1ba098]">Developer settings</p>
+                            <h2 className={`mb-1 text-[25px] font-bold ${isDarkMode ? "text-[#f3f4f6]" : "text-[#1a2940]"}`}>API Keys</h2>
+                            <p className={`text-secondary mb-0 ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}>
                                 Manage credentials used to connect your applications to Karnataka Ai.
                             </p>
                         </div>
@@ -55,12 +53,12 @@ function ApiKeys() {
 
                     <div className="row g-4 mt-2">
                         <div className="col-12 col-xl-8">
-                            <section className="api-card card border-0 shadow-sm">
+                            <section className={`api-card card rounded-[18px] border-0 shadow-sm ${isDarkMode ? "!bg-[#1f2937] !text-[#f3f4f6]" : ""}`}>
                                 <div className="card-body p-4">
                                     <div className="d-flex justify-content-between align-items-start gap-3">
                                         <div>
                                             <h5 className="card-title">Production key</h5>
-                                            <p className="text-secondary small mb-0">
+                                            <p className={`text-secondary small mb-0 ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}>
                                                 Created for your primary application
                                             </p>
                                         </div>
@@ -70,7 +68,7 @@ function ApiKeys() {
                                     </div>
                                     <div className="api-key-value input-group mt-4">
                                         <input
-                                            className="form-control"
+                                            className="form-control font-mono"
                                             value={revoked ? "This key has been revoked" : apiKey}
                                             readOnly
                                             aria-label="API key"
@@ -85,7 +83,7 @@ function ApiKeys() {
                                         </button>
                                     </div>
                                     <div className="d-flex justify-content-between align-items-center mt-3">
-                                        <small className="text-secondary">Last used today</small>
+                                        <small className={`text-secondary ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}>Last used today</small>
                                         <button
                                             className="btn btn-sm btn-outline-danger"
                                             type="button"
@@ -99,13 +97,13 @@ function ApiKeys() {
                             </section>
                         </div>
                         <div className="col-12 col-xl-4">
-                            <section className="api-card api-security-card card border-0 shadow-sm h-100">
+                            <section className="api-card api-security-card card h-100 rounded-[18px] border-0 bg-[linear-gradient(145deg,#1a2940,#263b5b)] text-white shadow-sm">
                                 <div className="card-body p-4">
                                     <h5 className="card-title">Keep your keys secure</h5>
-                                    <p className="text-secondary small">
+                                    <p className={`text-secondary small ${isDarkMode ? "!text-[#c1c8d3]" : "!text-white/70"}`}>
                                         Never expose an API key in browser code or commit it to source control.
                                     </p>
-                                    <ul className="small text-secondary ps-3 mb-0">
+                                    <ul className={`small text-secondary ps-3 mb-0 ${isDarkMode ? "!text-[#c1c8d3]" : "!text-white/70"}`}>
                                         <li>Store keys in environment variables.</li>
                                         <li>Rotate keys regularly.</li>
                                         <li>Revoke compromised keys immediately.</li>

@@ -117,5 +117,6 @@ export const loginUser = async (
 export const signupUser = async (
     _signupData: SignupData
 ): Promise<void> => {
+    void _signupData;
     // Signup is intentionally local-only; credentials are not persisted.
 };

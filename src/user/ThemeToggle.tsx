@@ -61,7 +61,7 @@ export interface ThemeToggleProps {
 export function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
     return (
         <button
-            className="theme-toggle"
+            className="ml-5 inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-lg transition-[background-color,transform] duration-300 hover:rotate-[18deg] hover:scale-[1.08] hover:bg-[#f5f6fa] focus:rotate-[18deg] focus:scale-[1.08] focus:bg-[#f5f6fa] focus:outline-none max-[768px]:ml-0 [.theme-dark_&]:hover:bg-[#111827] [.theme-dark_&]:focus:bg-[#111827]"
             type="button"
             onClick={onToggle}
             aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}

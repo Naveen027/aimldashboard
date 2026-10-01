@@ -11,7 +11,6 @@ import {
   Legend,
   Filler,
   type ChartOptions,
-  type Plugin,
 } from "chart.js";
 import { Line, Radar, Bar } from "react-chartjs-2";
 import {
@@ -26,7 +25,7 @@ import {
   Activity,
   Radio,
 } from "lucide-react";
-import "../css/AIModelsDashboard.css";
+import { useDashboardTheme } from "./ThemeToggle";
 
 ChartJS.register(
   CategoryScale,
@@ -57,7 +56,7 @@ const MODELS: ModelMeta[] = [
     name: "GPT-4",
     category: "Text Generation",
     description: "Advanced language generation for writing, analysis, and conversation.",
-    color: "#00f0ff",
+    color: "#4285f4",
     icon: <Cpu size={16} />,
   },
   {
@@ -65,7 +64,7 @@ const MODELS: ModelMeta[] = [
     name: "DALL-E 3",
     category: "Image Generation",
     description: "Create detailed images from natural language descriptions.",
-    color: "#ff2fb0",
+    color: "#34a853",
     icon: <ImageIcon size={16} />,
   },
   {
@@ -73,7 +72,7 @@ const MODELS: ModelMeta[] = [
     name: "Whisper",
     category: "Speech-to-Text",
     description: "Transcribe spoken audio accurately into written text.",
-    color: "#ffb020",
+    color: "#fbbc04",
     icon: <Mic size={16} />,
   },
   {
@@ -81,7 +80,7 @@ const MODELS: ModelMeta[] = [
     name: "Codex",
     category: "Code Assistance",
     description: "Generate, explain, and improve code across popular languages.",
-    color: "#39ff88",
+    color: "#1ba098",
     icon: <Code2 size={16} />,
   },
   {
@@ -89,7 +88,7 @@ const MODELS: ModelMeta[] = [
     name: "Stable Diffusion",
     category: "Open-Source Image",
     description: "Generate creative images with a flexible open-source model.",
-    color: "#b26bff",
+    color: "#ea4335",
     icon: <Sparkles size={16} />,
   },
 ];
@@ -182,25 +181,24 @@ function StatCard({
 }) {
   const animated = useCountUp(value ?? 0);
   return (
-    <div className="stat-card" style={{ ["--accent" as any]: accent }}>
-      <div className="stat-card__icon">{icon}</div>
-      <div className="stat-card__body">
-        <span className="stat-card__label">{label}</span>
+    <div className="relative flex min-h-[116px] items-center gap-3.5 overflow-hidden rounded-2xl !border !border-[#eef0f4] border-l-4 bg-[color-mix(in_srgb,var(--accent)_9%,white)] p-[18px_20px] shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-[transform,box-shadow] duration-200 hover:-translate-y-[3px] hover:shadow-[0_8px_20px_rgba(20,30,60,0.1)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]" style={{ ["--accent" as any]: accent, borderLeftColor: accent }}>
+      <div className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_12%,white)] [.theme-dark_&]:!bg-[color-mix(in_srgb,var(--accent)_18%,#1f2937)]">{icon}</div>
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="text-[0.82rem] font-medium text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">{label}</span>
         <span
-          className="stat-card__value"
+          className="text-2xl font-bold text-[var(--accent)]"
           style={valueColor ? { color: valueColor } : undefined}
         >
           {textValue ? (
-            <span className="stat-card__value--text">{textValue}</span>
+            <span className="block truncate text-lg whitespace-nowrap">{textValue}</span>
           ) : (
             <>
               {animated.toLocaleString()}
-              {suffix ? <em>{suffix}</em> : null}
+              {suffix ? <em className="ml-0.5 text-[0.9rem] not-italic opacity-70">{suffix}</em> : null}
             </>
           )}
         </span>
       </div>
-      <div className="stat-card__scan" />
     </div>
   );
 }
@@ -214,7 +212,8 @@ function getOrCreateTooltipEl(chart: any): HTMLDivElement {
   let el = parent.querySelector<HTMLDivElement>(".hud-tooltip");
   if (!el) {
     el = document.createElement("div");
-    el.className = "hud-tooltip";
+    el.className =
+      "hud-tooltip absolute z-20 pointer-events-none min-w-40 px-3 py-2.5 rounded-xl border border-[#eef0f4] bg-white shadow-lg transition-[opacity,left,top] duration-[120ms] opacity-0 [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937]";
     parent.appendChild(el);
   }
   return el;
@@ -239,14 +238,14 @@ function makeExternalTooltip(headFormatter: (ctx: any) => string) {
       const color = p.dataset.borderColor || p.dataset.backgroundColor;
       const raw = p.parsed.y ?? p.parsed.r ?? p.parsed.x ?? 0;
       const unit = p.chart?.config?._config?.__hudUnit ?? "";
-      rows += `<div class="hud-tooltip__row">
-          <span class="dot" style="background:${color}"></span>
-          <span class="hud-tooltip__name">${p.dataset.label}</span>
-          <span class="hud-tooltip__value">${Number(raw).toLocaleString()}${unit}</span>
+      rows += `<div class="flex items-center gap-2 text-[0.78rem] py-0.5 whitespace-nowrap">
+          <span class="inline-block size-2 rounded-full" style="background:${color}"></span>
+          <span class="flex-1 text-[#1c2033] [.theme-dark_&]:text-[#f3f4f6]">${p.dataset.label}</span>
+          <span class="font-bold text-[#3d7bfc]">${Number(raw).toLocaleString()}${unit}</span>
         </div>`;
     });
 
-    el.innerHTML = `<div class="hud-tooltip__head">${headFormatter(context)}</div>${rows}`;
+    el.innerHTML = `<div class="text-[0.68rem] tracking-[0.06em] text-[#667085] mb-1.5 whitespace-nowrap">${headFormatter(context)}</div>${rows}`;
 
     const { offsetLeft: canvasX, offsetTop: canvasY } = chart.canvas;
     const parent = chart.canvas.parentNode as HTMLElement;
@@ -262,23 +261,14 @@ function makeExternalTooltip(headFormatter: (ctx: any) => string) {
 
 /* Glow plugin: adds a soft canvas shadow behind lines/points/bars so the
    sci-fi accent colors read as glowing rather than flat vector strokes. */
-const glowPlugin: Plugin<"line" | "radar" | "bar"> = {
-  id: "glow",
-  beforeDatasetsDraw(chart) {
-    chart.ctx.save();
-    chart.ctx.shadowColor = "rgba(0, 240, 255, 0.35)";
-    chart.ctx.shadowBlur = 10;
-  },
-  afterDatasetsDraw(chart) {
-    chart.ctx.restore();
-  },
-};
-
 /* ------------------------------------------------------------------ */
 /*  Main dashboard                                                      */
 /* ------------------------------------------------------------------ */
 
 export default function AIModelsDashboard() {
+  const { isDarkMode } = useDashboardTheme();
+  const chartTextColor = isDarkMode ? "#c1c8d3" : "#667085";
+  const chartGridColor = isDarkMode ? "#374151" : "#eef0f4";
   const stats = useMemo(buildStats, []);
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const hoverTimeoutRef = useRef<number | undefined>(undefined);
@@ -338,10 +328,10 @@ export default function AIModelsDashboard() {
       legend: {
         position: "top",
         labels: {
-          color: "#9db3d4",
+          color: chartTextColor,
           usePointStyle: true,
           pointStyle: "rectRounded",
-          font: { family: "var(--font-mono)", size: 11 },
+          font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 },
         },
       },
       tooltip: {
@@ -352,14 +342,14 @@ export default function AIModelsDashboard() {
     },
     scales: {
       x: {
-        grid: { color: "rgba(0,240,255,0.08)", display: true },
-        ticks: { color: "#5a6b8c", font: { family: "var(--font-mono)", size: 11 } },
+        grid: { color: chartGridColor, display: true },
+        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
       },
       y: {
-        grid: { color: "rgba(0,240,255,0.08)" },
+        grid: { color: chartGridColor },
         ticks: {
-          color: "#5a6b8c",
-          font: { family: "var(--font-mono)", size: 11 },
+          color: chartTextColor,
+          font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 },
           callback: (v) => `${v}K`,
         },
       },
@@ -397,9 +387,9 @@ export default function AIModelsDashboard() {
       r: {
         min: 0,
         max: 100,
-        angleLines: { color: "rgba(0,240,255,0.15)" },
-        grid: { color: "rgba(0,240,255,0.15)" },
-        pointLabels: { color: "#9db3d4", font: { family: "var(--font-mono)", size: 11 } },
+        angleLines: { color: chartGridColor },
+        grid: { color: chartGridColor },
+        pointLabels: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
         ticks: { display: false, backdropColor: "transparent" },
       },
     },
@@ -434,98 +424,96 @@ export default function AIModelsDashboard() {
     },
     scales: {
       x: {
-        grid: { color: "rgba(0,240,255,0.08)" },
-        ticks: { color: "#5a6b8c", font: { family: "var(--font-mono)", size: 11 }, callback: (v) => `${v}h` },
+        grid: { color: chartGridColor },
+        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 }, callback: (v) => `${v}h` },
       },
       y: {
         grid: { display: false },
-        ticks: { color: "#5a6b8c", font: { family: "var(--font-mono)", size: 11 } },
+        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
       },
     },
   };
 
   return (
-    <div className="dashboard">
-      <div className="dashboard__grid" />
+    <div className="relative min-h-screen overflow-x-hidden p-0 text-[#1c2033] [.theme-dark_&]:text-[#f3f4f6]">
 
-      <header className="dashboard__header">
+      <header className="relative z-[2] mb-5 flex flex-wrap items-start justify-between gap-4 max-[560px]:flex-col">
         <div>
-          <span className="eyebrow">
-            <Radio size={12} className="pulse-icon" /> LIVE TELEMETRY
+          <span className="mb-2.5 inline-flex items-center gap-1.5 text-[15px] font-semibold uppercase text-[#1ba098]">
+            <Radio size={14} /> Model usage
           </span>
-          <h2 className="eyebrowh2">AI Model Command Deck</h2>
-          <p>Usage across all connected models, updated in real time.</p>
+          <h2 className="m-0 text-[25px] font-bold">AI model activity</h2>
+          <p className="mb-0 mt-2 text-[0.92rem] text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Usage across your connected models, updated in real time.</p>
         </div>
-        <div className="dashboard__clock">{clock.toLocaleTimeString([], { hour12: false })}</div>
+        <div className="rounded-xl border border-[#eef0f4] bg-white px-4 py-2.5 text-xl font-semibold tabular-nums text-[#3d7bfc] shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937]">{clock.toLocaleTimeString([], { hour12: false })}</div>
       </header>
 
-      <section className="stat-strip">
-        <StatCard icon={<Zap size={18} />} label="Total tokens processed" value={totalTokens} suffix="K" accent="#00f0ff" />
-        <StatCard icon={<Activity size={18} />} label="Total requests" value={totalRequests} accent="#39ff88" valueColor="#17c717" />
-        <StatCard icon={<CalendarDays size={18} />} label="Days monitored" value={daysMonitored} accent="#ffb020" />
+      <section className="relative z-[2] mb-6 grid grid-cols-4 gap-3 max-[980px]:grid-cols-2 max-[560px]:grid-cols-1">
+        <StatCard icon={<Zap size={18} />} label="Total tokens processed" value={totalTokens} suffix="K" accent="#4285f4" />
+        <StatCard icon={<Activity size={18} />} label="Total requests" value={totalRequests} accent="#34a853" />
+        <StatCard icon={<CalendarDays size={18} />} label="Days monitored" value={daysMonitored} accent="#fbbc04" />
         <StatCard icon={topModel.meta.icon} label="Most used model" textValue={topModel.meta.name} accent={topModel.meta.color} />
       </section>
 
-      <section className="panel">
-        <div className="panel__head">
-          <h2>Token Throughput — Last 14 Days</h2>
-          <span className="panel__sub">Click a legend tag to isolate a model</span>
+      <section className="relative z-[2] mb-5 rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
+        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
+          <h2 className="m-0 text-base font-semibold">Token throughput — last 14 days</h2>
+          <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Click a legend tag to isolate a model</span>
         </div>
-        <div className="chart-shell" style={{ height: 320 }}>
-          <Line data={lineData} options={lineOptions} plugins={[glowPlugin]} />
+        <div className="relative" style={{ height: 320 }}>
+          <Line data={lineData} options={lineOptions} />
         </div>
       </section>
 
-      <section className="panel-row">
-        <div className="panel panel--radar">
-          <div className="panel__head">
-            <h2>Capability Matrix</h2>
-            <span className="panel__sub">Hover a vertex for exact scores</span>
+      <section className="relative z-[2] mb-5 grid grid-cols-[1.1fr_0.9fr] gap-4 max-[980px]:grid-cols-1">
+        <div className="relative z-[2] rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
+          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="m-0 text-base font-semibold">Capability matrix</h2>
+            <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hover a vertex for exact scores</span>
           </div>
-          <div className="radar-wrap">
-            <div className="radar-sweep" />
-            <div className="chart-shell" style={{ height: 340 }}>
-              <Radar data={radarData} options={radarOptions} plugins={[glowPlugin]} />
+          <div className="relative overflow-hidden rounded-xl">
+            <div className="relative z-[1]" style={{ height: 340 }}>
+              <Radar data={radarData} options={radarOptions} />
             </div>
           </div>
-          <div className="radar-legend">
+          <div className="mt-2.5 flex flex-wrap gap-x-[18px] gap-y-3 text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">
             {stats.map((s) => (
-              <span key={s.meta.id} className="radar-legend__item">
-                <span className="dot" style={{ background: s.meta.color }} />
+              <span key={s.meta.id} className="inline-flex items-center gap-1.5">
+                <span className="inline-block size-2 rounded-full" style={{ background: s.meta.color }} />
                 {s.meta.name}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="panel panel--bar">
-          <div className="panel__head">
-            <h2>Time Allocation</h2>
-            <span className="panel__sub">Hours spent per model</span>
+        <div className="relative z-[2] rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
+          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="m-0 text-base font-semibold">Time allocation</h2>
+            <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hours spent per model</span>
           </div>
-          <div className="chart-shell" style={{ height: 340 }}>
-            <Bar data={barData} options={barOptions} plugins={[glowPlugin]} />
+          <div className="relative" style={{ height: 340 }}>
+            <Bar data={barData} options={barOptions} />
           </div>
         </div>
       </section>
 
-      <section className="panel">
-        <div className="panel__head">
-          <h2>Model Registry</h2>
-          <span className="panel__sub">Hover a row for full diagnostics</span>
+      <section className="relative z-[2] mb-5 rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
+        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
+          <h2 className="m-0 text-base font-semibold">Model registry</h2>
+          <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hover a row for full diagnostics</span>
         </div>
-        <div className="table-wrap">
-          <table className="hud-table">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-[0.85rem]">
             <thead>
               <tr>
-                <th>Model</th>
-                <th>Category</th>
-                <th>Tokens</th>
-                <th>Time spent</th>
-                <th>Days active</th>
-                <th>Requests</th>
-                <th>Last used</th>
-                <th>Status</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Model</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Category</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Tokens</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Time spent</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Days active</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Requests</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Last used</th>
+                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -535,38 +523,37 @@ export default function AIModelsDashboard() {
                 return (
                   <React.Fragment key={s.meta.id}>
                     <tr
-                      className={`hud-row ${isHover ? "hud-row--active" : ""}`}
-                      style={{ ["--row-accent" as any]: s.meta.color }}
+                      className={`border-l-2 border-transparent transition-colors duration-150 hover:bg-[#fafbfd] [.theme-dark_&]:hover:bg-[#273449] ${isHover ? "border-l-[#3d7bfc] bg-[#fafbfd] [.theme-dark_&]:bg-[#273449]" : ""}`}
                       onMouseEnter={() => showRowDetails(s.meta.id)}
                       onMouseLeave={hideRowDetails}
                     >
-                      <td className="hud-row__model">
-                        <span className="model-icon">{s.meta.icon}</span>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] transition-colors [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">
+                        <span className="mr-2 inline-grid place-items-center text-[#3d7bfc]">{s.meta.icon}</span>
                         {s.meta.name}
                       </td>
-                      <td>{s.meta.category}</td>
-                      <td>{s.totalTokens.toLocaleString()}K</td>
-                      <td>{s.timeSpentHours}h</td>
-                      <td>{s.daysActive}/30</td>
-                      <td>{s.requests.toLocaleString()}</td>
-                      <td>{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
-                      <td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.meta.category}</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.totalTokens.toLocaleString()}K</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.timeSpentHours}h</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.daysActive}/30</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.requests.toLocaleString()}</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
+                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">
                         {isTop ? (
-                          <span className="badge badge--top">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#fff6e5] px-2.5 py-1 text-[0.68rem] font-semibold text-[#a3690f]">
                             <Zap size={11} /> Most used
                           </span>
                         ) : (
-                          <span className="badge">Active</span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#e8f5f3] px-2.5 py-1 text-[0.68rem] font-semibold text-[#1ba098]">Active</span>
                         )}
                       </td>
                     </tr>
                     <tr
-                      className={`hud-detail-row ${isHover ? "hud-detail-row--active" : ""}`}
+                      className={`transition-[height,padding] duration-[250ms] [&>td]:h-0 [&>td]:px-3 [&>td]:py-0 [&>td]:border-b [&>td]:border-white/[0.04] ${isHover ? "[&>td]:h-[34px] [&>td]:pb-3.5" : ""}`}
                       onMouseEnter={() => showRowDetails(s.meta.id)}
                       onMouseLeave={hideRowDetails}
                     >
                         <td colSpan={8}>
-                          <div className={`hud-detail ${isHover ? "hud-detail--active" : ""}`}>
+                          <div className={`flex items-center gap-2 text-[0.82rem] text-[#7f93bd] max-h-0 opacity-0 overflow-hidden -translate-y-1 transition-[opacity,max-height,transform] duration-[250ms] [.theme-light_&]:text-[#53657b] ${isHover ? "max-h-[30px] opacity-100 translate-y-0" : ""}`}>
                             <Clock size={13} />
                             {s.meta.description}
                           </div>
