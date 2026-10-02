@@ -12,16 +12,16 @@ import {
 } from "./user/ThemeToggle";
 
 const AuthPage = lazy(() => import("./pages/AuthPage"));
-const UserDashboard = lazy(() => import("./pages/UserDashboard"));
+const UserDashboard = lazy(() => import("./user/UserDashboard"));
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard"));
 const Usermanagement = lazy(() => import("./admin/Usermanagement"));
 const Modelcontrol = lazy(() => import("./admin/Modelcontrol"));
 const Adminbilling = lazy(() => import("./admin/Adminbilling"));
 const Globalsettings = lazy(() => import("./admin/Globalsettings"));
 const Systemlogs = lazy(() => import("./admin/Systemlogs"));
-const ApiKeys = lazy(() => import("./pages/ApiKeys"));
-const Support = lazy(() => import("./pages/Support"));
-const Billing = lazy(() => import("./pages/Billing"));
+const ApiKeys = lazy(() => import("./user/ApiKeys"));
+const Support = lazy(() => import("./user/Support"));
+const Billing = lazy(() => import("./user/Billing"));
 
 function App() {
   const { isDarkMode } = useDashboardTheme();

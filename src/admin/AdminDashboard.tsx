@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   BarChart,
   Bar,
@@ -85,7 +86,7 @@ const usageRows: UsageRow[] = [
     usage: "470K",
     usagePct: 62,
   },
-    {
+  {
     id: 7,
     name: "Alex Johnson",
     initials: "AJ",
@@ -95,7 +96,7 @@ const usageRows: UsageRow[] = [
     usage: "270K",
     usagePct: 78,
   },
-    {
+  {
     id: 8,
     name: "Mia Wong",
     initials: "MW",
@@ -105,7 +106,7 @@ const usageRows: UsageRow[] = [
     usage: "270K",
     usagePct: 78,
   },
-    {
+  {
     id: 9,
     name: "Alex Johnson",
     initials: "AJ",
@@ -116,6 +117,71 @@ const usageRows: UsageRow[] = [
     usagePct: 78,
   },
 ];
+
+/* -------------------------------------------------------------------------- */
+/*  User profile details (replace with API data, e.g. getUserDetails(userId)) */
+/* -------------------------------------------------------------------------- */
+interface UserProfile {
+  email: string;
+  phone: string;
+  role: string;
+  department: string;
+  location: string;
+  joined: string;
+  plan: string;
+  status: "Active" | "Idle";
+}
+
+const userProfiles: Record<string, UserProfile> = {
+  "Alex Johnson": {
+    email: "alex.johnson@tidepool.ai",
+    phone: "+1 415 555 0142",
+    role: "Data Scientist",
+    department: "Research",
+    location: "San Francisco, USA",
+    joined: "12 Jan 2024",
+    plan: "Enterprise",
+    status: "Active",
+  },
+  "Mia Wong": {
+    email: "mia.wong@tidepool.ai",
+    phone: "+65 6555 0187",
+    role: "ML Engineer",
+    department: "Platform",
+    location: "Singapore",
+    joined: "03 Mar 2023",
+    plan: "Pro",
+    status: "Active",
+  },
+  "Mana Tuung": {
+    email: "mana.tuung@tidepool.ai",
+    phone: "+81 3 5555 0123",
+    role: "Product Analyst",
+    department: "Product",
+    location: "Tokyo, Japan",
+    joined: "21 Aug 2024",
+    plan: "Team",
+    status: "Idle",
+  },
+};
+
+const fallbackProfile: UserProfile = {
+  email: "—",
+  phone: "—",
+  role: "—",
+  department: "—",
+  location: "—",
+  joined: "—",
+  plan: "—",
+  status: "Idle",
+};
+
+// Sample per-row metrics derived from the row id (replace with real API fields)
+const getRowMetrics = (row: UsageRow) => ({
+  avgLatency: `${180 + ((row.id * 37) % 200)} ms`,
+  successRate: `${(97 + (row.id % 3) * 0.8).toFixed(1)}%`,
+  requests: `${(row.usagePct * 112 + row.id * 37).toLocaleString()}`,
+});
 
 const modelPerformance = [
   [82, 45, 60],
@@ -184,6 +250,300 @@ const ALL = "All models";
 const cardBase =
   "rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-slate-700/60 dark:bg-slate-800";
 
+/* -------------------------------------------------------------------------- */
+/*  User detail modal                                                         */
+/* -------------------------------------------------------------------------- */
+const CLOSE_DURATION = 250; // ms — keep in sync with duration-250 below
+
+interface UserDetailModalProps {
+  row: UsageRow;
+  onClose: () => void;
+}
+
+const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
+  const [visible, setVisible] = useState(false);
+  const closeTimer = useRef<number | null>(null);
+
+  const profile = userProfiles[row.name] ?? fallbackProfile;
+  const metrics = getRowMetrics(row);
+
+  const recentActivity = [
+    { icon: "bi-chat-dots-fill", text: `Chat completion on ${row.model}`, time: row.lastActivity },
+    { icon: "bi-file-earmark-text-fill", text: "Document summarisation request", time: "2 hours ago" },
+    { icon: "bi-key-fill", text: "API key rotated", time: "Yesterday" },
+    { icon: "bi-box-arrow-in-right", text: "Signed in from a new device", time: "3 days ago" },
+  ];
+
+  // Play the enter animation after first paint
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Animate out, then unmount
+  const handleClose = () => {
+    if (closeTimer.current) return;
+    setVisible(false);
+    closeTimer.current = window.setTimeout(onClose, CLOSE_DURATION);
+  };
+
+  // Escape to close + lock background scroll
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    const prevPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      document.body.style.paddingRight = prevPaddingRight;
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Staggered reveal for each section inside the panel
+  const stagger = (i: number): React.CSSProperties => ({
+    transitionDelay: visible ? `${120 + i * 70}ms` : "0ms",
+  });
+  const sectionAnim = `transition-all duration-500 ease-out motion-reduce:transition-none ${
+    visible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+  }`;
+
+  const infoItems: { icon: string; label: string; value: string }[] = [
+    { icon: "bi-envelope", label: "Email", value: profile.email },
+    { icon: "bi-telephone", label: "Phone", value: profile.phone },
+    { icon: "bi-briefcase", label: "Role", value: profile.role },
+    { icon: "bi-diagram-3", label: "Department", value: profile.department },
+    { icon: "bi-geo-alt", label: "Location", value: profile.location },
+    { icon: "bi-calendar-check", label: "Joined", value: profile.joined },
+  ];
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="user-detail-title"
+    >
+      {/* Backdrop */}
+      <div
+        onClick={handleClose}
+        className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-[250ms] ease-out motion-reduce:transition-none ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      />
+
+      {/* Panel */}
+      <div
+        className={`relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-[250ms] ease-out motion-reduce:transition-none dark:border-slate-700 dark:bg-slate-800 ${
+          visible
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-6 scale-95 opacity-0"
+        }`}
+      >
+        {/* Header */}
+        <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 px-5 pb-2 pt-5 sm:px-7 sm:pb-6 sm:pt-6">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 [border-radius:10px]! bg-white/10" />
+          <div className="pointer-events-none absolute -bottom-12 right-24 h-28 w-28 [border-radius:10px]! bg-white/10" />
+
+          {/* Close (X) button — rotates, scales and turns rose on hover */}
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="Close user details"
+            className="group absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center [border-radius:10px]! bg-white/15 text-white transition-all duration-300 ease-out hover:rotate-90 hover:scale-110 hover:bg-rose-500 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 motion-reduce:transition-none motion-reduce:hover:rotate-0 sm:right-4 sm:top-4"
+          >
+            <i className="bi bi-x-lg text-base transition-transform duration-300 group-hover:scale-110" />
+          </button>
+
+          <div className="relative flex items-center gap-4">
+            <span
+              className={`flex h-16 w-16 shrink-0 items-center justify-center [border-radius:10px]! text-xl font-bold text-slate-800 ring-4 ring-white/40 transition-all duration-500 ease-out motion-reduce:transition-none sm:h-20 sm:w-20 sm:text-2xl ${
+                visible ? "scale-100 opacity-100" : "scale-50 opacity-0"
+              }`}
+              style={{ background: row.color, transitionDelay: visible ? "100ms" : "0ms" }}
+            >
+              {row.initials}
+            </span>
+            <div className="min-w-0 pr-10">
+              <h3
+                id="user-detail-title"
+                className="truncate text-lg font-bold text-white sm:text-2xl"
+              >
+                {row.name}
+              </h3>
+              <p className="truncate text-sm text-indigo-100">
+                {profile.role} · {profile.department}
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 [border-radius:10px]! px-2.5 py-0.5 text-xs font-medium ${
+                    profile.status === "Active"
+                      ? "bg-emerald-400/20 text-emerald-100"
+                      : "bg-amber-400/20 text-amber-100"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 [border-radius:10px]! ${
+                      profile.status === "Active"
+                        ? "animate-pulse bg-emerald-300"
+                        : "bg-amber-300"
+                    }`}
+                  />
+                  {profile.status}
+                </span>
+                <span className="[border-radius:10px]! bg-white/15 px-2.5 py-0.5 text-xs font-medium text-white">
+                  {profile.plan} plan
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 space-y-5 overflow-y-auto px-3 py-3 sm:px-7 sm:py-6">
+          {/* Usage stats */}
+          <section className={sectionAnim} style={stagger(0)}>
+            <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
+              Usage summary
+            </h4>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: "API usage", value: row.usage },
+                { label: "Requests", value: metrics.requests },
+                { label: "Avg latency", value: metrics.avgLatency },
+                { label: "Success rate", value: metrics.successRate },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-700/40"
+                >
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    {s.label}
+                  </div>
+                  <div className="mt-0.5 truncate text-base font-bold text-slate-900 sm:text-lg dark:text-white">
+                    {s.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4">
+              <div className="mb-1.5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <span>Quota used</span>
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  {row.usagePct}%
+                </span>
+              </div>
+              <div className="h-2.5 w-full overflow-hidden [border-radius:10px]! bg-slate-100 dark:bg-slate-700">
+                <div
+                  className="h-full [border-radius:10px]! bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-1000 ease-out motion-reduce:transition-none"
+                  style={{
+                    width: visible ? `${row.usagePct}%` : "0%",
+                    transitionDelay: visible ? "400ms" : "0ms",
+                  }}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Current model */}
+          <section className={sectionAnim} style={stagger(1)}>
+            <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
+              Current model
+            </h4>
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-4 py-3 dark:border-slate-700">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                  <i className="bi bi-cpu-fill" />
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                    {row.model}
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Last activity {row.lastActivity}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Contact / profile info */}
+          <section className={sectionAnim} style={stagger(2)}>
+            <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
+              Profile details
+            </h4>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {infoItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2.5 dark:border-slate-700/60"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+                    <i className={`bi ${item.icon}`} />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-xs text-slate-400">{item.label}</div>
+                    <div className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
+                      {item.value}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Recent activity */}
+          <section className={sectionAnim} style={stagger(3)}>
+            <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
+              Recent activity
+            </h4>
+            <ul className="space-y-3">
+              {recentActivity.map((a, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center [border-radius:10px]! bg-indigo-50 text-sm text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
+                    <i className={`bi ${a.icon}`} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm text-slate-800 dark:text-slate-100">
+                      {a.text}
+                    </div>
+                    <div className="text-xs text-slate-400">{a.time}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="flex shrink-0 justify-end gap-2 border-t border-slate-100 px-5 py-3 sm:px-7 dark:border-slate-700/60">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-[10px]! border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+/* -------------------------------------------------------------------------- */
+/*  Dashboard                                                                 */
+/* -------------------------------------------------------------------------- */
 const AdminDashboard: React.FC = () => {
   const { authResponse } = useAuth();
   const adminUsername = authResponse?.username || "Admin";
@@ -192,6 +552,9 @@ const AdminDashboard: React.FC = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [modelFilter, setModelFilter] = useState<string>(ALL);
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // ---- User detail modal state ----
+  const [selectedRow, setSelectedRow] = useState<UsageRow | null>(null);
 
   const modelOptions = useMemo(
     () => [ALL, ...Array.from(new Set(usageRows.map((r) => r.model)))],
@@ -233,6 +596,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <AdminLayout>
+
       <div className="mx-auto w-full max-w-[1520px] px-0 py-2 sm:px-1">
         {/* Top bar */}
         <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
@@ -251,7 +615,7 @@ const AdminDashboard: React.FC = () => {
         </p>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        <div className="grid grid-cols-1 [height:100px]! gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
           {statCards.map((card) => (
             <div
               key={card.label}
@@ -282,7 +646,7 @@ const AdminDashboard: React.FC = () => {
           {/* User usage table */}
           <div className="min-w-0 xl:col-span-7">
             <div className={`${cardBase} flex h-full flex-col p-4 sm:p-6`}>
-              <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
+              <h5 className="mb-3 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
                 User Usage Overview
               </h5>
 
@@ -306,7 +670,7 @@ const AdminDashboard: React.FC = () => {
                     <i className="bi bi-funnel" />
                     Filters
                     {filterActive && (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-600 px-1 text-[11px] font-semibold text-white">
+                      <span className="flex h-5 min-w-5 items-center justify-center [border-radius:10px]! bg-indigo-600 px-1 text-[11px] font-semibold text-white">
                         1
                       </span>
                     )}
@@ -381,7 +745,7 @@ const AdminDashboard: React.FC = () => {
                         <td className="px-1 py-3 sm:px-2 sm:py-3.5">
                           <div className="flex items-center gap-2.5 sm:gap-3">
                             <span
-                              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-slate-800 sm:h-9 sm:w-9 sm:text-xs"
+                              className="flex h-8 w-8 shrink-0 items-center justify-center [border-radius:10px]! text-[11px] font-semibold text-slate-800 sm:h-9 sm:w-9 sm:text-xs"
                               style={{ background: row.color }}
                             >
                               {row.initials}
@@ -414,16 +778,23 @@ const AdminDashboard: React.FC = () => {
                             <span className="text-sm font-medium text-slate-700 min-[420px]:w-12 dark:text-slate-200">
                               {row.usage}
                             </span>
-                            <div className="h-2 w-14 overflow-hidden rounded-full bg-slate-100 sm:w-20 lg:w-24 dark:bg-slate-700">
+                            <div className="h-2 w-14 overflow-hidden [border-radius:10px]! bg-slate-100 sm:w-20 lg:w-24 dark:bg-slate-700">
                               <div
-                                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
+                                className="h-full [border-radius:10px]! bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
                                 style={{ width: `${row.usagePct}%` }}
                               />
                             </div>
                           </div>
                         </td>
-                        <td className="px-1 py-3 text-right text-slate-400 sm:px-2 sm:py-3.5">
-                          <i className="bi bi-chevron-right" />
+                        <td className="px-1 py-3 text-right sm:px-2 sm:py-3.5">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedRow(row)}
+                            aria-label={`View details for ${row.name}`}
+                            className="inline-flex h-8 w-8 items-center justify-center [border-radius:10px]! text-slate-400 transition-all duration-200 hover:translate-x-0.5 hover:bg-indigo-50 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-300"
+                          >
+                            <i className="bi bi-chevron-right" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -550,9 +921,9 @@ const AdminDashboard: React.FC = () => {
                         {formatCalls(m.value)}
                       </span>
                     </div>
-                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+                    <div className="h-2.5 w-full overflow-hidden [border-radius:10px]! bg-slate-100 dark:bg-slate-700">
                       <div
-                        className={`h-full rounded-full bg-gradient-to-r ${m.color} transition-all duration-700`}
+                        className={`h-full [border-radius:10px]! bg-gradient-to-r ${m.color} transition-all duration-700`}
                         style={{ width: `${(m.value / maxCalls) * 100}%` }}
                       />
                     </div>
@@ -563,6 +934,15 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* User detail modal */}
+      {selectedRow && (
+        <UserDetailModal
+          key={selectedRow.id}
+          row={selectedRow}
+          onClose={() => setSelectedRow(null)}
+        />
+      )}
     </AdminLayout>
   );
 };

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import { useAuth } from "../context/AuthContext";
-import UserSidebar from "../user/UserSidebar";
-import UserHeader from "../user/UserHeader";
-import { useDashboardTheme } from "../user/ThemeToggle";
+import UserSidebar from "./UserSidebar";
+import UserHeader from "./UserHeader";
+import { useDashboardTheme } from "./ThemeToggle";
 const invoices = [
     { date: "Sep 01, 2026", number: "INV-2026-09", amount: "₹4,690", status: "Paid" },
     { date: "Aug 01, 2026", number: "INV-2026-08", amount: "₹4,690", status: "Paid" },

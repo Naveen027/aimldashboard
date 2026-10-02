@@ -69,9 +69,9 @@ const SystemLogs: React.FC = () => {
       timestamp: '2024-09-22 14:10:22',
       user: 'System',
       action: 'Error Detected',
-      resource: 'API Endpoint',
+      resource: aiModelCatalog[3].name,
       status: 'error',
-      details: 'Connection timeout: OpenAI API - Retrying...',
+      details: `Connection timeout: ${aiModelCatalog[3].name} API - Retrying...`,
       ipAddress: 'N/A',
     },
     {
@@ -89,9 +89,9 @@ const SystemLogs: React.FC = () => {
       timestamp: '2024-09-22 13:58:45',
       user: 'System',
       action: 'Model Deployment',
-      resource: 'Claude 3.5 Sonnet',
+      resource: aiModelCatalog[4].name,
       status: 'success',
-      details: 'New model version deployed: 3.5-20240920',
+      details: `Deployment completed: ${aiModelCatalog[4].description}`,
       ipAddress: 'N/A',
     },
   ]);

@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import UserSidebar from "../user/UserSidebar";
-import UserHeader from "../user/UserHeader";
-import { useDashboardTheme } from "../user/ThemeToggle";
+import UserSidebar from "./UserSidebar";
+import UserHeader from "./UserHeader";
+import { useDashboardTheme } from "./ThemeToggle";
 function Support() {
     const { authResponse, logout } = useAuth();
     const navigate = useNavigate();

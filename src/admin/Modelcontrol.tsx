@@ -345,7 +345,7 @@ const ModelControl: React.FC = () => {
                     className={inputCls}
                     value={modelFormData.provider || ''}
                     onChange={(e) => setModelFormData({ ...modelFormData, provider: e.target.value })}
-                    placeholder="e.g., OpenAI"
+                    placeholder="e.g., Karnataka AI Cell"
                   />
                 </div>
               </div>
