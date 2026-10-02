@@ -347,7 +347,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
           }`}
       >
         {/* Header */}
-        <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 px-5 pb-2 pt-5 sm:px-7 sm:pb-6 sm:pt-6">
+        <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 px-4 pb-3 pt-3 sm:px-7 sm:pb-6 sm:pt-6">
           <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 [border-radius:10px]! bg-white/10" />
           <div className="pointer-events-none absolute -bottom-12 right-24 h-28 w-28 [border-radius:10px]! bg-white/10" />
 
