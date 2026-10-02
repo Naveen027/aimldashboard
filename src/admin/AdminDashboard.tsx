@@ -218,8 +218,8 @@ const formatCalls = (n: number) =>
   n >= 1_000_000
     ? `${(n / 1_000_000).toFixed(1)}M`
     : n >= 1_000
-    ? `${(n / 1_000).toFixed(1)}K`
-    : String(n);
+      ? `${(n / 1_000).toFixed(1)}K`
+      : String(n);
 
 const statCards = [
   {
@@ -313,9 +313,8 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
   const stagger = (i: number): React.CSSProperties => ({
     transitionDelay: visible ? `${120 + i * 70}ms` : "0ms",
   });
-  const sectionAnim = `transition-all duration-500 ease-out motion-reduce:transition-none ${
-    visible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
-  }`;
+  const sectionAnim = `transition-all duration-500 ease-out motion-reduce:transition-none ${visible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+    }`;
 
   const infoItems: { icon: string; label: string; value: string }[] = [
     { icon: "bi-envelope", label: "Email", value: profile.email },
@@ -336,18 +335,16 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
       {/* Backdrop */}
       <div
         onClick={handleClose}
-        className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-[250ms] ease-out motion-reduce:transition-none ${
-          visible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 bg-slate-900/50 transition-opacity duration-[250ms] ease-out motion-reduce:transition-none ${visible ? "opacity-100" : "opacity-0"
+          }`}
       />
 
       {/* Panel */}
       <div
-        className={`relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-[250ms] ease-out motion-reduce:transition-none dark:border-slate-700 dark:bg-slate-800 ${
-          visible
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-6 scale-95 opacity-0"
-        }`}
+        className={`relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-[250ms] ease-out motion-reduce:transition-none dark:border-slate-700 dark:bg-slate-800 ${visible
+          ? "translate-y-0 scale-100 opacity-100"
+          : "translate-y-6 scale-95 opacity-0"
+          }`}
       >
         {/* Header */}
         <div className="relative shrink-0 overflow-hidden bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 px-5 pb-2 pt-5 sm:px-7 sm:pb-6 sm:pt-6">
@@ -366,9 +363,8 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
 
           <div className="relative flex items-center gap-4">
             <span
-              className={`flex h-16 w-16 shrink-0 items-center justify-center [border-radius:10px]! text-xl font-bold text-slate-800 ring-4 ring-white/40 transition-all duration-500 ease-out motion-reduce:transition-none sm:h-20 sm:w-20 sm:text-2xl ${
-                visible ? "scale-100 opacity-100" : "scale-50 opacity-0"
-              }`}
+              className={`flex h-16 w-16 shrink-0 items-center justify-center [border-radius:10px]! text-xl font-bold text-slate-800 ring-4 ring-white/40 transition-all duration-500 ease-out motion-reduce:transition-none sm:h-20 sm:w-20 sm:text-2xl ${visible ? "scale-100 opacity-100" : "scale-50 opacity-0"
+                }`}
               style={{ background: row.color, transitionDelay: visible ? "100ms" : "0ms" }}
             >
               {row.initials}
@@ -385,18 +381,16 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span
-                  className={`inline-flex items-center gap-1.5 [border-radius:10px]! px-2.5 py-0.5 text-xs font-medium ${
-                    profile.status === "Active"
-                      ? "bg-emerald-400/20 text-emerald-100"
-                      : "bg-amber-400/20 text-amber-100"
-                  }`}
+                  className={`inline-flex items-center gap-1.5 [border-radius:10px]! px-2.5 py-0.5 text-xs font-medium ${profile.status === "Active"
+                    ? "bg-emerald-400/20 text-emerald-100"
+                    : "bg-amber-400/20 text-amber-100"
+                    }`}
                 >
                   <span
-                    className={`h-1.5 w-1.5 [border-radius:10px]! ${
-                      profile.status === "Active"
-                        ? "animate-pulse bg-emerald-300"
-                        : "bg-amber-300"
-                    }`}
+                    className={`h-1.5 w-1.5 [border-radius:10px]! ${profile.status === "Active"
+                      ? "animate-pulse bg-emerald-300"
+                      : "bg-amber-300"
+                      }`}
                   />
                   {profile.status}
                 </span>
@@ -615,7 +609,7 @@ const AdminDashboard: React.FC = () => {
         </p>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-1 [height:100px]! gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        <div className="grid grid-cols-1  mb-3 [height:100px]! gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
           {statCards.map((card) => (
             <div
               key={card.label}
@@ -640,12 +634,117 @@ const AdminDashboard: React.FC = () => {
             </div>
           ))}
         </div>
+        {/* Right column: Model performance + Calls by model */}
+        <div className="flex min-w-0 flex-col gap-3 sm:gap-5 xl:col-span-5">
+          {/* Model performance chart */}
+          <div className={`${cardBase} flex flex-col p-4 sm:p-6`}>
+            <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
+              Model Performance
+            </h5>
+
+            <div className="mb-3 flex items-center justify-between sm:mb-4">
+              <span className="text-sm font-medium text-slate-500 sm:text-[15px] dark:text-slate-400">
+                Real-time metrics chart
+              </span>
+              <i className="bi bi-three-dots cursor-pointer text-slate-400 hover:text-slate-600" />
+            </div>
+
+            <div className="mb-4 grid grid-cols-3 gap-2 text-center">
+              {callsByModel.slice(0, 3).map((m) => (
+                <div
+                  key={m.label}
+                  className="min-w-0 rounded-xl bg-slate-50 px-1.5 py-2.5 sm:px-2 sm:py-3 dark:bg-slate-700/40"
+                >
+                  <div className="truncate text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
+                    {m.label}
+                  </div>
+                  <div className="truncate text-base font-bold text-slate-900 sm:text-lg dark:text-white">
+                    {formatCalls(m.value)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Height scales with screen size; chart fills it */}
+            <div className="h-[240px] w-full sm:h-[260px] xl:h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  barGap={8}
+                  barCategoryGap="20%"
+                  margin={{ top: 4, right: 8, left: -12, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    vertical={false}
+                    stroke="var(--ain-chart-grid, #eef0f4)"
+                  />
+                  <XAxis
+                    dataKey="name"
+                    tickLine={false}
+                    axisLine={false}
+                    interval={0}
+                    tick={{ fill: "var(--ain-text-muted, #64748b)", fontSize: 11 }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    width={40}
+                    tick={{ fill: "var(--ain-text-muted, #64748b)", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "var(--ain-chart-cursor, rgba(99,102,241,0.06))" }}
+                    contentStyle={{
+                      maxWidth: 220,
+                      padding: "6px 8px",
+                      borderRadius: 8,
+                      border: "1px solid var(--ain-border, #e2e8f0)",
+                      backgroundColor: "var(--ain-surface, #fff)",
+                      color: "var(--ain-text, #0f172a)",
+                      fontSize: 11,
+                      lineHeight: 1.35,
+                    }}
+                    labelStyle={{ marginBottom: 3, fontSize: 10 }}
+                    itemStyle={{ padding: 0, fontSize: 10 }}
+                    wrapperStyle={{ outline: "none" }}
+                  />
+                  <Legend
+                    iconType="circle"
+                    wrapperStyle={{
+                      fontSize: 12,
+                      paddingTop: 8,
+                      color: "var(--ain-text, #334155)",
+                    }}
+                  />
+                  {modelSeries.map((model, index) => (
+                    <Bar
+                      key={model.name}
+                      dataKey={model.name}
+                      fill={model.color}
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={28}
+                      activeBar={false}
+                      isAnimationActive
+                      animationDuration={900}
+                      animationEasing="ease-out"
+                      animationBegin={index * 120}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
 
         {/* Bottom row */}
-        <div className="mt-3 grid grid-cols-1 items-stretch gap-3 sm:mt-5 sm:gap-5 xl:grid-cols-12">
+        <div className="mt-3 grid grid-cols-1 items-start gap-3 sm:mt-5 sm:gap-5 xl:grid-cols-[minmax(0,65fr)_minmax(0,35fr)]">
           {/* User usage table */}
-          <div className="min-w-0 xl:col-span-7">
-            <div className={`${cardBase} flex h-full flex-col p-4 sm:p-6`}>
+          <div className="min-w-0">
+            <div className={`${cardBase} flex flex-col p-4 sm:p-6`}>
               <h5 className="mb-3 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
                 User Usage Overview
               </h5>
@@ -814,125 +913,35 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Right column: Model performance + Calls by model */}
-          <div className="flex min-w-0 flex-col gap-3 sm:gap-5 xl:col-span-5">
-            {/* Model performance chart */}
-            <div className={`${cardBase} flex flex-col p-4 sm:p-6`}>
-              <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
-                Model Performance
-              </h5>
-
-              <div className="mb-3 flex items-center justify-between sm:mb-4">
-                <span className="text-sm font-medium text-slate-500 sm:text-[15px] dark:text-slate-400">
-                  Real-time metrics chart
-                </span>
-                <i className="bi bi-three-dots cursor-pointer text-slate-400 hover:text-slate-600" />
-              </div>
-
-              <div className="mb-4 grid grid-cols-3 gap-2 text-center">
-                {callsByModel.slice(0, 3).map((m) => (
-                  <div
-                    key={m.label}
-                    className="min-w-0 rounded-xl bg-slate-50 px-1.5 py-2.5 sm:px-2 sm:py-3 dark:bg-slate-700/40"
-                  >
-                    <div className="truncate text-[11px] text-slate-500 sm:text-xs dark:text-slate-400">
+          {/* Calls by model */}
+          <div className={`${cardBase} p-3 sm:p-4`}>
+            <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
+              Calls by Model
+            </h5>
+            <ul className="space-y-4">
+              {callsByModel.map((m) => (
+                <li key={m.label}>
+                  <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                    <span className="truncate font-medium text-slate-700 dark:text-slate-200">
                       {m.label}
-                    </div>
-                    <div className="truncate text-base font-bold text-slate-900 sm:text-lg dark:text-white">
+                    </span>
+                    <span className="shrink-0 text-slate-500 dark:text-slate-400">
                       {formatCalls(m.value)}
-                    </div>
+                    </span>
                   </div>
-                ))}
-              </div>
-
-              {/* Height scales with screen size; chart fills it */}
-              <div className="h-[240px] w-full sm:h-[260px] xl:h-[280px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={chartData}
-                    barGap={4}
-                    margin={{ top: 4, right: 4, left: -16, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      vertical={false}
-                      stroke="var(--ain-chart-grid, #eef0f4)"
+                  <div className="h-2.5 w-full overflow-hidden [border-radius:10px]! bg-slate-100 dark:bg-slate-700">
+                    <div
+                      className={`h-full [border-radius:10px]! bg-gradient-to-r ${m.color} transition-all duration-700`}
+                      style={{ width: `${(m.value / maxCalls) * 100}%` }}
                     />
-                    <XAxis
-                      dataKey="name"
-                      tickLine={false}
-                      axisLine={false}
-                      interval={0}
-                      tick={{ fill: "var(--ain-text-muted, #64748b)", fontSize: 11 }}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      width={40}
-                      tick={{ fill: "var(--ain-text-muted, #64748b)", fontSize: 11 }}
-                    />
-                    <Tooltip
-                      cursor={{ fill: "var(--ain-chart-cursor, rgba(99,102,241,0.06))" }}
-                      contentStyle={{
-                        borderRadius: 12,
-                        border: "1px solid var(--ain-border, #e2e8f0)",
-                        backgroundColor: "var(--ain-surface, #fff)",
-                        color: "var(--ain-text, #0f172a)",
-                      }}
-                    />
-                    <Legend
-                      iconType="circle"
-                      wrapperStyle={{
-                        fontSize: 12,
-                        paddingTop: 8,
-                        color: "var(--ain-text, #334155)",
-                      }}
-                    />
-                    {modelSeries.map((model, index) => (
-                      <Bar
-                        key={model.name}
-                        dataKey={model.name}
-                        fill={model.color}
-                        radius={[4, 4, 0, 0]}
-                        maxBarSize={18}
-                        isAnimationActive
-                        animationDuration={900}
-                        animationEasing="ease-out"
-                        animationBegin={index * 120}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Calls by model */}
-            <div className={`${cardBase} p-3 sm:p-4`}>
-              <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
-                Calls by Model
-              </h5>
-              <ul className="space-y-4">
-                {callsByModel.map((m) => (
-                  <li key={m.label}>
-                    <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
-                      <span className="truncate font-medium text-slate-700 dark:text-slate-200">
-                        {m.label}
-                      </span>
-                      <span className="shrink-0 text-slate-500 dark:text-slate-400">
-                        {formatCalls(m.value)}
-                      </span>
-                    </div>
-                    <div className="h-2.5 w-full overflow-hidden [border-radius:10px]! bg-slate-100 dark:bg-slate-700">
-                      <div
-                        className={`h-full [border-radius:10px]! bg-gradient-to-r ${m.color} transition-all duration-700`}
-                        style={{ width: `${(m.value / maxCalls) * 100}%` }}
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
+
         </div>
+
       </div>
 
       {/* User detail modal */}
