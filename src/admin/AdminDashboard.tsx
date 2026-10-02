@@ -536,6 +536,194 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
 };
 
 /* -------------------------------------------------------------------------- */
+/*  Export menu (Model Performance card)                                      */
+/* -------------------------------------------------------------------------- */
+type ExportKind = "pdf" | "excel";
+
+const ExportMenu: React.FC = () => {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState<ExportKind | null>(null);
+  const [done, setDone] = useState<ExportKind | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click / Escape
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  // One row per model: Accuracy / Usage / Reliability + total calls
+  const buildRows = () =>
+    modelSeries.map((m, i) => ({
+      Model: m.name,
+      Accuracy: m.values[0],
+      Usage: m.values[1],
+      Reliability: m.values[2],
+      "Total Calls": callsByModel[i]?.value ?? 0,
+    }));
+
+  const stamp = () => new Date().toISOString().slice(0, 10);
+
+  const exportExcel = async () => {
+    const XLSX = await import("xlsx");
+    const rows = buildRows();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws["!cols"] = [{ wch: 28 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Model Performance");
+    XLSX.writeFile(wb, `model-performance-${stamp()}.xlsx`);
+  };
+
+  const exportPdf = async () => {
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+    ]);
+    const rows = buildRows();
+    const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+
+    doc.setFontSize(18);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Model Performance Report", 40, 50);
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Generated on ${new Date().toLocaleString()}`, 40, 68);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [["Model", "Accuracy", "Usage", "Reliability", "Total Calls"]],
+      body: rows.map((r) => [
+        r.Model,
+        r.Accuracy,
+        r.Usage,
+        r.Reliability,
+        formatCalls(r["Total Calls"]),
+      ]),
+      theme: "striped",
+      headStyles: { fillColor: [99, 102, 241], textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 6 },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
+    });
+
+    doc.save(`model-performance-${stamp()}.pdf`);
+  };
+
+  const run = async (kind: ExportKind) => {
+    if (busy) return;
+    setBusy(kind);
+    try {
+      // tiny delay so the spinner is visible even for fast exports
+      await new Promise((r) => setTimeout(r, 350));
+      if (kind === "pdf") await exportPdf();
+      else await exportExcel();
+      setBusy(null);
+      setDone(kind);
+      window.setTimeout(() => {
+        setDone(null);
+        setOpen(false);
+      }, 900);
+    } catch (err) {
+      console.error("Export failed", err);
+      setBusy(null);
+    }
+  };
+
+  const items: { kind: ExportKind; label: string; icon: string; tint: string }[] = [
+    {
+      kind: "pdf",
+      label: "Export to PDF",
+      icon: "bi-file-earmark-pdf-fill",
+      tint: "text-rose-500",
+    },
+    {
+      kind: "excel",
+      label: "Export to Excel",
+      icon: "bi-file-earmark-excel-fill",
+      tint: "text-emerald-600",
+    },
+  ];
+
+  return (
+    <div className="relative" ref={wrapRef}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Export options"
+        className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+          open
+            ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+            : "text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+        }`}
+      >
+        <i
+          className={`bi bi-three-dots cursor-pointer transition-transform duration-300 ${
+            open ? "rotate-90" : "rotate-0"
+          }`}
+        />
+      </button>
+
+      {/* Always mounted so it can animate in and out */}
+      <div
+        role="menu"
+        aria-hidden={!open}
+        className={`absolute right-0 z-30 mt-2 w-48 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg transition-all duration-200 ease-out motion-reduce:transition-none dark:border-slate-600 dark:bg-slate-800 ${
+          open
+            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+            : "pointer-events-none -translate-y-1 scale-95 opacity-0"
+        }`}
+      >
+        <div className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          Export data
+        </div>
+        {items.map((item, i) => {
+          const isBusy = busy === item.kind;
+          const isDone = done === item.kind;
+          return (
+            <button
+              key={item.kind}
+              type="button"
+              role="menuitem"
+              tabIndex={open ? 0 : -1}
+              disabled={busy !== null}
+              onClick={() => run(item.kind)}
+              style={{ transitionDelay: open ? `${60 + i * 50}ms` : "0ms" }}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition-all duration-300 hover:bg-slate-50 disabled:cursor-wait disabled:opacity-70 dark:text-slate-200 dark:hover:bg-slate-700 ${
+                open ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0"
+              }`}
+            >
+              {isBusy ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-500" />
+              ) : isDone ? (
+                <i className="bi bi-check-circle-fill text-emerald-500" />
+              ) : (
+                <i className={`bi ${item.icon} ${item.tint}`} />
+              )}
+              <span className="flex-1">
+                {isBusy ? "Preparing…" : isDone ? "Downloaded" : item.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/* -------------------------------------------------------------------------- */
 /*  Dashboard                                                                 */
 /* -------------------------------------------------------------------------- */
 const AdminDashboard: React.FC = () => {
@@ -650,7 +838,7 @@ const AdminDashboard: React.FC = () => {
               <span className="text-sm font-medium text-slate-500 sm:text-[15px] dark:text-slate-400">
                 Real-time metrics chart
               </span>
-              <i className="bi bi-three-dots cursor-pointer text-slate-400 hover:text-slate-600" />
+              <ExportMenu />
             </div>
 
 
