@@ -253,7 +253,7 @@ const ModelControl: React.FC = () => {
             <div
               key={s.label}
               style={delay(i + 1)}
-              className={`mc-rise group relative overflow-hidden rounded-[10px] p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${statCardStyles[i]} ${dark}:bg-gray-800 ${dark}:text-gray-100`}
+              className={`mc-rise group relative overflow-hidden rounded-[10px] p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${statCardStyles[i]} ${dark}:bg-gray-800 ${dark}:text-gray-100`}
             >
               {/* one-time sheen sweep on hover */}
               <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-[120%] bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-[320%]" />
@@ -477,7 +477,7 @@ const ModelControl: React.FC = () => {
                 <div
                   key={model.id}
                   style={delay(i + 6)}
-                  className={`mc-rise group relative flex min-h-[200px] flex-col overflow-hidden rounded-[10px]! border border-slate-200 bg-white p-2 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 ${
+                  className={`mc-rise group relative flex min-h-[200px] flex-col overflow-hidden rounded-[10px]! border border-slate-200 bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 ${
                     model.status === 'disabled' ? 'bg-slate-50 opacity-70' : ''
                   } ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100 ${
                     model.status === 'disabled' ? `${dark}:bg-[#273449]` : ''

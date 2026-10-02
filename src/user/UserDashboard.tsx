@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AiModelCard from "./AiModelCard";
 import { aiModelCatalog } from "../data/aiModels";
@@ -11,6 +11,7 @@ import { useDashboardTheme } from "./ThemeToggle";
 
 function UserDashboard() {
     const { authResponse, logout } = useAuth();
+    const navigate = useNavigate();
     const { isDarkMode } = useDashboardTheme();
     const { pathname } = useLocation();
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +31,10 @@ function UserDashboard() {
               )
           )
         : availableModels;
+    const handleLogout = () => {
+        logout();
+        navigate("/", { replace: true });
+    };
 
     return (
         <div
@@ -41,7 +46,7 @@ function UserDashboard() {
         >
             <UserSidebar
                 userName={userName}
-                onLogout={logout}
+                onLogout={handleLogout}
             />
             <main className="relative z-[2] min-h-screen min-w-0 flex-1 bg-transparent ml-[260px] max-[991px]:ml-[240px] max-[767px]:ml-0">
                 <UserHeader
