@@ -604,7 +604,7 @@ const AdminDashboard: React.FC = () => {
           </span>
         </div>
 
-        <p className="mb-4  font-normal !text-slate-500! text-[15px]  sm:mb-5  !dark:text-slate-400">
+        <p className="mb-3  font-normal !text-slate-500! text-[15px]  sm:mb-5  !dark:text-slate-400">
           System-wide Summary
         </p>
 
@@ -634,6 +634,10 @@ const AdminDashboard: React.FC = () => {
             </div>
           ))}
         </div>
+
+
+
+
         {/* Right column: Model performance + Calls by model */}
         <div className="flex min-w-0 flex-col gap-3 sm:gap-5 xl:col-span-5">
           {/* Model performance chart */}
@@ -648,6 +652,7 @@ const AdminDashboard: React.FC = () => {
               </span>
               <i className="bi bi-three-dots cursor-pointer text-slate-400 hover:text-slate-600" />
             </div>
+
 
             <div className="mb-4 grid grid-cols-3 gap-2 text-center">
               {callsByModel.slice(0, 3).map((m) => (
@@ -666,7 +671,14 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Height scales with screen size; chart fills it */}
-            <div className="h-[240px] w-full sm:h-[260px] xl:h-[280px]">
+            <div className="admin-model-performance-chart h-[240px] w-full sm:h-[260px] xl:h-[280px]">
+              <style>{`
+                .admin-model-performance-chart .recharts-surface:focus,
+                .admin-model-performance-chart .recharts-layer:focus,
+                .admin-model-performance-chart .recharts-rectangle:focus {
+                  outline: none;
+                }
+              `}</style>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartData}
@@ -918,7 +930,7 @@ const AdminDashboard: React.FC = () => {
             <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
               Calls by Model
             </h5>
-            <ul className="space-y-4">
+            <ul className="space-y-4 p-1!">
               {callsByModel.map((m) => (
                 <li key={m.label}>
                   <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
