@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
+import { aiModelCatalog } from '../data/aiModels';
 interface SystemLog {
   id: string;
   timestamp: string;
@@ -38,9 +39,9 @@ const SystemLogs: React.FC = () => {
       timestamp: '2024-09-22 14:25:08',
       user: 'Alex Johnson',
       action: 'API Call',
-      resource: 'GPT-4 Model',
+      resource: aiModelCatalog[0].name,
       status: 'success',
-      details: 'Model: gpt-4-turbo | Tokens: 1245 | Cost: $0.04',
+      details: `Model: ${aiModelCatalog[0].name} | Tokens: 1245 | Cost: $0.04`,
       ipAddress: '203.0.113.45',
     },
     {

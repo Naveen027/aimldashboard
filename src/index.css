@@ -1,6 +1,18 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.theme-dark, .theme-dark *));
 
+:root {
+    --bs-font-sans-serif: "Google Sans Flex", sans-serif;
+    --bs-body-font-family: "Google Sans Flex", sans-serif;
+    --font-sans: "Google Sans Flex", sans-serif;
+}
+
+html,
+body,
+#root {
+    font-family: "Google Sans Flex", sans-serif;
+}
+
 .auth-role-button.bg-white {
     --bs-bg-opacity: 1;
     background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity)) !important;

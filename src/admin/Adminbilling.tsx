@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AdminLayout from './AdminLayout';
+import { aiModelCatalog } from '../data/aiModels';
 interface BillingData {
   period: string;
   totalCost: number;
@@ -34,7 +35,7 @@ const BillingAdmin: React.FC = () => {
     apiCalls: 5230000,
     costPerCall: 0.000544,
     topUser: 'Mia Wong',
-    topModel: 'GPT-4',
+    topModel: aiModelCatalog[0].name,
   });
 
   const [userBillings] = useState<UserBilling[]>([

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Navigate,
@@ -5,21 +6,22 @@ import {
   Routes,
 } from "react-router-dom";
 
-import AuthPage from "./pages/AuthPage";
-import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./admin/AdminDashboard.tsx";
-import Usermanagement from "./admin/Usermanagement";
-import Modelcontrol from "./admin/Modelcontrol";
-import Adminbilling from "./admin/Adminbilling";
-import Globalsettings from "./admin/Globalsettings";
-import Systemlogs from "./admin/Systemlogs";
-import ApiKeys from "./pages/ApiKeys";
-import Support from "./pages/Support";
-import Billing from "./pages/Billing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import {
   useDashboardTheme,
 } from "./user/ThemeToggle";
+
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const UserDashboard = lazy(() => import("./pages/UserDashboard"));
+const AdminDashboard = lazy(() => import("./admin/AdminDashboard"));
+const Usermanagement = lazy(() => import("./admin/Usermanagement"));
+const Modelcontrol = lazy(() => import("./admin/Modelcontrol"));
+const Adminbilling = lazy(() => import("./admin/Adminbilling"));
+const Globalsettings = lazy(() => import("./admin/Globalsettings"));
+const Systemlogs = lazy(() => import("./admin/Systemlogs"));
+const ApiKeys = lazy(() => import("./pages/ApiKeys"));
+const Support = lazy(() => import("./pages/Support"));
+const Billing = lazy(() => import("./pages/Billing"));
 
 function App() {
   const { isDarkMode } = useDashboardTheme();
@@ -27,6 +29,13 @@ function App() {
   return (
     <div className={isDarkMode ? "theme-dark" : "theme-light"}>
     <BrowserRouter>
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-300">
+            Loading...
+          </div>
+        }
+      >
         <Routes>
           <Route path="/" element={<AuthPage mode="login" />} />
           <Route path="/signup" element={<AuthPage mode="signup" />} />
@@ -52,8 +61,7 @@ function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-
-
+      </Suspense>
       </BrowserRouter>
     </div>
   );

@@ -14,18 +14,20 @@ import {
 } from "chart.js";
 import { Line, Radar, Bar } from "react-chartjs-2";
 import {
-  Cpu,
-  ImageIcon,
-  Mic,
-  Code2,
-  Sparkles,
+  Bot,
   Zap,
   Clock,
   CalendarDays,
   Activity,
   Radio,
+  FileSearch,
+  Fingerprint,
+  Languages,
+  MessageSquareText,
+  ScanFace,
 } from "lucide-react";
 import { useDashboardTheme } from "./ThemeToggle";
+import { aiModelCatalog } from "../data/aiModels";
 
 ChartJS.register(
   CategoryScale,
@@ -46,52 +48,28 @@ interface ModelMeta {
   name: string;
   category: string;
   description: string;
+  highlights: string[];
   color: string;
   icon: React.ReactNode;
 }
 
-const MODELS: ModelMeta[] = [
-  {
-    id: "gpt4",
-    name: "GPT-4",
-    category: "Text Generation",
-    description: "Advanced language generation for writing, analysis, and conversation.",
-    color: "#4285f4",
-    icon: <Cpu size={16} />,
-  },
-  {
-    id: "dalle3",
-    name: "DALL-E 3",
-    category: "Image Generation",
-    description: "Create detailed images from natural language descriptions.",
-    color: "#34a853",
-    icon: <ImageIcon size={16} />,
-  },
-  {
-    id: "whisper",
-    name: "Whisper",
-    category: "Speech-to-Text",
-    description: "Transcribe spoken audio accurately into written text.",
-    color: "#fbbc04",
-    icon: <Mic size={16} />,
-  },
-  {
-    id: "codex",
-    name: "Codex",
-    category: "Code Assistance",
-    description: "Generate, explain, and improve code across popular languages.",
-    color: "#1ba098",
-    icon: <Code2 size={16} />,
-  },
-  {
-    id: "sd",
-    name: "Stable Diffusion",
-    category: "Open-Source Image",
-    description: "Generate creative images with a flexible open-source model.",
-    color: "#ea4335",
-    icon: <Sparkles size={16} />,
-  },
+const modelColors = ["#4285f4", "#34a853", "#fbbc04", "#9c27b0", "#1ba098", "#ea4335"];
+const modelIcons = [
+  ScanFace,
+  Fingerprint,
+  MessageSquareText,
+  FileSearch,
+  Bot,
+  Languages,
 ];
+const MODELS: ModelMeta[] = aiModelCatalog.map((model, index) => {
+  const Icon = modelIcons[index];
+  return {
+    ...model,
+    color: modelColors[index],
+    icon: <Icon size={16} />,
+  };
+});
 
 const RADAR_AXES = ["Speed", "Accuracy", "Efficiency", "Reliability", "Cost Control"];
 
@@ -548,14 +526,24 @@ export default function AIModelsDashboard() {
                       </td>
                     </tr>
                     <tr
-                      className={`transition-[height,padding] duration-[250ms] [&>td]:h-0 [&>td]:px-3 [&>td]:py-0 [&>td]:border-b [&>td]:border-white/[0.04] ${isHover ? "[&>td]:h-[34px] [&>td]:pb-3.5" : ""}`}
+                      className={`transition-[height,padding] duration-[250ms] [&>td]:h-0 [&>td]:px-3 [&>td]:py-0 [&>td]:border-b [&>td]:border-white/[0.04] ${isHover ? "[&>td]:h-[62px] [&>td]:pb-3" : ""}`}
                       onMouseEnter={() => showRowDetails(s.meta.id)}
                       onMouseLeave={hideRowDetails}
                     >
                         <td colSpan={8}>
-                          <div className={`flex items-center gap-2 text-[0.82rem] text-[#7f93bd] max-h-0 opacity-0 overflow-hidden -translate-y-1 transition-[opacity,max-height,transform] duration-[250ms] [.theme-light_&]:text-[#53657b] ${isHover ? "max-h-[30px] opacity-100 translate-y-0" : ""}`}>
-                            <Clock size={13} />
-                            {s.meta.description}
+                          <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.82rem] text-[#7f93bd] max-h-0 opacity-0 overflow-hidden -translate-y-1 transition-[opacity,max-height,transform] duration-[250ms] [.theme-light_&]:text-[#53657b] ${isHover ? "max-h-[56px] opacity-100 translate-y-0" : ""}`}>
+                            <span className="inline-flex items-center gap-2">
+                              <Clock size={13} />
+                              {s.meta.description}
+                            </span>
+                            {s.meta.highlights.map((highlight) => (
+                              <span
+                                key={highlight}
+                                className="rounded-full bg-[#eef4ff] px-2 py-0.5 text-[0.68rem] font-medium text-[#3d5fa8] [.theme-dark_&]:bg-[#273449] [.theme-dark_&]:text-[#c1d2f5]"
+                              >
+                                {highlight}
+                              </span>
+                            ))}
                           </div>
                         </td>
                     </tr>

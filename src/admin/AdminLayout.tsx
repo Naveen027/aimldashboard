@@ -37,7 +37,7 @@ function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className={`ain-app d-flex ${isDarkMode ? "theme-dark" : "theme-light"} ${collapsed ? "sidebar-collapsed" : ""}
-      [font-family:Inter,_Segoe_UI,_system-ui,_-apple-system,_sans-serif]
+      [font-family:"Google_Sans_Flex",_sans-serif]
       [--ain-navy:#131b2e]
       [--ain-navy-light:#1b2540]
       [--ain-blue:#3d7bfc]

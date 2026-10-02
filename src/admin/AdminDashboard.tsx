@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import AdminLayout from "./AdminLayout";
 import { useAuth } from "../context/AuthContext";
+import { aiModelCatalog } from "../data/aiModels";
 
 interface UsageRow {
   id: number;
@@ -29,7 +30,7 @@ const usageRows: UsageRow[] = [
     name: "Alex Johnson",
     initials: "AJ",
     color: "#f6c453",
-    model: "GPT-4 (Text Generation)",
+    model: aiModelCatalog[0].name,
     lastActivity: "5 mins ago",
     usage: "270K",
     usagePct: 78,
@@ -39,7 +40,7 @@ const usageRows: UsageRow[] = [
     name: "Mia Wong",
     initials: "MW",
     color: "#f28fb0",
-    model: "DALL-E 3",
+    model: aiModelCatalog[1].name,
     lastActivity: "3 minuts ago",
     usage: "1.51K",
     usagePct: 35,
@@ -49,7 +50,7 @@ const usageRows: UsageRow[] = [
     name: "Mana Tuung",
     initials: "MT",
     color: "#8fd3c7",
-    model: "DALL-E 3",
+    model: aiModelCatalog[2].name,
     lastActivity: "3 minuts ago",
     usage: "421K",
     usagePct: 55,
@@ -59,7 +60,7 @@ const usageRows: UsageRow[] = [
     name: "Alex Johnson",
     initials: "AJ",
     color: "#f6c453",
-    model: "GPT-4 (Text Generation)",
+    model: aiModelCatalog[3].name,
     lastActivity: "10 rours ago",
     usage: "270K",
     usagePct: 78,
@@ -69,7 +70,7 @@ const usageRows: UsageRow[] = [
     name: "Mia Wong",
     initials: "MW",
     color: "#f28fb0",
-    model: "DALL-E 3",
+    model: aiModelCatalog[4].name,
     lastActivity: "5 monts ago",
     usage: "2.1M",
     usagePct: 95,
@@ -79,18 +80,80 @@ const usageRows: UsageRow[] = [
     name: "Mia Wong",
     initials: "MW",
     color: "#f28fb0",
-    model: "GPT-4 (Text Generation)",
+    model: aiModelCatalog[5].name,
     lastActivity: "14 minutes ago",
     usage: "470K",
     usagePct: 62,
   },
+    {
+    id: 7,
+    name: "Alex Johnson",
+    initials: "AJ",
+    color: "#f6c453",
+    model: aiModelCatalog[0].name,
+    lastActivity: "5 mins ago",
+    usage: "270K",
+    usagePct: 78,
+  },
+    {
+    id: 8,
+    name: "Mia Wong",
+    initials: "MW",
+    color: "#f28fb0",
+    model: aiModelCatalog[1].name,
+    lastActivity: "3 mins ago",
+    usage: "270K",
+    usagePct: 78,
+  },
+    {
+    id: 9,
+    name: "Alex Johnson",
+    initials: "AJ",
+    color: "#f6c453",
+    model: aiModelCatalog[2].name,
+    lastActivity: "5 mins ago",
+    usage: "270K",
+    usagePct: 78,
+  },
 ];
 
-const chartData = [
-  { name: "GPT-4", "GPT-4": 82, "DALL-E 3": 65, Whisper: 58 },
-  { name: "DALL-E 3", "GPT-4": 45, "DALL-E 3": 88, Whisper: 70 },
-  { name: "Whisper", "GPT-4": 60, "DALL-E 3": 78, Whisper: 92 },
+const modelPerformance = [
+  [82, 45, 60],
+  [65, 88, 78],
+  [58, 70, 92],
+  [74, 68, 85],
+  [88, 72, 80],
+  [91, 84, 93],
 ];
+const modelColors = ["#5ec8d8", "#8b7cf6", "#3fae6a", "#f59e0b", "#ec4899", "#06b6d4"];
+const modelSeries = aiModelCatalog.map((model, index) => ({
+  name: model.name,
+  color: modelColors[index],
+  values: modelPerformance[index],
+}));
+const chartData = ["Accuracy", "Usage", "Reliability"].map((name, metricIndex) => ({
+  name,
+  ...Object.fromEntries(
+    modelSeries.map((model) => [model.name, model.values[metricIndex]])
+  ),
+}));
+
+// Calls by model (replace with API data, e.g. from a getModels() call)
+const callsByModel = [
+  { label: aiModelCatalog[0].name, value: 48300, color: "from-cyan-400 to-sky-500" },
+  { label: aiModelCatalog[1].name, value: 31200, color: "from-indigo-500 to-violet-500" },
+  { label: aiModelCatalog[2].name, value: 25400, color: "from-emerald-400 to-green-600" },
+  { label: aiModelCatalog[3].name, value: 22100, color: "from-amber-400 to-orange-500" },
+  { label: aiModelCatalog[4].name, value: 18600, color: "from-pink-400 to-rose-500" },
+  { label: aiModelCatalog[5].name, value: 15200, color: "from-teal-400 to-cyan-600" },
+];
+
+const formatCalls = (n: number) =>
+  n >= 1_000_000
+    ? `${(n / 1_000_000).toFixed(1)}M`
+    : n >= 1_000
+    ? `${(n / 1_000).toFixed(1)}K`
+    : String(n);
 
 const statCards = [
   {
@@ -143,6 +206,11 @@ const AdminDashboard: React.FC = () => {
     [modelFilter]
   );
 
+  const maxCalls = useMemo(
+    () => Math.max(...callsByModel.map((m) => m.value), 1),
+    []
+  );
+
   // Close dropdown on outside click / Escape
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -168,17 +236,17 @@ const AdminDashboard: React.FC = () => {
       <div className="mx-auto w-full max-w-[1520px] px-0 py-2 sm:px-1">
         {/* Top bar */}
         <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-          <h2 className="break-words !text-xl !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
+          <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
             Welcome, {adminUsername}!
           </h2>
 
-          <span className="inline-flex w-fit max-w-full items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 !text-sm !font-thin !text-amber-700 ring-1 ring-amber-200 sm:px-3.5 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
+          <span className="inline-flex w-fit max-w-full items-center gap-2 rounded-[10px]! bg-amber-50 px-3 py-1.5 !text-sm !font-thin !text-amber-700 ring-1 ring-amber-200 sm:px-3.5 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
             <i className="bi bi-exclamation-triangle-fill" />
             System-wide notifications
           </span>
         </div>
 
-        <p className="mb-4  font-normal !text-slate-500 text-[15px]  sm:mb-5  !dark:text-slate-400">
+        <p className="mb-4  font-normal !text-slate-500! text-[15px]  sm:mb-5  !dark:text-slate-400">
           System-wide Summary
         </p>
 
@@ -190,7 +258,7 @@ const AdminDashboard: React.FC = () => {
               className={`${cardBase} flex items-center gap-3 px-2 py-2 transition-shadow hover:shadow-md sm:gap-4 sm:px-6 sm:py-6`}
             >
               <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[60px] sm:w-[60px] sm:text-2xl ${card.healthy
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[50px] sm:w-[50px] sm:text-2xl ${card.healthy
                   ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                   : "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
                   }`}
@@ -289,13 +357,6 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/*
-                Responsive table: columns drop out as the screen narrows
-                instead of forcing horizontal scroll.
-                  < sm : User (+ model underneath) | Usage | chevron
-                  sm+  : + Current Model
-                  md+  : + Last Activity
-              */}
               <div className="-mx-1 overflow-x-auto sm:-mx-2">
                 <table className="w-full border-collapse text-left">
                   <thead>
@@ -382,9 +443,10 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Model performance chart */}
-          <div className="min-w-0 xl:col-span-5">
-            <div className={`${cardBase} flex h-full flex-col p-4 sm:p-6`}>
+          {/* Right column: Model performance + Calls by model */}
+          <div className="flex min-w-0 flex-col gap-3 sm:gap-5 xl:col-span-5">
+            {/* Model performance chart */}
+            <div className={`${cardBase} flex flex-col p-4 sm:p-6`}>
               <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
                 Model Performance
               </h5>
@@ -397,11 +459,7 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               <div className="mb-4 grid grid-cols-3 gap-2 text-center">
-                {[
-                  { label: "GPT-4", value: "48.3K" },
-                  { label: "DALL-E 3", value: "2.1M" },
-                  { label: "Whisper", value: "99.8%" },
-                ].map((m) => (
+                {callsByModel.slice(0, 3).map((m) => (
                   <div
                     key={m.label}
                     className="min-w-0 rounded-xl bg-slate-50 px-1.5 py-2.5 sm:px-2 sm:py-3 dark:bg-slate-700/40"
@@ -410,7 +468,7 @@ const AdminDashboard: React.FC = () => {
                       {m.label}
                     </div>
                     <div className="truncate text-base font-bold text-slate-900 sm:text-lg dark:text-white">
-                      {m.value}
+                      {formatCalls(m.value)}
                     </div>
                   </div>
                 ))}
@@ -458,38 +516,49 @@ const AdminDashboard: React.FC = () => {
                         color: "var(--ain-text, #334155)",
                       }}
                     />
-                    <Bar
-                      dataKey="GPT-4"
-                      fill="#5ec8d8"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={18}
-                      isAnimationActive
-                      animationDuration={900}
-                      animationEasing="ease-out"
-                    />
-                    <Bar
-                      dataKey="DALL-E 3"
-                      fill="#8b7cf6"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={18}
-                      isAnimationActive
-                      animationDuration={900}
-                      animationEasing="ease-out"
-                      animationBegin={120}
-                    />
-                    <Bar
-                      dataKey="Whisper"
-                      fill="#3fae6a"
-                      radius={[4, 4, 0, 0]}
-                      maxBarSize={18}
-                      isAnimationActive
-                      animationDuration={900}
-                      animationEasing="ease-out"
-                      animationBegin={240}
-                    />
+                    {modelSeries.map((model, index) => (
+                      <Bar
+                        key={model.name}
+                        dataKey={model.name}
+                        fill={model.color}
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={18}
+                        isAnimationActive
+                        animationDuration={900}
+                        animationEasing="ease-out"
+                        animationBegin={index * 120}
+                      />
+                    ))}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+
+            {/* Calls by model */}
+            <div className={`${cardBase} p-3 sm:p-4`}>
+              <h5 className="mb-4 text-lg font-semibold text-slate-900 sm:mb-5 sm:text-xl dark:text-white">
+                Calls by Model
+              </h5>
+              <ul className="space-y-4">
+                {callsByModel.map((m) => (
+                  <li key={m.label}>
+                    <div className="mb-1.5 flex items-center justify-between gap-3 text-sm">
+                      <span className="truncate font-medium text-slate-700 dark:text-slate-200">
+                        {m.label}
+                      </span>
+                      <span className="shrink-0 text-slate-500 dark:text-slate-400">
+                        {formatCalls(m.value)}
+                      </span>
+                    </div>
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+                      <div
+                        className={`h-full rounded-full bg-gradient-to-r ${m.color} transition-all duration-700`}
+                        style={{ width: `${(m.value / maxCalls) * 100}%` }}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

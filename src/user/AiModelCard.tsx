@@ -1,75 +1,60 @@
 import { useState } from "react";
-import codexImage from "../assets/codex.jpeg";
-import dalleImage from "../assets/dalle.jpeg";
-import gptImage from "../assets/gpt.jpeg";
-import stableImage from "../assets/stable.jpeg";
-import whisperImage from "../assets/whisper.jpeg";
+import {
+    Bot,
+    FileSearch,
+    Fingerprint,
+    Languages,
+    MessageSquareText,
+    ScanFace,
+    type LucideIcon,
+} from "lucide-react";
+import { type AiModelDefinition } from "../data/aiModels";
 
-export interface AiModel {
-    name: string;
-    category: string;
-    description: string;
-    image: string;
-}
-
-export const aiModels: AiModel[] = [
-    {
-        name: "GPT-4",
-        category: "Text Generation",
-        image: gptImage,
-        description:
-            "Advanced natural language processing to understand natural language, prompts, and personalized responses.",
-    },
-    {
-        name: "DALL-E 3",
-        category: "Image Generation",
-        image: dalleImage,
-        description:
-            "Generate creative images from text prompts to produce imaginative and visually appealing images.",
-    },
-    {
-        name: "Whisper",
-        category: "Speech-to-Text",
-        image: whisperImage,
-        description:
-            "Convert audio to text accurately to convert customer calls, conversations, and recordings.",
-    },
-    {
-        name: "Codex",
-        category: "Code Assistance",
-        image: codexImage,
-        description:
-            "Generate code snippets and debug, optimize, and improve code across different programming languages.",
-    },
-    {
-        name: "Stable Diffusion",
-        category: "Open-Source Image",
-        image: stableImage,
-        description:
-            "Customizable image generation to customize your image editors and filters with creative outputs.",
-    },
-];
+const modelIcons: Record<string, LucideIcon> = {
+    "kartavya-face-matching": ScanFace,
+    "muzzle-print-identification": Fingerprint,
+    "grievance-management": MessageSquareText,
+    "government-order-information": FileSearch,
+    "ai-enabled-chatbots": Bot,
+    "kannada-kasthuri": Languages,
+};
 
 interface AiModelCardProps {
-    model: AiModel;
+    model: AiModelDefinition;
 }
 
 function AiModelCard({ model }: AiModelCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const ModelIcon = modelIcons[model.id];
 
     return (
         <>
         <div className="mb-6 w-full px-3 min-[768px]:w-1/2 min-[992px]:w-1/3">
             <div className="flex min-h-[220px] flex-col rounded-2xl !border !border-[#eef0f4] bg-white p-5 text-[#1c2033] shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-[3px] hover:!border-[#3d7bfc] hover:shadow-[0_8px_20px_rgba(20,30,60,0.1)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937] [.theme-dark_&]:text-[#f3f4f6]">
                 <div className="mb-[5px] flex items-center gap-3.5">
-                    <div className="h-[58px] w-14 shrink-0 overflow-hidden rounded-[10px] max-[576px]:size-12">
-                        <img className="block h-[85%] w-[85%] rounded-[15px] object-cover" src={model.image} alt="" />
+                    <div className="grid h-[58px] w-14 shrink-0 place-items-center rounded-[10px] bg-[#eef4ff] text-[#3d7bfc] max-[576px]:size-12 [.theme-dark_&]:bg-[#273449]">
+                        <ModelIcon size={26} aria-hidden="true" />
                     </div>
-                    <h5 className="m-0 text-base font-bold text-[#2c3e50] max-[768px]:text-sm max-[576px]:text-[13px] [.theme-dark_&]:text-[#f3f4f6]">
-                        {model.category}
-                    </h5>
+                    <div className="min-w-0">
+                        <h5 className="m-0 text-base font-bold text-[#2c3e50] max-[768px]:text-sm max-[576px]:text-[13px] [.theme-dark_&]:text-[#f3f4f6]">
+                            {model.name}
+                        </h5>
+                        <p className="m-0 mt-1 text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">
+                            {model.category}
+                        </p>
+                    </div>
                 </div>
                 <p className="mb-[5px] mt-0 min-h-0 flex-1 overflow-y-auto text-[13px] leading-[1.6] text-[#5f6b7a] max-[576px]:text-xs [.theme-dark_&]:text-[#c1c8d3]">{model.description}</p>
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                    {model.highlights.map((highlight) => (
+                        <span
+                            key={highlight}
+                            className="rounded-full bg-[#eef4ff] px-2 py-1 text-[11px] font-medium text-[#3d5fa8] [.theme-dark_&]:bg-[#273449] [.theme-dark_&]:text-[#c1d2f5]"
+                        >
+                            {highlight}
+                        </span>
+                    ))}
+                </div>
                 <div className="mb-0">
                     <p className="m-0 flex items-center gap-2 text-[13px] text-[#5f6b7a] [.theme-dark_&]:text-[#c1c8d3]">
                         Status:{" "}
@@ -115,6 +100,16 @@ function AiModelCard({ model }: AiModelCardProps) {
                         {model.category}
                     </p>
                     <p>{model.description}</p>
+                    <div className="mb-3 flex flex-wrap gap-2">
+                        {model.highlights.map((highlight) => (
+                            <span
+                                key={highlight}
+                                className="rounded-full bg-[#eef4ff] px-2.5 py-1 text-xs font-medium text-[#3d5fa8] [.theme-dark_&]:bg-[#273449] [.theme-dark_&]:text-[#c1d2f5]"
+                            >
+                                {highlight}
+                            </span>
+                        ))}
+                    </div>
                     <p>
                         Status:{" "}
                         <strong>Available</strong>

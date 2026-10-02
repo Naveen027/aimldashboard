@@ -108,7 +108,7 @@ function AdminSidebar({
       [&_.ain-brand-seal]:[flex:0_0_36px]
       [&_.ain-brand-seal]:[object-fit:contain]
       [&_.ain-brand-text]:[color:#fff]
-      [&_.ain-brand-text]:[font-size:15px]
+      [&_.ain-brand-text]:[font-size:18px]
       [&_.ain-brand-text]:[font-weight:700]
       [&_.ain-brand-text]:[line-height:1.15]
       [&_.ain-brand-text]:[white-space:nowrap]

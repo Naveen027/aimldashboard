@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import AiModelCard, {
-    aiModels,
-} from "../user/AiModelCard";
+import AiModelCard from "../user/AiModelCard";
+import { aiModelCatalog } from "../data/aiModels";
 import ProfileCard from "../user/ProfileCard";
 import UserHeader from "../user/UserHeader";
 import UserSidebar from "../user/UserSidebar";
@@ -18,7 +17,7 @@ function UserDashboard() {
     const showAIModelsDashboard = pathname === "/my-profile";
     const userName = authResponse?.username ?? "Alex Johnson";
     const firstName = userName.split(" ")[0];
-    const availableModels = aiModels;
+    const availableModels = aiModelCatalog;
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
     const filteredModels = normalizedSearchQuery
         ? availableModels.filter((model) =>
