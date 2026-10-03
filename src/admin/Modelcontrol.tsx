@@ -252,13 +252,13 @@ const ModelControl: React.FC = () => {
         {/* ---------- Header ---------- */}
         <div className="mc-rise mb-0 flex flex-col items-start justify-between gap-4 md:flex-row md:gap-0">
            <div className="mb-2">
-            <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-[color:#000]  dark:text-white">Model Control</h2>
+            <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-[color:black]!  dark:text-white">Model Control</h2>
             <p className="mt-0.5 mb-0 text-[color:#6b7280]">Manage AI models and endpoints</p>
           </div>
         </div>
 
         {/* ---------- Stats ---------- */}
-        <div className="mb-4 grid grid-cols-2 gap-4 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
+        <div className="mb-3 grid grid-cols-2 gap-4 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
           {stats.map((s, i) => (
             <div
               key={s.label}
@@ -572,7 +572,7 @@ const ModelControl: React.FC = () => {
                   {/* top row: icon + title + status pill */}
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-4">
-                      <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:#131b2e] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+                      <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
                         <ModelIcon size={26} strokeWidth={2} aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
