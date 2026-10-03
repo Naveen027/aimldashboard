@@ -226,13 +226,9 @@ const ModelControl: React.FC = () => {
       >
         {/* ---------- Header ---------- */}
         <div className="mc-rise mb-0 flex flex-col items-start justify-between gap-4 md:flex-row md:gap-0">
-          <div>
-            <h2 className="break-words text-xl font-bold leading-tight tracking-tight text-slate-700 dark:text-white [.ain-app.theme-dark_&]:text-white">
-              Model Control
-            </h2>
-            <p className="mb-4 text-[15px] font-normal text-slate-500 sm:mb-5 [.ain-app.theme-dark_&]:text-slate-300">
-              Manage AI models and endpoints
-            </p>
+           <div className="mb-2">
+            <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-[color:#000]  dark:text-white">Model Control</h2>
+            <p className="mt-0.5 mb-0 text-[color:#6b7280]">Manage AI models and endpoints</p>
           </div>
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row">
             <button className={`${btnPrimary} w-full md:w-auto`} onClick={handleAddModel}>

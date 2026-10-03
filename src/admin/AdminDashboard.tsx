@@ -777,15 +777,15 @@ const AdminDashboard: React.FC = () => {
 
       <div className="mx-auto w-full max-w-[1520px] px-0 py-0 sm:px-1">
         {/* Top bar */}
-        <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="mb-0 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
             Dashboard
           </h2>
 
-          <span className="inline-flex w-fit max-w-full items-center gap-2 rounded-[10px]! bg-amber-50 px-3 py-1.5 !text-sm !font-thin !text-amber-700 ring-1 ring-amber-200 sm:px-3.5 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
+          {/* <span className="inline-flex w-fit max-w-full items-center gap-2 rounded-[10px]! bg-amber-50 px-3 py-1.5 !text-sm !font-thin !text-amber-700 ring-1 ring-amber-200 sm:px-3.5 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
             <i className="bi bi-exclamation-triangle-fill" />
             System-wide notifications
-          </span>
+          </span> */}
         </div>
 
          <p className="mt-0 mb-2 text-[color:#6b7280]">
