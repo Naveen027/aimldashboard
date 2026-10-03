@@ -221,7 +221,7 @@ function AdminSidebar({
       motion-reduce:[&_.ain-nav-link]:[transition:none]!`}
     >
       {/* Sidebar brand */}
-      <div className="ain-header">
+      <div className="ain-header ">
         <div className="ain-brand">
           <img className="ain-brand-seal" src={seal} alt="Seal of Karnataka" />
           <span

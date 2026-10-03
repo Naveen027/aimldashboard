@@ -103,7 +103,7 @@ function AuthPage({ mode }: AuthPageProps) {
                     className="pointer-events-none absolute left-1/2 top-1/2 w-[min(72%,520px)] -translate-x-1/2 -translate-y-1/2 opacity-[0.12] mix-blend-screen"
                 />
                 <div className="relative flex items-center gap-3 text-xl font-bold">
-                    <span className="inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    <span className="inline-flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full">
                         <img
                             src={seal}
                             alt=""
