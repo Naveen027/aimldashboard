@@ -1,9 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import AdminLayout from './AdminLayout';
-import editIcon from '../assets/edit.png'
-import deleteIcon from '../assets/delete.png'
-import enableIcon from '../assets/enable.png'
-import disableIcon from '../assets/disable.png'
 
 interface User {
   id: string;
@@ -16,7 +12,7 @@ interface User {
   lastActive: string;
 }
 
-type SortKey = 'name' | 'role' | 'status' | 'joinDate' | 'apiUsage';
+type SortKey = 'name' | 'status' | 'apiUsage';
 type FormData = { name: string; email: string; role: User['role']; status: User['status'] };
 
 const PAGE_SIZE = 8;
@@ -26,27 +22,18 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const formatUsage = (n: number) =>
   n >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : `${(n / 1_000).toFixed(1)}K`;
 
-const initials = (name: string) =>
-  name.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]?.toUpperCase()).join('');
-
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 /* ------------------------------------------------------------------ */
-/* Tailwind class tokens (replaces the old <style> block)              */
+/* Tailwind class tokens                                               */
 /* ------------------------------------------------------------------ */
 
-// Theme variables: light defaults + dark overrides (same selector as before: .ain-app.theme-dark .um)
 const ROOT_VARS = [
   // light
   '[--bg:#f5f6fa]', '[--surface:#fff]', '[--surface-2:#f9fafb]', '[--border:#e5e7eb]',
   '[--text:#111827]', '[--muted:#6b7280]', '[--input:#fff]', '[--hover:#f3f4f6]',
   '[--accent:#4f5bd5]', '[--accent-h:#4350c0]', '[--ring:rgba(79,91,213,.18)]',
   '[--danger:#dc2626]', '[--danger-h:#b91c1c]',
-  '[--admin-fg:#b91c1c]', '[--admin-bg:rgba(239,68,68,.12)]',
-  '[--user-fg:#1d4ed8]', '[--user-bg:rgba(59,130,246,.12)]',
-  '[--analyst-fg:#7e22ce]', '[--analyst-bg:rgba(168,85,247,.12)]',
   '[--ok-fg:#15803d]', '[--ok-bg:rgba(34,197,94,.14)]',
-  '[--off-fg:#b91c1c]', '[--off-bg:rgba(239,68,68,.12)]',
+  '[--off-fg:#be123c]', '[--off-bg:rgba(244,63,94,.12)]',
   // dark
   '[.ain-app.theme-dark_&]:[--bg:transparent]',
   '[.ain-app.theme-dark_&]:[--surface:#1f2937]',
@@ -59,11 +46,8 @@ const ROOT_VARS = [
   '[.ain-app.theme-dark_&]:[--accent:#7c88f0]',
   '[.ain-app.theme-dark_&]:[--accent-h:#6a77e6]',
   '[.ain-app.theme-dark_&]:[--ring:rgba(124,136,240,.25)]',
-  '[.ain-app.theme-dark_&]:[--admin-fg:#fca5a5]',
-  '[.ain-app.theme-dark_&]:[--user-fg:#93c5fd]',
-  '[.ain-app.theme-dark_&]:[--analyst-fg:#d8b4fe]',
   '[.ain-app.theme-dark_&]:[--ok-fg:#86efac]',
-  '[.ain-app.theme-dark_&]:[--off-fg:#fca5a5]',
+  '[.ain-app.theme-dark_&]:[--off-fg:#fda4af]',
 ].join(' ');
 
 const ROOT = `um user-management ${ROOT_VARS} bg-[var(--bg)] text-[color:var(--text)] min-h-screen text-[14px]`;
@@ -87,30 +71,28 @@ const FIELD_BASE = `border rounded-[10px] bg-[var(--input)] text-[color:var(--te
 const FIELD_NORMAL = 'border-[color:var(--border)] focus:border-[color:var(--accent)]';
 const FIELD_INVALID = 'border-[color:var(--danger)]';
 
-const CONTROL_SELECT = `${FIELD_BASE} ${FIELD_NORMAL} h-9 px-2.5 py-0 cursor-pointer`;
-const SEARCH_INPUT = `${FIELD_BASE} ${FIELD_NORMAL} h-9 w-full py-2 pl-[34px] pr-[30px]`;
+// Controls row (rounded, taller – matches the new table look)
+const CONTROL_SELECT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 px-3.5 py-0 text-sm cursor-pointer`;
+const SEARCH_INPUT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 w-full py-2 pl-10 pr-[30px] text-sm`;
 const formField = (invalid: boolean, extra = '') =>
   `${FIELD_BASE} ${invalid ? FIELD_INVALID : FIELD_NORMAL} w-full px-2.5 py-2 ${extra}`.trim();
 
-// Table
-const TH = 'px-3 py-2.5 text-left font-semibold text-xs text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
-const TD = 'px-3 py-2.5 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
+// Table (new look)
+const TH = 'px-4 py-3 text-left font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
+const TD = 'px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
-// Role + status variants
-const AVATAR_ROLE: Record<User['role'], string> = {
-  admin: 'bg-[var(--admin-bg)] text-[color:var(--admin-fg)]',
-  user: 'bg-[var(--user-bg)] text-[color:var(--user-fg)]',
-  analyst: 'bg-[var(--analyst-bg)] text-[color:var(--analyst-fg)]',
-};
-const BADGE_ROLE = AVATAR_ROLE;
 const STATUS_CLS: Record<User['status'], string> = {
   active: 'bg-[var(--ok-bg)] text-[color:var(--ok-fg)]',
   inactive: 'bg-[var(--off-bg)] text-[color:var(--off-fg)]',
 };
+const STATUS_LABEL: Record<User['status'], string> = {
+  active: 'Active',
+  inactive: 'Suspended',
+};
 
 // Icon buttons
-const ICON_BTN = `group bg-transparent border-0 p-[5px] rounded-md cursor-pointer grid place-items-center transition-colors duration-150 ${FOCUS_RING}`;
-const ICON_IMG = 'w-[18px] h-[18px] transition-transform duration-150 group-hover:scale-110';
+const ICON_BTN = `group bg-transparent border-0 p-1.5 rounded-lg cursor-pointer grid place-items-center transition-colors duration-150 hover:bg-[var(--hover)] ${FOCUS_RING}`;
+const ICON_SVG = 'w-[18px] h-[18px] transition-transform duration-150 group-hover:scale-110';
 
 // Modal
 const OVERLAY = 'fixed inset-0 bg-[rgba(15,23,42,.5)] flex items-center justify-center z-[1000] p-3 animate-um-fade motion-reduce:animate-none';
@@ -120,6 +102,47 @@ const MODAL_SUB = 'mt-0 text-[color:var(--muted)] text-[13px]';
 const FORM_LABEL = 'block mb-1 text-xs font-medium text-[color:var(--muted)]';
 const FIELD_ERROR = 'mt-1 text-xs text-[color:var(--danger)]';
 const FORM_ACTIONS = 'flex gap-2 justify-end mt-4';
+
+/* ------------------------------------------------------------------ */
+/* Inline action icons (replace the PNG images)                        */
+/* ------------------------------------------------------------------ */
+const svgProps = {
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+  className: ICON_SVG,
+};
+
+const EyeIcon = () => (
+  <svg {...svgProps}>
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+const BanIcon = () => (
+  <svg {...svgProps}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m5.6 5.6 12.8 12.8" />
+  </svg>
+);
+const CheckCircleIcon = () => (
+  <svg {...svgProps}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m8 12.5 2.8 2.8L16 9.5" />
+  </svg>
+);
+const TrashIcon = () => (
+  <svg {...svgProps}>
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="M6 6l1 14h10l1-14" />
+    <path d="M10 10.5v6M14 10.5v6" />
+  </svg>
+);
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([
@@ -160,7 +183,6 @@ const UserManagement: React.FC = () => {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'all' | User['role']>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | User['status']>('all');
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'name', dir: 'asc' });
   const [page, setPage] = useState(1);
@@ -191,9 +213,8 @@ const UserManagement: React.FC = () => {
     const q = searchTerm.trim().toLowerCase();
     const list = users.filter(user => {
       const matchesSearch = !q || user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q);
-      const matchesRole = filterRole === 'all' || user.role === filterRole;
       const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
-      return matchesSearch && matchesRole && matchesStatus;
+      return matchesSearch && matchesStatus;
     });
     const { key, dir } = sort;
     const factor = dir === 'asc' ? 1 : -1;
@@ -205,14 +226,13 @@ const UserManagement: React.FC = () => {
         : String(av).localeCompare(String(bv));
       return cmp * factor;
     });
-  }, [users, searchTerm, filterRole, filterStatus, sort]);
+  }, [users, searchTerm, filterStatus, sort]);
 
   const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const pageStart = (currentPage - 1) * PAGE_SIZE;
   const pagedUsers = filteredUsers.slice(pageStart, pageStart + PAGE_SIZE);
-  const maxUsage = useMemo(() => Math.max(1, ...users.map(u => u.apiUsage)), [users]);
-  const hasFilters = searchTerm !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const hasFilters = searchTerm !== '' || filterStatus !== 'all';
 
   const stats = {
     totalUsers: users.length,
@@ -224,12 +244,11 @@ const UserManagement: React.FC = () => {
   const handleSort = (key: SortKey) => {
     setSort(prev => prev.key === key
       ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-      : { key, dir: key === 'apiUsage' || key === 'joinDate' ? 'desc' : 'asc' });
+      : { key, dir: key === 'apiUsage' ? 'desc' : 'asc' });
   };
 
   const resetFilters = () => {
     setSearchTerm('');
-    setFilterRole('all');
     setFilterStatus('all');
     setPage(1);
   };
@@ -301,7 +320,7 @@ const UserManagement: React.FC = () => {
     if (!target) return;
     const nextStatus = target.status === 'active' ? 'inactive' : 'active';
     setUsers(users.map(u => (u.id === id ? { ...u, status: nextStatus } : u)));
-    notify(nextStatus === 'active' ? 'User activated' : 'User deactivated');
+    notify(nextStatus === 'active' ? 'User activated' : 'User suspended');
   };
 
   const handleExport = () => {
@@ -329,7 +348,7 @@ const UserManagement: React.FC = () => {
     return (
       <th className={TH} aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
         <button
-          className={`inline-flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer rounded hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
+          className={`inline-flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer rounded uppercase tracking-wider font-medium text-xs hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
           onClick={() => handleSort(k)}
         >
           {label}
@@ -388,11 +407,11 @@ const UserManagement: React.FC = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          <div className="relative flex-[1_1_240px] max-w-[360px] max-md:max-w-none max-md:basis-full">
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="relative flex-[1_1_240px] max-w-[400px] max-md:max-w-none max-md:basis-full">
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--muted)] pointer-events-none"
-              width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--muted)] pointer-events-none"
+              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"
             >
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
@@ -400,7 +419,7 @@ const UserManagement: React.FC = () => {
             <input
               className={SEARCH_INPUT}
               type="text"
-              placeholder="Search by name or email"
+              placeholder="Search by name or email..."
               aria-label="Search users"
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
@@ -415,30 +434,19 @@ const UserManagement: React.FC = () => {
           </div>
           <select
             className={CONTROL_SELECT}
-            aria-label="Filter by role"
-            value={filterRole}
-            onChange={(e) => { setFilterRole(e.target.value as 'all' | User['role']); setPage(1); }}
-          >
-            <option value="all">All roles</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-            <option value="analyst">Analyst</option>
-          </select>
-          <select
-            className={CONTROL_SELECT}
             aria-label="Filter by status"
             value={filterStatus}
             onChange={(e) => { setFilterStatus(e.target.value as 'all' | User['status']); setPage(1); }}
           >
-            <option value="all">All statuses</option>
+            <option value="all">All status</option>
             <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="inactive">Suspended</option>
           </select>
           {hasFilters && (
-            <button className={btn(BTN_SECONDARY, BTN_MD, 'h-9')} onClick={resetFilters}>Clear filters</button>
+            <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl!')} onClick={resetFilters}>Clear filters</button>
           )}
           <span className="flex-1 max-md:hidden" />
-          <button className={btn(BTN_SECONDARY, BTN_MD, 'h-9')} onClick={handleExport}>Export CSV</button>
+          <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl!')} onClick={handleExport}>Export CSV</button>
         </div>
 
         {/* Add / Edit modal */}
@@ -497,7 +505,7 @@ const UserManagement: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as User['status'] })}
                   >
                     <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="inactive">Suspended</option>
                   </select>
                 </div>
               </div>
@@ -528,85 +536,59 @@ const UserManagement: React.FC = () => {
         )}
 
         {/* Table */}
-        <div className="bg-[var(--surface)] border border-[color:var(--border)] rounded-[10px] overflow-hidden">
+        <div className="bg-[var(--surface)] border border-[color:var(--border)] rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-[13px]">
+            <table className="w-full border-collapse text-sm">
               <thead className="bg-[var(--surface-2)]">
                 <tr>
                   {renderSortHeader('User', 'name')}
-                  {renderSortHeader('Role', 'role')}
                   {renderSortHeader('Status', 'status')}
-                  {renderSortHeader('Joined', 'joinDate')}
-                  {renderSortHeader('API usage', 'apiUsage')}
+                  {renderSortHeader('Requests', 'apiUsage')}
                   <th className={TH}>Last active</th>
-                  <th className={TH}>Actions</th>
+                  <th className={`${TH} text-right`}><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
                 {pagedUsers.map(user => (
                   <tr key={user.id} className="transition-colors duration-[120ms] hover:bg-[var(--hover)] last:[&>td]:border-b-0">
                     <td className={TD}>
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={`w-[30px] h-[30px] rounded-full grid place-items-center text-[11px] font-semibold shrink-0 ${AVATAR_ROLE[user.role]}`}
-                          aria-hidden="true"
-                        >
-                          {initials(user.name)}
-                        </span>
-                        <div>
-                          <div className="font-semibold text-[color:var(--text)] leading-[1.3]">{user.name}</div>
-                          <div className="text-xs text-[color:var(--muted)]">{user.email}</div>
-                        </div>
-                      </div>
+                      <div className="text-[15px] font-medium text-[color:var(--text)] leading-snug">{user.name}</div>
+                      <div className="text-[13px] text-[color:var(--muted)]">{user.email}</div>
                     </td>
                     <td className={TD}>
-                      <span className={`inline-block px-[9px] py-0.5 rounded-full text-xs font-medium ${BADGE_ROLE[user.role]}`}>
-                        {capitalize(user.role)}
+                      <span className={`inline-block px-3 py-0.5 rounded-full text-[13px] font-medium ${STATUS_CLS[user.status]}`}>
+                        {STATUS_LABEL[user.status]}
                       </span>
                     </td>
-                    <td className={TD}>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-[9px] py-0.5 rounded-full text-xs font-medium before:content-[''] before:w-1.5 before:h-1.5 before:rounded-full before:bg-current ${STATUS_CLS[user.status]}`}
-                      >
-                        {capitalize(user.status)}
-                      </span>
+                    <td className={`${TD} text-[15px] text-[color:var(--text)]`}>
+                      {user.apiUsage.toLocaleString('en-US')}
                     </td>
-                    <td className={TD}>{user.joinDate}</td>
-                    <td className={`${TD} min-w-[90px]`}>
-                      <div className="text-[color:var(--text)] font-medium">{formatUsage(user.apiUsage)}</div>
-                      <div className="h-[3px] rounded-[2px] bg-[var(--border)] mt-1 overflow-hidden">
-                        <span
-                          className="block h-full bg-[var(--accent)] rounded-[2px]"
-                          style={{ width: `${Math.max(2, (user.apiUsage / maxUsage) * 100)}%` }}
-                        />
-                      </div>
-                    </td>
-                    <td className={TD}>{user.lastActive}</td>
+                    <td className={`${TD} text-[15px]`}>{user.lastActive}</td>
                     <td className={TD}>
-                      <div className="flex gap-0.5">
+                      <div className="flex justify-end gap-3 pr-2">
                         <button
-                          className={`${ICON_BTN} hover:bg-[rgba(59,130,246,.14)]`}
+                          className={`${ICON_BTN} text-[color:var(--text)]`}
                           onClick={() => handleEditUser(user)}
-                          title="Edit"
-                          aria-label={`Edit ${user.name}`}
+                          title="View / Edit"
+                          aria-label={`View ${user.name}`}
                         >
-                          <img className={ICON_IMG} src={editIcon} alt="" />
+                          <EyeIcon />
                         </button>
                         <button
-                          className={`${ICON_BTN} hover:bg-[rgba(168,85,247,.14)]`}
+                          className={`${ICON_BTN} ${user.status === 'active' ? 'text-orange-500' : 'text-emerald-600'}`}
                           onClick={() => handleStatusToggle(user.id)}
-                          title={user.status === 'active' ? 'Deactivate' : 'Activate'}
-                          aria-label={`${user.status === 'active' ? 'Deactivate' : 'Activate'} ${user.name}`}
+                          title={user.status === 'active' ? 'Suspend' : 'Activate'}
+                          aria-label={`${user.status === 'active' ? 'Suspend' : 'Activate'} ${user.name}`}
                         >
-                          <img className={ICON_IMG} src={user.status === 'active' ? enableIcon : disableIcon} alt="" />
+                          {user.status === 'active' ? <BanIcon /> : <CheckCircleIcon />}
                         </button>
                         <button
-                          className={`${ICON_BTN} hover:bg-[rgba(239,68,68,.14)]`}
+                          className={`${ICON_BTN} text-rose-600`}
                           onClick={() => setDeleteTarget(user)}
                           title="Delete"
                           aria-label={`Delete ${user.name}`}
                         >
-                          <img className={ICON_IMG} src={deleteIcon} alt="" />
+                          <TrashIcon />
                         </button>
                       </div>
                     </td>
@@ -631,7 +613,7 @@ const UserManagement: React.FC = () => {
           )}
 
           {filteredUsers.length > 0 && (
-            <div className="flex justify-between items-center gap-2 px-3 py-2 border-t border-[color:var(--border)] text-[color:var(--muted)] text-xs flex-wrap">
+            <div className="flex justify-between items-center gap-2 px-6 py-3 border-t border-[color:var(--border)] text-[color:var(--muted)] text-xs flex-wrap">
               <span>
                 Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredUsers.length)} of {filteredUsers.length}
               </span>

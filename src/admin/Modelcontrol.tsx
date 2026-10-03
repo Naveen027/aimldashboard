@@ -1,4 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Cpu,
+  Eye,
+  MessageSquare,
+  Network,
+  ScanFace,
+  Fingerprint,
+  type LucideIcon,
+} from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { aiModelCatalog, type AiModelType } from '../data/aiModels';
 
@@ -68,13 +77,23 @@ const statusLabel: Record<Model['status'], string> = {
   maintenance: 'Maintenance',
 };
 
-const modelTypeIcon: Record<string, string> = {
-  llm: 'bi-chat-dots-fill',
-  vision: 'bi-eye-fill',
-  embedding: 'bi-diagram-3-fill',
-  other: 'bi-cpu-fill',
+/* ---------- Lucide icons for models ---------- */
+// Fallback icon by model type
+const modelTypeIcon: Record<string, LucideIcon> = {
+  llm: MessageSquare,
+  vision: Eye,
+  embedding: Network,
+  other: Cpu,
 };
-const getModelIcon = (type: string) => modelTypeIcon[type] ?? 'bi-cpu-fill';
+
+// Specific icon overrides by model id
+const modelIdIcon: Record<string, LucideIcon> = {
+  'kartavya-face-matching': ScanFace,
+  'muzzle-print-identification': Fingerprint,
+};
+
+const getModelIcon = (model: Pick<Model, 'id' | 'type'>): LucideIcon =>
+  modelIdIcon[model.id] ?? modelTypeIcon[model.type] ?? Cpu;
 
 const modelTypeLabel: Record<string, string> = {
   llm: 'Language',
@@ -203,6 +222,9 @@ const ModelControl: React.FC = () => {
 
   const delay = (i: number, step = 70): React.CSSProperties => ({ animationDelay: `${i * step}ms` });
 
+  // Resolved icon components (capitalised so JSX treats them as components)
+  const SelectedIcon = selectedModel ? getModelIcon(selectedModel) : Cpu;
+
   return (
     <AdminLayout>
       {/* Keyframes (Tailwind has no built-in ones for these) */}
@@ -291,10 +313,10 @@ const ModelControl: React.FC = () => {
               <div className="mb-3 flex items-start justify-between gap-3 pr-10">
                 <div className="flex min-w-0 items-start gap-3">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xl text-indigo-600 transition-colors duration-300 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-300">
-                    <i className={`bi ${getModelIcon(selectedModel.type)}`} />
+                    <SelectedIcon size={22} strokeWidth={2} aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
-                  <h2 className="mb-1 break-words text-xl font-semibold text-slate-900 [.ain-app.theme-dark_&]:text-white">
+                  <h2 className="mb-1 break-words [font-size:1.25rem]! font-semibold text-slate-900 [.ain-app.theme-dark_&]:text-white">
                     {selectedModel.name}
                   </h2>
                   <p className="m-0 text-xs text-slate-500 [.ain-app.theme-dark_&]:text-slate-300">
@@ -338,7 +360,7 @@ const ModelControl: React.FC = () => {
               )}
 
               {/* metrics */}
-              <div className="mb-3 grid grid-cols-1 gap-3 border-y border-slate-100 py-3 md:grid-cols-2 [.ain-app.theme-dark_&]:border-gray-700">
+              <div className="mb-2 grid grid-cols-1 gap-3 border-y border-slate-100 py-3 md:grid-cols-2 [.ain-app.theme-dark_&]:border-gray-700">
                 <div className="text-center">
                   <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
                     Usage
@@ -527,6 +549,7 @@ const ModelControl: React.FC = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
             {models.map((model, i) => {
               const isActive = model.status === 'active';
+              const ModelIcon = getModelIcon(model);
               return (
                 <div
                   key={model.id}
@@ -549,8 +572,8 @@ const ModelControl: React.FC = () => {
                   {/* top row: icon + title + status pill */}
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-4">
-                      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px]! bg-gradient-to-br from-indigo-500 to-purple-500 text-2xl text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
-                        <i className="bi bi-cpu" />
+                      <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[16px]! bg-gradient-to-br from-indigo-500 to-purple-500 text-2xl text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+                        <ModelIcon size={26} strokeWidth={2} aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
                         <h3 className="m-0 line-clamp-2 !text-[18px] font-semibold leading-tight text-slate-900 [.ain-app.theme-dark_&]:text-white">
