@@ -387,7 +387,7 @@ const ModelControl: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mb-4 text-[11px] text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
+              <div className="mb-2 text-[11px] text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
                 <small>Last Updated: {selectedModel.lastUpdated}</small>
               </div>
 
@@ -572,7 +572,7 @@ const ModelControl: React.FC = () => {
                   {/* top row: icon + title + status pill */}
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-4">
-                      <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[16px]! bg-gradient-to-br from-indigo-500 to-purple-500 text-2xl text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+                      <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:#131b2e] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
                         <ModelIcon size={26} strokeWidth={2} aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
