@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import AdminLayout from "./AdminLayout";
-import { useAuth } from "../context/AuthContext";
 import { aiModelCatalog } from "../data/aiModels";
 
 interface UsageRow {
@@ -727,9 +726,6 @@ const ExportMenu: React.FC = () => {
 /*  Dashboard                                                                 */
 /* -------------------------------------------------------------------------- */
 const AdminDashboard: React.FC = () => {
-  const { authResponse } = useAuth();
-  const adminUsername = authResponse?.username || "Admin";
-
   // ---- Filter state ----
   const [filterOpen, setFilterOpen] = useState(false);
   const [modelFilter, setModelFilter] = useState<string>(ALL);
@@ -783,7 +779,6 @@ const AdminDashboard: React.FC = () => {
         {/* Top bar */}
         <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
-            {/* Welcome, {adminUsername}! */}
             Dashboard
           </h2>
 
