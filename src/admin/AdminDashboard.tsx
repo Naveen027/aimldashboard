@@ -779,11 +779,12 @@ const AdminDashboard: React.FC = () => {
   return (
     <AdminLayout>
 
-      <div className="mx-auto w-full max-w-[1520px] px-0 py-2 sm:px-1">
+      <div className="mx-auto w-full max-w-[1520px] px-0 py-0 sm:px-1">
         {/* Top bar */}
         <div className="mb-1 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
           <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
-            Welcome, {adminUsername}!
+            {/* Welcome, {adminUsername}! */}
+            Dashboard
           </h2>
 
           <span className="inline-flex w-fit max-w-full items-center gap-2 rounded-[10px]! bg-amber-50 px-3 py-1.5 !text-sm !font-thin !text-amber-700 ring-1 ring-amber-200 sm:px-3.5 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/30">
@@ -792,7 +793,7 @@ const AdminDashboard: React.FC = () => {
           </span>
         </div>
 
-        <p className="mb-3  font-normal !text-slate-500! text-[15px]  sm:mb-5  !dark:text-slate-400">
+         <p className="mt-0 mb-2 text-[color:#6b7280]">
           System-wide Summary
         </p>
 

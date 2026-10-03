@@ -16,7 +16,7 @@ interface AdminSidebarProps {
 }
 
 const navItems: NavItem[] = [
-  { label: "System Overview", icon: "bi-grid-1x2-fill", to: "/admin-dashboard" },
+  { label: "Dashboard", icon: "bi-grid-1x2-fill", to: "/admin-dashboard" },
   { label: "User Management", icon: "bi-person", to: "/admin/user-management" },
   { label: "Model Control", icon: "bi-gear", to: "/admin/model-control" },
   { label: "Billing Admin", icon: "bi-receipt", to: "/admin/billing" },
