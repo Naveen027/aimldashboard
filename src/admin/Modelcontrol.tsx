@@ -251,7 +251,7 @@ const ModelControl: React.FC = () => {
       >
         {/* ---------- Header ---------- */}
         <div className="mc-rise mb-0 flex flex-col items-start justify-between gap-4 md:flex-row md:gap-0">
-           <div className="mb-2">
+          <div className="mb-2">
             <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-[color:black]!  dark:text-white">Model Control</h2>
             <p className="mt-0.5 mb-0 text-[color:#6b7280]">Manage AI models and endpoints</p>
           </div>
@@ -266,11 +266,10 @@ const ModelControl: React.FC = () => {
               className={`mc-rise flex items-center gap-3 rounded-[10px] border border-slate-200 bg-white px-3 py-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:gap-4 sm:px-5 sm:py-4 ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
             >
               <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[50px] sm:w-[50px] sm:text-2xl ${
-                  s.healthy
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
                     ? `bg-emerald-50 text-emerald-600 ${dark}:bg-emerald-500/10 ${dark}:text-emerald-400`
                     : `bg-indigo-50 text-indigo-600 ${dark}:bg-indigo-500/10 ${dark}:text-indigo-300`
-                }`}
+                  }`}
               >
                 <i className={`bi ${s.icon}`} />
               </span>
@@ -289,7 +288,7 @@ const ModelControl: React.FC = () => {
         {/* ---------- Model Details Modal (opens on card click) ---------- */}
         {selectedModel && (
           <div
-            className="mc-fade fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            className="mc-fade fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md"
             onClick={() => setSelectedModelId(null)}
           >
             <div
@@ -297,116 +296,124 @@ const ModelControl: React.FC = () => {
               aria-modal="true"
               aria-label={selectedModel.name}
               onClick={(e) => e.stopPropagation()}
-              className={`mc-pop relative max-h-[90vh] w-[95%] max-w-[600px] overflow-y-auto rounded-[10px] bg-white p-3 shadow-2xl md:w-[90%] md:p-6 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
+              className={`mc-pop relative max-h-[90vh] w-[95%] max-w-[600px] overflow-y-auto rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 md:w-[90%] ${dark}:bg-gray-900 ${dark}:text-gray-100 ${dark}:ring-white/10`}
             >
-              {/* Close (X) button — rotates, scales and turns rose on hover */}
+              {/* Close (X) button */}
               <button
                 type="button"
                 onClick={() => setSelectedModelId(null)}
                 aria-label="Close model details"
-                className="group absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center [border-radius:10px]! bg-slate-100 text-slate-500 transition-all duration-300 ease-out hover:rotate-90 hover:scale-110 hover:bg-rose-500 hover:text-white hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 active:scale-95 motion-reduce:transition-none motion-reduce:hover:rotate-0 [.ain-app.theme-dark_&]:bg-gray-700 [.ain-app.theme-dark_&]:text-gray-200 [.ain-app.theme-dark_&]:hover:bg-rose-500 [.ain-app.theme-dark_&]:hover:text-white"
+                className="group absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center [border-radius:10px]! bg-white/20 text-white backdrop-blur transition-all duration-300 ease-out hover:rotate-90 hover:scale-110 hover:bg-rose-500 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 motion-reduce:transition-none motion-reduce:hover:rotate-0"
               >
-                <i className="bi bi-x-lg text-sm transition-transform duration-300 group-hover:scale-110" />
+                <i className="bi bi-x-lg text-sm" />
               </button>
 
-              {/* header */}
-              <div className="mb-3 flex items-start justify-between gap-3 pr-10">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xl text-indigo-600 transition-colors duration-300 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-300">
-                    <SelectedIcon size={22} strokeWidth={2} aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0">
-                  <h2 className="mb-1 break-words [font-size:1.25rem]! font-semibold text-slate-900 [.ain-app.theme-dark_&]:text-white">
-                    {selectedModel.name}
-                  </h2>
-                  <p className="m-0 text-xs text-slate-500 [.ain-app.theme-dark_&]:text-slate-300">
-                    {selectedModel.provider} • {selectedModel.category}
-                  </p>
-                  </div>
-                </div>
-                <span
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-[10px]! px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${statusBadgeCls[selectedModel.status]}`}
-                >
-                  {selectedModel.status === 'active' ? '✓' : '○'} {selectedModel.status}
-                </span>
-              </div>
+              {/* hero banner */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-4 pb-10 pt-3 md:px-6">
+                <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
+                <span className="pointer-events-none absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-white/10" />
 
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <div className="w-fit rounded-[10px] bg-indigo-50 px-2.5 py-1 text-[11px] font-semibold uppercase text-indigo-500">
-                  {selectedModel.type.charAt(0).toUpperCase() + selectedModel.type.slice(1)}
-                </div>
-                <div className="w-fit rounded-[10px] bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600 [.ain-app.theme-dark_&]:bg-gray-700 [.ain-app.theme-dark_&]:text-slate-300">
-                  v{selectedModel.version}
-                </div>
-              </div>
-
-              {selectedModel.description && (
-                <p className="mb-3 text-sm leading-relaxed text-slate-600 [.ain-app.theme-dark_&]:text-slate-300">
-                  {selectedModel.description}
-                </p>
-              )}
-
-              {selectedModel.highlights.length > 0 && (
-                <div className="mb-4 flex flex-wrap gap-1.5">
-                  {selectedModel.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      className="rounded-full bg-indigo-50 px-2 py-1 text-[10px] font-medium text-indigo-700 [.ain-app.theme-dark_&]:bg-gray-700 [.ain-app.theme-dark_&]:text-indigo-200"
-                    >
-                      {highlight}
+                <div className="relative flex items-start justify-between gap-3 pr-10">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur">
+                      <SelectedIcon size={24} strokeWidth={2} aria-hidden="true" />
                     </span>
-                  ))}
-                </div>
-              )}
-
-              {/* metrics */}
-              <div className="mb-2 grid grid-cols-1 gap-3 border-y border-slate-100 py-3 md:grid-cols-2 [.ain-app.theme-dark_&]:border-gray-700">
-                <div className="text-center">
-                  <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                    Usage
-                  </div>
-                  <div className="text-lg font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
-                    {selectedModel.usagePercentage.toFixed(1)}%
-                  </div>
-                  <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className="mc-fill relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-purple-600"
-                      style={{ ['--mc-w' as string]: `${Math.min(selectedModel.usagePercentage, 100)}%`, width: `${Math.min(selectedModel.usagePercentage, 100)}%` } as React.CSSProperties}
-                    >
-                      <span className="mc-sheen absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                    <div className="min-w-0">
+                      <h2 className="m-0 break-words [font-size:1.25rem]! font-semibold leading-tight text-white">
+                        {selectedModel.name}
+                      </h2>
+                      <p className="m-0 mt-0.5 text-xs text-white/80">
+                        {selectedModel.provider} • {selectedModel.category}
+                      </p>
                     </div>
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                    RPM Limit
-                  </div>
-                  <div className="text-lg font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
-                    {(selectedModel.rpmLimit / 1000).toFixed(1)}K
-                  </div>
+
+                <div className="relative mt-4 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase text-white ring-1 ring-white/25">
+                    {selectedModel.type.charAt(0).toUpperCase() + selectedModel.type.slice(1)}
+                  </span>
+                  <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/25">
+                    v{selectedModel.version}
+                  </span>
+                  <span
+                    className={`ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-[10px]! px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-sm ${statusBadgeCls[selectedModel.status]}`}
+                  >
+                    {selectedModel.status === 'active' ? '✓' : '○'} {selectedModel.status}
+                  </span>
                 </div>
               </div>
 
-              <div className="mb-2 text-[11px] text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                <small>Last Updated: {selectedModel.lastUpdated}</small>
-              </div>
+              {/* body — overlaps the banner */}
+              <div className="relative -mt-6 rounded-t-3xl bg-white p-4 md:p-6 [.ain-app.theme-dark_&]:bg-gray-900">
+                {selectedModel.description && (
+                  <p className="mb-4 text-sm leading-relaxed text-slate-600 [.ain-app.theme-dark_&]:text-slate-300">
+                    {selectedModel.description}
+                  </p>
+                )}
 
-              {/* actions (Disable/Enable moved to the card) */}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  className={`${actionBtn} hover:border-blue-700 hover:bg-blue-50 hover:text-blue-700`}
-                  onClick={() => handleEditModel(selectedModel)}
-                  title="Edit"
-                >
-                  ✏️ Edit
-                </button>
-                <button
-                  className={`${actionBtn} hover:border-red-800 hover:bg-red-100 hover:text-red-800`}
-                  onClick={() => handleDeleteModel(selectedModel.id)}
-                  title="Delete"
-                >
-                  🗑️ Delete
-                </button>
+                {selectedModel.highlights.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-1.5">
+                    {selectedModel.highlights.map((highlight) => (
+                      <span
+                        key={highlight}
+                        className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-medium text-indigo-700 ring-1 ring-indigo-100 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-200 [.ain-app.theme-dark_&]:ring-indigo-400/20"
+                      >
+                        {highlight}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* metrics */}
+                <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div className="[border-radius:10px]! bg-slate-50 p-2 text-center ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5">
+                    <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
+                      Usage
+                    </div>
+                    <div className="text-2xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
+                      {selectedModel.usagePercentage.toFixed(1)}%
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 [.ain-app.theme-dark_&]:bg-gray-700">
+                      <div
+                        className="mc-fill relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"
+                        style={{ ['--mc-w' as string]: `${Math.min(selectedModel.usagePercentage, 100)}%`, width: `${Math.min(selectedModel.usagePercentage, 100)}%` } as React.CSSProperties}
+                      >
+                        <span className="mc-sheen absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center rounded-2xl bg-slate-50 p-4 text-center ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5">
+                    <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
+                      RPM Limit
+                    </div>
+                    <div className="text-2xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
+                      {(selectedModel.rpmLimit / 1000).toFixed(1)}K
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-2 text-center text-[11px] text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
+                  <small>Last Updated: {selectedModel.lastUpdated}</small>
+                </div>
+
+                {/* actions */}
+                <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-2 [.ain-app.theme-dark_&]:border-gray-800">
+                  <button
+                    className={`${actionBtn} hover:border-blue-700 hover:bg-blue-50 hover:text-blue-700`}
+                    onClick={() => handleEditModel(selectedModel)}
+                    title="Edit"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className={`${actionBtn} hover:border-red-800 hover:bg-red-100 hover:text-red-800`}
+                    onClick={() => handleDeleteModel(selectedModel.id)}
+                    title="Delete"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -565,9 +572,8 @@ const ModelControl: React.FC = () => {
                     }
                   }}
                   style={delay(i + 6)}
-                  className={`mc-rise group relative flex cursor-pointer flex-col rounded-[16px]! border border-slate-200 bg-white p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${
-                    model.status === 'disabled' ? 'opacity-80' : ''
-                  } ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
+                  className={`mc-rise group relative flex cursor-pointer flex-col rounded-[16px]! border border-slate-200 bg-white p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === 'disabled' ? 'opacity-80' : ''
+                    } ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
                 >
                   {/* top row: icon + title + status pill */}
                   <div className="mb-2 flex items-start justify-between gap-3">
@@ -621,11 +627,10 @@ const ModelControl: React.FC = () => {
                       handleToggleModel(model.id);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
-                    className={`mt-auto w-full !rounded-[14px] border bg-white px-3 py-2 text-center text-base font-medium transition-all duration-200 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 ${
-                      isActive
+                    className={`mt-auto w-full !rounded-[14px] border bg-white px-3 py-2 text-center text-base font-medium transition-all duration-200 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 ${isActive
                         ? 'border-slate-200 text-slate-800 hover:border-red-300 hover:bg-red-50 hover:text-red-700 focus-visible:ring-red-400/20'
                         : 'border-slate-200 text-slate-800 hover:border-green-300 hover:bg-green-50 hover:text-green-700 focus-visible:ring-green-400/20'
-                    } ${dark}:border-gray-600 ${dark}:bg-gray-700/60 ${dark}:text-gray-100`}
+                      } ${dark}:border-gray-600 ${dark}:bg-gray-700/60 ${dark}:text-gray-100`}
                   >
                     {isActive ? 'Disable model' : 'Enable model'}
                   </button>
