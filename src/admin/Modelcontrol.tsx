@@ -88,7 +88,7 @@ const modelTypeIcon: Record<string, LucideIcon> = {
 
 // Specific icon overrides by model id
 const modelIdIcon: Record<string, LucideIcon> = {
-  'kartavya-face-matching': ScanFace,
+  'face-matching': ScanFace,
   'muzzle-print-identification': Fingerprint,
 };
 
@@ -122,7 +122,7 @@ const ModelControl: React.FC = () => {
   const [endpoints] = useState<ModelEndpoint[]>([
     {
       id: 'endpoint-face-matching',
-      modelId: 'kartavya-face-matching',
+      modelId: 'face-matching',
       url: 'https://api.karnataka.gov.in/v1/face-matching',
       apiKey: 'sk-***',
       region: 'US-East',
@@ -549,11 +549,11 @@ const ModelControl: React.FC = () => {
         )}
 
         {/* ---------- Models (cards styled like the reference image) ---------- */}
-        <div className="mb-2">
-          <h2 className="mc-rise mb-2 text-xl font-semibold text-slate-900 [.ain-app.theme-dark_&]:text-white" style={delay(5)}>
+        <div className="mb-2 rounded-[16px]! border border-slate-200 bg-white p-4 ">
+          <h2 className="mc-rise  mb-2 [font-size:20px]! font-semibold text-slate-900 [.ain-app.theme-dark_&]:text-white" style={delay(5)}>
             Active Models
           </h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
+          <div className="grid  grid-cols-1 gap-4 md:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
             {models.map((model, i) => {
               const isActive = model.status === 'active';
               const ModelIcon = getModelIcon(model);
@@ -572,12 +572,18 @@ const ModelControl: React.FC = () => {
                     }
                   }}
                   style={delay(i + 6)}
-                  className={`mc-rise group relative flex cursor-pointer flex-col rounded-[16px]! border border-slate-200 bg-white p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === 'disabled' ? 'opacity-80' : ''
+                  className={`mc-rise ![gap:10px] group relative flex cursor-pointer flex-col rounded-[16px]! border border-slate-200 bg-white p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === 'disabled' ? 'opacity-80' : ''
                     } ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
                 >
+                  {/* animated border: draws left → right on hover */}
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -inset-px z-10 rounded-[16px]! border-2 border-indigo-500 [clip-path:inset(0_100%_0_0)] transition-[clip-path] duration-300 ease-out group-hover:[clip-path:inset(0_0_0_0)] motion-reduce:transition-none"
+                  />
+
                   {/* top row: icon + title + status pill */}
                   <div className="mb-2 flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-4 ">
                       <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
                         <ModelIcon size={26} strokeWidth={2} aria-hidden="true" />
                       </span>
@@ -627,10 +633,13 @@ const ModelControl: React.FC = () => {
                       handleToggleModel(model.id);
                     }}
                     onKeyDown={(e) => e.stopPropagation()}
-                    className={`mt-auto w-full !rounded-[14px] border bg-white px-3 py-2 text-center text-base font-medium transition-all duration-200 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 ${isActive
-                        ? 'border-slate-200 text-slate-800 hover:border-red-300 hover:bg-red-50 hover:text-red-700 focus-visible:ring-red-400/20'
-                        : 'border-slate-200 text-slate-800 hover:border-green-300 hover:bg-green-50 hover:text-green-700 focus-visible:ring-green-400/20'
-                      } ${dark}:border-gray-600 ${dark}:bg-gray-700/60 ${dark}:text-gray-100`}
+                    className={`mt-auto w-full !rounded-[14px] border px-3 py-2 text-center text-base font-medium transition-all duration-200 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 ${
+                      isActive
+                        ? // ENABLED: coloured background
+                          'border-indigo-500 bg-indigo-500 text-white hover:border-indigo-600 hover:bg-indigo-600 focus-visible:ring-indigo-500/30'
+                        : // DISABLED: original look, unchanged
+                          `border-slate-200 bg-white text-slate-800 hover:border-green-300 hover:bg-green-50 hover:text-green-700 focus-visible:ring-green-400/20 ${dark}:border-gray-600 ${dark}:bg-gray-700/60 ${dark}:text-gray-100`
+                    }`}
                   >
                     {isActive ? 'Disable model' : 'Enable model'}
                   </button>
