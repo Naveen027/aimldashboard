@@ -150,8 +150,8 @@ const BillingAdmin: React.FC = () => {
       [&_.ba-header_h1]:[color:#1a1a1a]
       [&_.ba-header_h1]:[margin:0_0_8px_0]
       [&_.ba-header_p]:[font-size:14px]
-      [&_.ba-header_p]:[color:#666]
-      [&_.ba-header_p]:[margin:0]
+      [&_.ba-header_p]:[color:#6b7280]
+      [&_.ba-header_p]:[margin:2px_0_0]
       [&_.btn-primary]:[padding:10px_20px]
       [&_.btn-primary]:[background:#667eea]
       [&_.btn-primary]:[color:white]
@@ -421,10 +421,10 @@ const BillingAdmin: React.FC = () => {
       max-[768px]:[&_.invoice-actions_.action-btn]:[width:100%]`}>
       <div className="ba-header">
         <div>
-          <h2 className="break-words !text-xl !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
+          <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">
             Billing & Analytics
           </h2>
-          <p className="mb-4  font-normal !text-slate-500 text-[15px]  sm:mb-5  !dark:text-slate-400">
+          <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
             Revenue tracking and invoice management
           </p>
         </div>

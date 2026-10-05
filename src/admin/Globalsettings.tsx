@@ -252,8 +252,8 @@ const GlobalSettings: React.FC = () => {
         {/* Header */}
         <header className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="break-words [font-size:1.2rem]! font-bold leading-tight tracking-tight text-[color:black]!  dark:text-white">Global Settings</h2>
-            <p className="mt-0.5 mb-0 text-[color:#6b7280]">System configuration and admin preferences</p>
+            <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Global Settings</h2>
+            <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">System configuration and admin preferences</p>
           </div>
           <button className={btnPrimary} onClick={() => setToast('Settings saved')}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
@@ -266,7 +266,7 @@ const GlobalSettings: React.FC = () => {
         {/* Tabs with sliding indicator */}
         <nav
           role="tablist"
-          className={`relative mb-2 flex overflow-x-auto p-1.5 ${card}`}
+          className={`relative mb-3 flex overflow-x-auto p-1.5 ${card}`}
         >
           <span
             aria-hidden

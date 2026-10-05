@@ -778,7 +778,7 @@ const AdminDashboard: React.FC = () => {
       <div className="mx-auto w-full max-w-[1520px] px-0 py-0 sm:px-1">
         {/* Top bar */}
         <div className="mb-0 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-          <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
+          <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">
             Dashboard
           </h2>
 
@@ -788,7 +788,7 @@ const AdminDashboard: React.FC = () => {
           </span> */}
         </div>
 
-         <p className="mt-0 mb-2 text-[color:#6b7280]">
+         <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
           System-wide Summary
         </p>
 

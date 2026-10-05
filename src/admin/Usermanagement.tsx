@@ -366,8 +366,8 @@ const UserManagement: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center gap-3 mb-2 max-md:flex-col max-md:items-start">
           <div>
-            <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">User Management</h2>
-            <p className="mt-0.5 mb-0 text-[color:var(--muted)]">Manage and monitor user accounts</p>
+            <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">User Management</h2>
+            <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Manage and monitor user accounts</p>
           </div>
           <button className={btn(BTN_PRIMARY)} onClick={handleAddUser}>
             + Add user

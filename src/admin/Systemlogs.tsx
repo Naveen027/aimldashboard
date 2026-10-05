@@ -12,6 +12,28 @@ interface SystemLog {
   ipAddress: string;
 }
 
+/* ------------------------------------------------------------------ */
+/* Stat card tokens (same look as User Management cards)               */
+/* ------------------------------------------------------------------ */
+const CARD =
+  'sl-card group flex h-[100px] items-center gap-3 px-2 py-2 sm:gap-4 sm:px-6 sm:py-6 ' +
+  'rounded-[10px] border border-[#e5e7eb] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] ' +
+  '[.ain-app.theme-dark_&]:border-[#374151] [.ain-app.theme-dark_&]:bg-[#1f2937] ' +
+  'transition-[transform,box-shadow] duration-300 ease-out ' +
+  'hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0';
+
+const ICON_BOX =
+  'flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] text-xl ' +
+  'sm:h-[50px] sm:w-[50px] sm:text-2xl ' +
+  'transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none';
+
+const TONE = {
+  indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300',
+  emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
+  amber: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400',
+  rose: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400',
+} as const;
+
 const SystemLogs: React.FC = () => {
   const [logs] = useState<SystemLog[]>([
     {
@@ -119,6 +141,13 @@ const SystemLogs: React.FC = () => {
     error: logs.filter(l => l.status === 'error').length,
   };
 
+  const statCards: { label: string; value: number; icon: string; tone: keyof typeof TONE }[] = [
+    { label: 'Total logs', value: stats.totalLogs, icon: 'bi-journal-text', tone: 'indigo' },
+    { label: 'Success', value: stats.success, icon: 'bi-check-circle', tone: 'emerald' },
+    { label: 'Warnings', value: stats.warning, icon: 'bi-exclamation-triangle', tone: 'amber' },
+    { label: 'Errors', value: stats.error, icon: 'bi-x-octagon', tone: 'rose' },
+  ];
+
   const uniqueActions = Array.from(new Set(logs.map(l => l.action)));
 
   const handleExportLogs = () => {
@@ -155,17 +184,19 @@ const SystemLogs: React.FC = () => {
       [padding:0px]
       [background:#f5f5f5]
       [min-height:100vh]
+      [border-radius:10px]
+      [&_div]:[border-radius:10px]
       [&_.sl-header]:[display:flex]
       [&_.sl-header]:[justify-content:space-between]
       [&_.sl-header]:[align-items:flex-start]
-      [&_.sl-header]:[margin-bottom:32px]
+      [&_.sl-header]:[margin-bottom:10px]
       [&_.sl-header_h1]:[font-size:25px]
       [&_.sl-header_h1]:[font-weight:700]
       [&_.sl-header_h1]:[color:#1a1a1a]
       [&_.sl-header_h1]:[margin:0_0_8px_0]
       [&_.sl-header_p]:[font-size:14px]
-      [&_.sl-header_p]:[color:#666]
-      [&_.sl-header_p]:[margin:0]
+      [&_.sl-header_p]:[color:#6b7280]
+      [&_.sl-header_p]:[margin:2px_0_0]
       [&_.header-actions]:[display:flex]
       [&_.header-actions]:[gap:12px]
       [&_.btn-primary]:[padding:10px_20px]
@@ -189,27 +220,6 @@ const SystemLogs: React.FC = () => {
       [&_.btn-secondary]:[background:#f0f0f0]
       [&_.btn-secondary]:[color:#333]
       [&_.btn-secondary:hover]:[background:#e8e8e8]
-      [&_.sl-stats]:[display:grid]
-      [&_.sl-stats]:[grid-template-columns:repeat(auto-fit,_minmax(180px,_1fr))]
-      [&_.sl-stats]:[gap:16px]
-      [&_.sl-stats]:[margin-bottom:32px]
-      [&_.stat-card]:[background:white]
-      [&_.stat-card]:[padding:20px]
-      [&_.stat-card]:[border-radius:8px]
-      [&_.stat-card]:[box-shadow:0_2px_4px_rgba(0,_0,_0,_0.05)]
-      [&_.stat-card]:[border-left:4px_solid_#667eea]
-      [&_.stat-card.success]:[border-left-color:#10b981]
-      [&_.stat-card.warning]:[border-left-color:#f59e0b]
-      [&_.stat-card.error]:[border-left-color:#ef4444]
-      [&_.stat-label]:[font-size:12px]
-      [&_.stat-label]:[color:#888]
-      [&_.stat-label]:[text-transform:uppercase]
-      [&_.stat-label]:[letter-spacing:0.3px]
-      [&_.stat-label]:[margin-bottom:8px]
-      [&_.stat-label]:[font-weight:500]
-      [&_.stat-value]:[font-size:28px]
-      [&_.stat-value]:[font-weight:700]
-      [&_.stat-value]:[color:#1a1a1a]
       [&_.sl-controls]:[display:grid]
       [&_.sl-controls]:[grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))]
       [&_.sl-controls]:[gap:16px]
@@ -332,7 +342,6 @@ const SystemLogs: React.FC = () => {
       max-[768px]:[&_.header-actions]:[width:100%]
       max-[768px]:[&_.header-actions_.btn-primary]:[width:100%]
       max-[768px]:[&_.header-actions_.btn-secondary]:[width:100%]
-      max-[768px]:[&_.sl-stats]:[grid-template-columns:repeat(2,_1fr)]
       max-[768px]:[&_.sl-controls]:[grid-template-columns:1fr]
       max-[768px]:[&_.controls-group]:[flex-direction:column]
       max-[768px]:[&_.controls-group]:[align-items:stretch]
@@ -348,19 +357,14 @@ const SystemLogs: React.FC = () => {
       [.ain-app.theme-dark_&]:[color:#f3f4f6]
       [.ain-app.theme-dark_&]:[background:transparent]
       [.ain-app.theme-dark_&_.sl-header_h1]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.stat-value]:[color:#f3f4f6]
       [.ain-app.theme-dark_&_.user]:[color:#f3f4f6]
       [.ain-app.theme-dark_&_.action]:[color:#f3f4f6]
       [.ain-app.theme-dark_&_.sl-header_p]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.stat-label]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.logs-table_th]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.logs-table_td]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.resource]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.date-separator]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.sl-footer_small]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.sl-stats]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.sl-stats]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.sl-stats]:[border-color:#374151]
       [.ain-app.theme-dark_&_.sl-controls]:[color:#f3f4f6]
       [.ain-app.theme-dark_&_.sl-controls]:[background:#1f2937]
       [.ain-app.theme-dark_&_.sl-controls]:[border-color:#374151]
@@ -391,47 +395,67 @@ const SystemLogs: React.FC = () => {
       max-[768px]:[&_.logs-table]:[font-size:11px]
       max-[768px]:[&_.logs-table_th]:[padding:8px_4px]
       max-[768px]:[&_.logs-table_td]:[padding:8px_4px]
-      max-[480px]:[&_.sl-stats]:[grid-template-columns:1fr]
       max-[480px]:[&_.logs-table_.resource]:[display:none]
       max-[480px]:[&_.logs-table_th:nth-child(4)]:[display:none]
       max-[480px]:[&_.logs-table_th]:[padding:6px_4px]
       max-[480px]:[&_.logs-table_td]:[padding:6px_4px]`}>
+      {/* Smooth card entrance animation */}
+      <style>{`
+        @keyframes sl-card-in {
+          from { opacity: 0; transform: translateY(14px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes sl-value-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .sl-card, .sl-card-value { animation: none !important; }
+        }
+      `}</style>
+
       <div className="sl-header">
         <div>
-          <h2 className="break-words !text-xl !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
-            System Logs
-          </h2>
-          <p className="mb-4  font-normal !text-slate-500 text-[15px]  sm:mb-5  !dark:text-slate-400">
+          <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">System Logs</h2>
+          <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
             Monitor all system events and user activities
           </p>
         </div>
         <div className="header-actions">
-          <button className="btn-primary" onClick={handleExportLogs}>
+          <button className="btn-primary [border-radius:10px]!" onClick={handleExportLogs}>
             📥 Export Logs
           </button>
-          <button className="btn-secondary" onClick={handleClearOldLogs}>
+          <button className="btn-secondary [border-radius:10px]!" onClick={handleClearOldLogs}>
             🗑️ Clear Old Logs
           </button>
         </div>
       </div>
 
-      <div className="sl-stats">
-        <div className="stat-card">
-          <div className="stat-label">Total Logs</div>
-          <div className="stat-value">{stats.totalLogs}</div>
-        </div>
-        <div className="stat-card success">
-          <div className="stat-label">Success</div>
-          <div className="stat-value">{stats.success}</div>
-        </div>
-        <div className="stat-card warning">
-          <div className="stat-label">Warnings</div>
-          <div className="stat-value">{stats.warning}</div>
-        </div>
-        <div className="stat-card error">
-          <div className="stat-label">Errors</div>
-          <div className="stat-value">{stats.error}</div>
-        </div>
+      {/* Stat cards */}
+      <div className="mb-3 grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        {statCards.map((s, i) => (
+          <div
+            key={s.label}
+            className={CARD}
+            style={{ animation: `sl-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${i * 90}ms both` }}
+          >
+            <span className={`${ICON_BOX} ${TONE[s.tone]}`}>
+              <i className={`bi ${s.icon}`} />
+            </span>
+            <div className="min-w-0">
+              <div className="truncate text-sm text-slate-500 sm:text-[15px] dark:text-slate-400">
+                {s.label}
+              </div>
+              <div
+                key={s.value}
+                className="sl-card-value !text-xl font-bold leading-tight text-slate-900 sm:text-[25px] dark:text-white [.ain-app.theme-dark_&]:text-white"
+                style={{ animation: 'sl-value-in 0.4s ease-out both' }}
+              >
+                {s.value}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="sl-controls">

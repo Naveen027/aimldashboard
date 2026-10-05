@@ -252,8 +252,8 @@ const ModelControl: React.FC = () => {
         {/* ---------- Header ---------- */}
         <div className="mc-rise mb-0 flex flex-col items-start justify-between gap-4 md:flex-row md:gap-0">
           <div className="mb-2">
-            <h2 className="break-words [font-size:1.2rem] !font-bold leading-tight tracking-tight text-[color:black]!  dark:text-white">Model Control</h2>
-            <p className="mt-0.5 mb-0 text-[color:#6b7280]">Manage AI models and endpoints</p>
+            <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Model Control</h2>
+            <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">Manage AI models and endpoints</p>
           </div>
         </div>
 
