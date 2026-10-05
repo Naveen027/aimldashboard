@@ -212,7 +212,7 @@ function AdminHeader({
         <Bell strokeWidth={1.5} aria-hidden="true" />
       </button>
 
-      <form
+      {/* <form
         className="ain-admin-search-box"
         role="search"
         onSubmit={handleSubmit}
@@ -248,7 +248,7 @@ function AdminHeader({
             <X size={16} aria-hidden="true" />
           </button>
         )}
-      </form>
+      </form> */}
 
       <div className="ain-admin-theme-toggle">
         <GlobalThemeToggle />
