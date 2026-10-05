@@ -857,10 +857,10 @@ const AdminDashboard: React.FC = () => {
             {/* Height scales with screen size; chart fills it */}
             <div className="admin-model-performance-chart h-[240px] w-full sm:h-[260px] xl:h-[280px]">
               <style>{`
-                .admin-model-performance-chart .recharts-surface:focus,
-                .admin-model-performance-chart .recharts-layer:focus,
-                .admin-model-performance-chart .recharts-rectangle:focus {
-                  outline: none;
+                .admin-model-performance-chart :focus,
+                .admin-model-performance-chart :focus-visible {
+                  outline: none !important;
+                  box-shadow: none !important;
                 }
               `}</style>
               <ResponsiveContainer width="100%" height="100%">

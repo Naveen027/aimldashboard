@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Cpu,
   Eye,
@@ -6,6 +6,13 @@ import {
   Network,
   ScanFace,
   Fingerprint,
+  LayoutGrid,
+  Sparkles,
+  Plug,
+  ShieldCheck,
+  Target,
+  Check,
+  ArrowUpRight,
   type LucideIcon,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
@@ -87,9 +94,9 @@ const modelTypeIcon: Record<string, LucideIcon> = {
   other: Cpu,
 };
 
-// Specific icon overrides by model id
+// Specific icon overrides by model id (ids must match aiModelCatalog)
 const modelIdIcon: Record<string, LucideIcon> = {
-  'face-matching': ScanFace,
+  'kartavya-face-matching': ScanFace,
   'muzzle-print-identification': Fingerprint,
 };
 
@@ -103,6 +110,53 @@ const modelTypeLabel: Record<string, string> = {
   other: 'Other',
 };
 const getTypeLabel = (type: string) => modelTypeLabel[type] ?? 'Other';
+
+/* ---------- description parser ---------- */
+interface ParsedDescription {
+  intro: string;
+  sections: { title: string; items: string[] }[];
+  links: string[];
+}
+
+// Stray call-to-action lines that live inside some descriptions
+const CTA_LABELS = ['Request Demo', 'Technical Documentation', 'Case Studies'];
+
+const parseDescription = (raw: string): ParsedDescription => {
+  const intro: string[] = [];
+  const sections: ParsedDescription['sections'] = [];
+  const links: string[] = [];
+  let current: ParsedDescription['sections'][number] | null = null;
+
+  raw
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .forEach((line) => {
+      if (CTA_LABELS.includes(line)) {
+        links.push(line);
+        return;
+      }
+      if (line.endsWith(':')) {
+        current = { title: line.slice(0, -1), items: [] };
+        sections.push(current);
+        return;
+      }
+      const text = line.replace(/^[-•]\s*/, '');
+      if (current) current.items.push(text);
+      else intro.push(text);
+    });
+
+  return { intro: intro.join(' '), sections, links };
+};
+
+const sectionMeta = (title: string): { label: string; Icon: LucideIcon } => {
+  const t = title.toLowerCase();
+  if (t.includes('capabilit')) return { label: 'Capabilities', Icon: Sparkles };
+  if (t.includes('integration')) return { label: 'Integration', Icon: Plug };
+  if (t.includes('governance')) return { label: 'Governance', Icon: ShieldCheck };
+  if (t.includes('outcome')) return { label: 'Outcome', Icon: Target };
+  return { label: title, Icon: Sparkles };
+};
 
 const ModelControl: React.FC = () => {
   const [models, setModels] = useState<Model[]>(
@@ -123,7 +177,7 @@ const ModelControl: React.FC = () => {
   const [endpoints] = useState<ModelEndpoint[]>([
     {
       id: 'endpoint-face-matching',
-      modelId: 'face-matching',
+      modelId: 'kartavya-face-matching',
       url: 'https://api.karnataka.gov.in/v1/face-matching',
       apiKey: 'sk-***',
       region: 'US-East',
@@ -145,9 +199,28 @@ const ModelControl: React.FC = () => {
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [modelFormData, setModelFormData] = useState<Partial<Model>>({});
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Always derive from `models` so status changes stay in sync
-  const selectedModel = models.find(m => m.id === selectedModelId) || null;
+  const selectedModel = models.find((m) => m.id === selectedModelId) || null;
+
+  // Parse the multi-line description into intro + sections + CTA links
+  const parsed = useMemo(
+    () => (selectedModel ? parseDescription(selectedModel.description) : null),
+    [selectedModel?.description] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  const tabs = parsed
+    ? [
+        { key: 'overview', label: 'Overview', Icon: LayoutGrid },
+        ...parsed.sections.map((s) => ({ key: s.title, ...sectionMeta(s.title) })),
+      ]
+    : [];
+
+  // Start on Overview whenever a different model is opened
+  useEffect(() => {
+    setActiveTab('overview');
+  }, [selectedModelId]);
 
   // Close the details modal with Escape
   useEffect(() => {
@@ -173,7 +246,7 @@ const ModelControl: React.FC = () => {
     }
 
     if (editingModel) {
-      setModels(models.map(m => (m.id === editingModel.id ? { ...m, ...modelFormData } : m)));
+      setModels(models.map((m) => (m.id === editingModel.id ? { ...m, ...modelFormData } : m)));
     } else {
       const newModel: Model = {
         id: Date.now().toString(),
@@ -199,7 +272,7 @@ const ModelControl: React.FC = () => {
 
   const handleToggleModel = (id: string) => {
     setModels(
-      models.map(m =>
+      models.map((m) =>
         m.id === id ? { ...m, status: m.status === 'active' ? 'disabled' : 'active' } : m
       )
     );
@@ -207,7 +280,7 @@ const ModelControl: React.FC = () => {
 
   const handleDeleteModel = (id: string) => {
     if (window.confirm('Are you sure you want to delete this model?')) {
-      setModels(models.filter(m => m.id !== id));
+      setModels(models.filter((m) => m.id !== id));
       setSelectedModelId(null);
     }
   };
@@ -216,7 +289,7 @@ const ModelControl: React.FC = () => {
 
   const stats = [
     { value: models.length, label: 'Total Models', icon: 'bi-cpu-fill', healthy: false },
-    { value: models.filter(m => m.status === 'active').length, label: 'Active Models', icon: 'bi-check-circle-fill', healthy: true },
+    { value: models.filter((m) => m.status === 'active').length, label: 'Active Models', icon: 'bi-check-circle-fill', healthy: true },
     { value: endpoints.length, label: 'Endpoints', icon: 'bi-hdd-network-fill', healthy: false },
     { value: `${totalUsage.toFixed(1)}%`, label: 'Total Usage', icon: 'bi-lightning-charge-fill', healthy: false },
   ];
@@ -287,7 +360,7 @@ const ModelControl: React.FC = () => {
         </div>
 
         {/* ---------- Model Details Modal (opens on card click) ---------- */}
-        {selectedModel && (
+        {selectedModel && parsed && (
           <div
             className="mc-fade fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md"
             onClick={() => setSelectedModelId(null)}
@@ -297,42 +370,40 @@ const ModelControl: React.FC = () => {
               aria-modal="true"
               aria-label={selectedModel.name}
               onClick={(e) => e.stopPropagation()}
-              className={`mc-pop relative max-h-[90vh] w-[95%] max-w-[600px] overflow-y-auto rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 md:w-[90%] ${dark}:bg-gray-900 ${dark}:text-gray-100 ${dark}:ring-white/10`}
+              className="mc-pop relative flex max-h-[90vh] w-[95%] max-w-[640px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 md:w-[90%] [.ain-app.theme-dark_&]:bg-gray-900 [.ain-app.theme-dark_&]:text-gray-100 [.ain-app.theme-dark_&]:ring-white/10"
             >
-              {/* Close (X) button */}
+              {/* close */}
               <button
                 type="button"
                 onClick={() => setSelectedModelId(null)}
                 aria-label="Close model details"
-                className="group absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center [border-radius:10px]! bg-white/20 text-white backdrop-blur transition-all duration-300 ease-out hover:rotate-90 hover:scale-110 hover:bg-rose-500 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 motion-reduce:transition-none motion-reduce:hover:rotate-0"
+                className="group absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center [border-radius:10px]! bg-white/20 text-white backdrop-blur transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 motion-reduce:hover:rotate-0"
               >
                 <i className="bi bi-x-lg text-sm" />
               </button>
 
-              {/* hero banner */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-4 pb-10 pt-3 md:px-6">
+              {/* ---------- hero (fixed) ---------- */}
+              <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 px-4 pb-4 pt-4 md:px-6">
                 <span className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10" />
                 <span className="pointer-events-none absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-white/10" />
 
-                <div className="relative flex items-start justify-between gap-3 pr-10">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur">
-                      <SelectedIcon size={24} strokeWidth={2} aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0">
-                      <h2 className="m-0 break-words [font-size:1.25rem]! font-semibold leading-tight text-white">
-                        {selectedModel.name}
-                      </h2>
-                      <p className="m-0 mt-0.5 text-xs text-white/80">
-                        {selectedModel.provider} • {selectedModel.category}
-                      </p>
-                    </div>
+                <div className="relative flex items-center gap-3 pr-10">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur">
+                    <SelectedIcon size={24} strokeWidth={2} aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="m-0 break-words [font-size:1.25rem]! font-semibold leading-tight text-white">
+                      {selectedModel.name}
+                    </h2>
+                    <p className="m-0 mt-0.5 text-xs text-white/80">
+                      {selectedModel.provider} • {selectedModel.category}
+                    </p>
                   </div>
                 </div>
 
-                <div className="relative mt-4 flex flex-wrap items-center gap-2">
+                <div className="relative mt-3 flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase text-white ring-1 ring-white/25">
-                    {selectedModel.type.charAt(0).toUpperCase() + selectedModel.type.slice(1)}
+                    {getTypeLabel(selectedModel.type)}
                   </span>
                   <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/25">
                     v{selectedModel.version}
@@ -345,76 +416,146 @@ const ModelControl: React.FC = () => {
                 </div>
               </div>
 
-              {/* body — overlaps the banner */}
-              <div className="relative -mt-6 rounded-t-3xl bg-white p-4 md:p-6 [.ain-app.theme-dark_&]:bg-gray-900">
-                {selectedModel.description && (
-                  <p className="mb-4 text-sm leading-relaxed text-slate-600 [.ain-app.theme-dark_&]:text-slate-300">
-                    {selectedModel.description}
-                  </p>
-                )}
-
-                {selectedModel.highlights.length > 0 && (
-                  <div className="mb-3 flex flex-wrap gap-1.5">
-                    {selectedModel.highlights.map((highlight) => (
-                      <span
-                        key={highlight}
-                        className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-medium text-indigo-700 ring-1 ring-indigo-100 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-200 [.ain-app.theme-dark_&]:ring-indigo-400/20"
+              {/* ---------- tabs (fixed) ---------- */}
+              {tabs.length > 1 && (
+                <div
+                  role="tablist"
+                  className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-slate-100 px-4 py-2.5 md:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [.ain-app.theme-dark_&]:border-gray-800"
+                >
+                  {tabs.map(({ key, label, Icon }) => {
+                    const on = activeTab === key;
+                    return (
+                      <button
+                        key={key}
+                        role="tab"
+                        aria-selected={on}
+                        type="button"
+                        onClick={() => setActiveTab(key)}
+                        className={`inline-flex shrink-0 items-center gap-1.5 !rounded-[10px] px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 ${
+                          on
+                            ? 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/30'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:text-slate-300 [.ain-app.theme-dark_&]:hover:bg-gray-700'
+                        }`}
                       >
-                        {highlight}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                        <Icon size={14} aria-hidden="true" />
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
-                {/* metrics */}
-                <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <div className="[border-radius:10px]! bg-slate-50 p-2 text-center ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5">
-                    <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                      Usage
-                    </div>
-                    <div className="text-2xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
-                      {selectedModel.usagePercentage.toFixed(1)}%
-                    </div>
-                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 [.ain-app.theme-dark_&]:bg-gray-700">
-                      <div
-                        className="mc-fill relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"
-                        style={{ ['--mc-w' as string]: `${Math.min(selectedModel.usagePercentage, 100)}%`, width: `${Math.min(selectedModel.usagePercentage, 100)}%` } as React.CSSProperties}
-                      >
-                        <span className="mc-sheen absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+              {/* ---------- tab content (only this area can scroll, thin bar, rarely needed) ---------- */}
+              <div
+                key={`${selectedModel.id}-${activeTab}`}
+                className="mc-fade min-h-[250px] flex-1 overflow-y-auto px-4 py-3 md:px-6 [scrollbar-width:thin]"
+              >
+                {activeTab === 'overview' ? (
+                  <div className="space-y-4">
+                    {parsed.intro && (
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600 [.ain-app.theme-dark_&]:text-slate-300">
+                        {parsed.intro}
+                      </p>
+                    )}
+
+                    {selectedModel.highlights.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedModel.highlights.map((h) => (
+                          <span
+                            key={h}
+                            className="rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700 ring-1 ring-indigo-100 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-200 [.ain-app.theme-dark_&]:ring-indigo-400/20"
+                          >
+                            {h}
+                          </span>
+                        ))}
                       </div>
+                    )}
+
+                    {/* metrics */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-[12px] bg-slate-50 p-3 ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5">
+                        <div className="text-[11px] uppercase tracking-wide text-slate-400">Usage</div>
+                        <div className="text-xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
+                          {selectedModel.usagePercentage.toFixed(1)}%
+                        </div>
+                        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 [.ain-app.theme-dark_&]:bg-gray-700">
+                          <div
+                            className="mc-fill relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"
+                            style={{ ['--mc-w' as string]: `${Math.min(selectedModel.usagePercentage, 100)}%`, width: `${Math.min(selectedModel.usagePercentage, 100)}%` } as React.CSSProperties}
+                          >
+                            <span className="mc-sheen absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                          </div>
+                        </div>
+                      </div>
+                      {[
+                        { label: 'RPM Limit', value: `${(selectedModel.rpmLimit / 1000).toFixed(1)}K` },
+                        { label: 'Requests', value: selectedModel.requests.toLocaleString('en-IN') },
+                        { label: 'Latency', value: `${selectedModel.latency} ms` },
+                      ].map((m) => (
+                        <div
+                          key={m.label}
+                          className="rounded-[12px] bg-slate-50 p-3 ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5"
+                        >
+                          <div className="text-[11px] uppercase tracking-wide text-slate-400">{m.label}</div>
+                          <div className="text-xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">{m.value}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {parsed.links.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {parsed.links.map((l) => (
+                          <button
+                            key={l}
+                            type="button"
+                            className="inline-flex items-center gap-1 !rounded-[10px] border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 active:scale-95 [.ain-app.theme-dark_&]:border-indigo-400/20 [.ain-app.theme-dark_&]:bg-indigo-500/10 [.ain-app.theme-dark_&]:text-indigo-200"
+                          >
+                            {l} <ArrowUpRight size={12} aria-hidden="true" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="text-center text-[11px] text-slate-400">
+                      Last Updated: {selectedModel.lastUpdated}
                     </div>
                   </div>
-                  <div className="flex flex-col justify-center rounded-2xl bg-slate-50 p-4 text-center ring-1 ring-slate-100 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:ring-white/5">
-                    <div className="mb-1 text-[11px] uppercase tracking-wide text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                      RPM Limit
-                    </div>
-                    <div className="text-2xl font-bold text-slate-900 [.ain-app.theme-dark_&]:text-white">
-                      {(selectedModel.rpmLimit / 1000).toFixed(1)}K
-                    </div>
-                  </div>
-                </div>
+                ) : (
+                  <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
+                    {parsed.sections
+                      .find((s) => s.title === activeTab)
+                      ?.items.map((item, idx) => (
+                        <li
+                          key={item}
+                          style={delay(idx, 40)}
+                          className="mc-rise flex items-start gap-2.5 rounded-[12px] border border-slate-100 bg-slate-50 p-3 text-[13px] leading-snug text-slate-700 transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50/60 [.ain-app.theme-dark_&]:border-white/5 [.ain-app.theme-dark_&]:bg-gray-800 [.ain-app.theme-dark_&]:text-slate-200 [.ain-app.theme-dark_&]:hover:border-indigo-400/30"
+                        >
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
+                            <Check size={12} strokeWidth={3} aria-hidden="true" />
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
 
-                <div className="mb-2 text-center text-[11px] text-slate-400 [.ain-app.theme-dark_&]:text-slate-300">
-                  <small>Last Updated: {selectedModel.lastUpdated}</small>
-                </div>
-
-                {/* actions */}
-                <div className="flex flex-wrap gap-2 border-t border-slate-100 pt-2 [.ain-app.theme-dark_&]:border-gray-800">
-                  <button
-                    className={`${actionBtn} hover:border-blue-700 hover:bg-blue-50 hover:text-blue-700`}
-                    onClick={() => handleEditModel(selectedModel)}
-                    title="Edit"
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    className={`${actionBtn} hover:border-red-800 hover:bg-red-100 hover:text-red-800`}
-                    onClick={() => handleDeleteModel(selectedModel.id)}
-                    title="Delete"
-                  >
-                    <DeleteIcon className="mr-1 inline-block h-4 w-4 align-[-3px]" /> Delete
-                  </button>
-                </div>
+              {/* ---------- actions (fixed footer) ---------- */}
+              <div className="flex shrink-0 flex-wrap gap-2 border-t border-slate-100 px-4 py-3 md:px-6 [.ain-app.theme-dark_&]:border-gray-800">
+                <button
+                  className={`${actionBtn} hover:border-blue-700 hover:bg-blue-50 hover:text-blue-700`}
+                  onClick={() => handleEditModel(selectedModel)}
+                  title="Edit"
+                >
+                  ✏️ Edit
+                </button>
+                <button
+                  className={`${actionBtn} hover:border-red-800 hover:bg-red-100 hover:text-red-800`}
+                  onClick={() => handleDeleteModel(selectedModel.id)}
+                  title="Delete"
+                >
+                  <DeleteIcon className="mr-1 inline-block h-4 w-4 align-[-3px]" /> Delete
+                </button>
               </div>
             </div>
           </div>
