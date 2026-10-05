@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import AdminLayout from './AdminLayout';
+
+/* ───────────────────────── Types ───────────────────────── */
+
 interface ApiKey {
   id: string;
   name: string;
@@ -20,6 +23,106 @@ interface SystemConfig {
   logRetention: number;
 }
 
+type TabId = 'general' | 'api' | 'notifications' | 'security';
+
+/* ───────────── Shared class strings (full literals so Tailwind can see them) ─────────────
+   Dark mode follows your existing `.ain-app.theme-dark` ancestor class. */
+
+const card =
+  '[border-radius:10px] border border-slate-200 bg-white shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-800';
+const heading = 'text-slate-900 [.ain-app.theme-dark_&]:text-slate-100';
+const muted = 'text-slate-500 [.ain-app.theme-dark_&]:text-slate-400';
+const label = 'mb-1.5 block text-sm font-medium text-slate-700 [.ain-app.theme-dark_&]:text-slate-300';
+const input =
+  'w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-100 [.ain-app.theme-dark_&]:hover:border-slate-600';
+const btnPrimary =
+  'inline-flex items-center justify-center gap-2 [border-radius:10px]! bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 transition-all duration-200 hover:-translate-y-px hover:bg-indigo-500 hover:shadow-md hover:shadow-indigo-600/30 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30';
+const btnGhost =
+  'inline-flex  items-center justify-center gap-2 [border-radius:10px]! border border-slate-300 bg-transparent px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 [.ain-app.theme-dark_&]:border-slate-600 [.ain-app.theme-dark_&]:text-slate-200 [.ain-app.theme-dark_&]:hover:bg-slate-700';
+const row =
+  'rounded-xl border border-slate-200 p-3 transition-all duration-200 hover:border-indigo-300 hover:shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:hover:border-indigo-500/60';
+
+/* Keyframes live here so the file works with no tailwind.config changes. */
+const keyframes = `
+@keyframes gs-panel { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+@keyframes gs-pop   { from { opacity: 0; transform: scale(.96) translateY(-6px) } to { opacity: 1; transform: none } }
+@keyframes gs-toast { from { opacity: 0; transform: translateY(12px) scale(.96) } to { opacity: 1; transform: none } }
+@keyframes gs-out   { to { opacity: 0; transform: translateX(24px) scale(.97) } }
+@media (prefers-reduced-motion: reduce) {
+  .gs-root * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}`;
+
+/* ───────────────────────── Small building blocks ───────────────────────── */
+
+const Toggle: React.FC<{
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  title: string;
+  hint: string;
+}> = ({ checked, onChange, title, hint }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    onClick={() => onChange(!checked)}
+    className={`${row} group [border-radius:10px]! flex w-full items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20`}
+  >
+    <span>
+      <span className={`block [font-size:1.3rem] font-medium ${heading}`}>{title}</span>
+      <span className={`block text-xs ${muted}`}>{hint}</span>
+    </span>
+    <span
+      className={`relative h-6 w-11 shrink-0 [border-radius:10px]! transition-colors duration-300 ${checked ? 'bg-indigo-600' : 'bg-slate-300 [.ain-app.theme-dark_&]:bg-slate-600'
+        }`}
+    >
+      <span
+        className={`absolute left-0.5 top-0.5 h-5 w-5 [border-radius:10px]! bg-white shadow transition-all duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] group-active:w-6 ${checked ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'
+          }`}
+      />
+    </span>
+  </button>
+);
+
+const Field: React.FC<{ title: string; hint?: string; children: React.ReactNode }> = ({
+  title,
+  hint,
+  children,
+}) => (
+  <div>
+    <label className={label}>{title}</label>
+    {children}
+    {hint && <p className={`mt-1.5 text-xs ${muted}`}>{hint}</p>}
+  </div>
+);
+
+const Badge: React.FC<{ on?: boolean; children: React.ReactNode }> = ({ on, children }) => (
+  <span
+    className={`rounded-full px-2.5 py-1 text-xs font-medium ${on
+        ? 'bg-emerald-100 text-emerald-700 [.ain-app.theme-dark_&]:bg-emerald-500/15 [.ain-app.theme-dark_&]:text-emerald-300'
+        : 'bg-slate-100 text-slate-600 [.ain-app.theme-dark_&]:bg-slate-700 [.ain-app.theme-dark_&]:text-slate-300'
+      }`}
+  >
+    {children}
+  </span>
+);
+
+const tabs: { id: TabId; label: string }[] = [
+  { id: 'general', label: 'General' },
+  { id: 'api', label: 'API keys' },
+  { id: 'notifications', label: 'Notifications' },
+  { id: 'security', label: 'Security' },
+];
+
+const maskKey = (k: string) => `${k.slice(0, 8)}${'•'.repeat(14)}${k.slice(-4)}`;
+
+const makeKey = () => {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return `sk_live_${Array.from(bytes, (b) => b.toString(36).padStart(2, '0')).join('').slice(0, 32)}`;
+};
+
+/* ───────────────────────── Component ───────────────────────── */
+
 const GlobalSettings: React.FC = () => {
   const [config, setConfig] = useState<SystemConfig>({
     siteName: 'Karnataka AI Cell',
@@ -33,30 +136,9 @@ const GlobalSettings: React.FC = () => {
   });
 
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([
-    {
-      id: '1',
-      name: 'Dashboard API Key',
-      key: 'sk_live_4eC39HqLyjWDarhtT663',
-      lastUsed: '2024-09-22 14:30',
-      createdAt: '2024-01-15',
-      isActive: true,
-    },
-    {
-      id: '2',
-      name: 'Development Key',
-      key: 'sk_test_51JWHQ7IxKxQ9D2eY6FZ',
-      lastUsed: '2024-09-20 11:15',
-      createdAt: '2024-02-01',
-      isActive: true,
-    },
-    {
-      id: '3',
-      name: 'Legacy Integration',
-      key: 'sk_live_old_8mQ2P9Rx4YvZ2LjK3',
-      lastUsed: '2024-08-15 09:00',
-      createdAt: '2023-06-10',
-      isActive: false,
-    },
+    { id: '1', name: 'Dashboard API Key', key: 'sk_live_4eC39HqLyjWDarhtT663', lastUsed: '2024-09-22 14:30', createdAt: '2024-01-15', isActive: true },
+    { id: '2', name: 'Development Key', key: 'sk_test_51JWHQ7IxKxQ9D2eY6FZ', lastUsed: '2024-09-20 11:15', createdAt: '2024-02-01', isActive: true },
+    { id: '3', name: 'Legacy Integration', key: 'sk_live_old_8mQ2P9Rx4YvZ2LjK3', lastUsed: '2024-08-15 09:00', createdAt: '2023-06-10', isActive: false },
   ]);
 
   const [notifications, setNotifications] = useState({
@@ -67,727 +149,383 @@ const GlobalSettings: React.FC = () => {
     criticalAlerts: true,
   });
 
+  const [activeTab, setActiveTab] = useState<TabId>('general');
   const [showApiForm, setShowApiForm] = useState(false);
   const [newApiName, setNewApiName] = useState('');
-  const [activeTab, setActiveTab] = useState<'general' | 'api' | 'notifications' | 'security'>('general');
+  const [nameError, setNameError] = useState(false);
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const handleConfigChange = <Key extends keyof SystemConfig,>(
-    key: Key,
-    value: SystemConfig[Key],
-  ) => {
-    setConfig((currentConfig) => ({ ...currentConfig, [key]: value }));
-  };
+  /* Sliding tab indicator */
+  const tabRefs = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({});
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
 
-  const handleGenerateApiKey = () => {
+  const measure = useCallback(() => {
+    const el = tabRefs.current[activeTab];
+    if (el) setIndicator({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [activeTab]);
+
+  useLayoutEffect(measure, [measure]);
+  useEffect(() => {
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [measure]);
+
+  /* Toast auto-dismiss */
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2600);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const setCfg = <K extends keyof SystemConfig>(key: K, value: SystemConfig[K]) =>
+    setConfig((c) => ({ ...c, [key]: value }));
+
+  const num = (v: string) => (Number.isNaN(parseInt(v, 10)) ? 0 : parseInt(v, 10));
+
+  const handleGenerate = () => {
     if (!newApiName.trim()) {
-      alert('Please enter a name for the API key');
+      setNameError(true);
       return;
     }
-
-    const newKey: ApiKey = {
-      id: Date.now().toString(),
-      name: newApiName,
-      key: `sk_live_${Math.random().toString(36).substring(2, 40)}`,
-      lastUsed: 'Never',
-      createdAt: new Date().toISOString().split('T')[0],
-      isActive: true,
-    };
-
-    setApiKeys([...apiKeys, newKey]);
+    setApiKeys((k) => [
+      {
+        id: Date.now().toString(),
+        name: newApiName.trim(),
+        key: makeKey(),
+        lastUsed: 'Never',
+        createdAt: new Date().toISOString().split('T')[0],
+        isActive: true,
+      },
+      ...k,
+    ]);
     setNewApiName('');
+    setNameError(false);
     setShowApiForm(false);
+    setToast('API key generated');
   };
 
-  const handleDeleteApiKey = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this API key?')) {
-      setApiKeys(apiKeys.filter(k => k.id !== id));
+  const handleDelete = (id: string) => {
+    setConfirmId(null);
+    setRemovingId(id);
+    setTimeout(() => {
+      setApiKeys((k) => k.filter((x) => x.id !== id));
+      setRemovingId(null);
+      setToast('API key deleted');
+    }, 280);
+  };
+
+  const handleCopy = async (k: ApiKey) => {
+    try {
+      await navigator.clipboard.writeText(k.key);
+      setCopiedId(k.id);
+      setTimeout(() => setCopiedId((c) => (c === k.id ? null : c)), 1600);
+    } catch {
+      setToast('Copy failed. Select the key and copy it manually.');
     }
   };
 
-  const handleToggleApiKey = (id: string) => {
-    setApiKeys(apiKeys.map(k => k.id === id ? { ...k, isActive: !k.isActive } : k));
-  };
+  const notificationItems: { key: keyof typeof notifications; title: string; hint: string }[] = [
+    { key: 'emailOnErrors', title: 'Email on errors', hint: 'Get notified when critical errors occur' },
+    { key: 'emailOnLimits', title: 'Rate limit alerts', hint: 'Notify when users approach rate limits' },
+    { key: 'criticalAlerts', title: 'Critical alerts', hint: 'High-priority system alerts' },
+    { key: 'dailySummary', title: 'Daily summary', hint: 'Daily usage and analytics digest' },
+    { key: 'weeklyReport', title: 'Weekly report', hint: 'Comprehensive weekly analytics' },
+  ];
 
-  const handleSaveSettings = () => {
-    alert('Settings saved successfully!');
-  };
+  const securityItems = [
+    { title: 'Two-factor authentication', badge: 'Enabled', on: true, text: '2FA is enabled for all admin accounts', action: 'Configure' },
+    { title: 'IP whitelist', badge: '5 IPs', on: false, text: 'Restrict API access to specific IP addresses', action: 'Manage IPs' },
+    { title: 'SSL/TLS certificate', badge: 'Valid', on: true, text: 'Expires: 2025-09-22', action: 'View details' },
+    { title: 'Data encryption', badge: 'Active', on: true, text: 'All sensitive data is encrypted at rest and in transit', action: 'View policy' },
+    { title: 'Audit logs', badge: '', on: false, text: 'View all admin actions and system events', action: 'View logs' },
+  ];
 
   return (
     <AdminLayout>
-    <div className={`global-settings
-      [padding:0px]
-      [background:#f5f5f5]
-      [min-height:100vh]
-      [&_.gs-header]:[display:flex]
-      [&_.gs-header]:[justify-content:space-between]
-      [&_.gs-header]:[align-items:flex-start]
-      [&_.gs-header]:[margin-bottom:32px]
-      [&_.gs-header_h1]:[font-size:25px]
-      [&_.gs-header_h1]:[font-weight:700]
-      [&_.gs-header_h1]:[color:#1a1a1a]
-      [&_.gs-header_h1]:[margin:0_0_8px_0]
-      [&_.gs-header_p]:[font-size:14px]
-      [&_.gs-header_p]:[color:#666]
-      [&_.gs-header_p]:[margin:0]
-      [&_.btn-primary]:[padding:10px_20px]
-      [&_.btn-primary]:[border:none]
-      [&_.btn-primary]:[border-radius:6px]
-      [&_.btn-primary]:[font-size:14px]
-      [&_.btn-primary]:[font-weight:500]
-      [&_.btn-primary]:[cursor:pointer]
-      [&_.btn-primary]:[transition:all_0.3s_ease]
-      [&_.btn-secondary]:[padding:10px_20px]
-      [&_.btn-secondary]:[border:1px_solid_#ddd]
-      [&_.btn-secondary]:[border-radius:6px]
-      [&_.btn-secondary]:[font-size:14px]
-      [&_.btn-secondary]:[font-weight:500]
-      [&_.btn-secondary]:[cursor:pointer]
-      [&_.btn-secondary]:[transition:all_0.3s_ease]
-      [&_.btn-primary]:[background:#667eea]
-      [&_.btn-primary]:[color:white]
-      [&_.btn-primary:hover]:[background:#5568d3]
-      [&_.btn-primary:hover]:[box-shadow:0_4px_12px_rgba(102,_126,_234,_0.3)]
-      [&_.btn-secondary]:[background:#f0f0f0]
-      [&_.btn-secondary]:[color:#333]
-      [&_.btn-secondary:hover]:[background:#e8e8e8]
-      [&_.gs-tabs]:[display:flex]
-      [&_.gs-tabs]:[gap:0]
-      [&_.gs-tabs]:[margin-bottom:32px]
-      [&_.gs-tabs]:[border-bottom:2px_solid_#e0e0e0]
-      [&_.gs-tabs]:[background:white]
-      [&_.gs-tabs]:[border-radius:8px_8px_0_0]
-      [&_.tab]:[padding:14px_24px]
-      [&_.tab]:[border:none]
-      [&_.tab]:[background:none]
-      [&_.tab]:[color:#666]
-      [&_.tab]:[font-size:14px]
-      [&_.tab]:[font-weight:500]
-      [&_.tab]:[cursor:pointer]
-      [&_.tab]:[transition:all_0.3s_ease]
-      [&_.tab]:[border-bottom:3px_solid_transparent]
-      [&_.tab]:[position:relative]
-      [&_.tab]:[bottom:-2px]
-      [&_.tab:hover]:[color:#333]
-      [&_.tab.active]:[color:#667eea]
-      [&_.tab.active]:[border-bottom-color:#667eea]
-      [&_.gs-section]:[background:white]
-      [&_.gs-section]:[border-radius:8px]
-      [&_.gs-section]:[padding:24px]
-      [&_.gs-section]:[box-shadow:0_2px_4px_rgba(0,_0,_0,_0.05)]
-      [&_.gs-section_h2]:[font-size:20px]
-      [&_.gs-section_h2]:[font-weight:600]
-      [&_.gs-section_h2]:[color:#1a1a1a]
-      [&_.gs-section_h2]:[margin:0_0_20px_0]
-      [&_.gs-section_h3]:[font-size:16px]
-      [&_.gs-section_h3]:[font-weight:600]
-      [&_.gs-section_h3]:[color:#1a1a1a]
-      [&_.gs-section_h3]:[margin:0_0_16px_0]
-      [&_.section-header]:[display:flex]
-      [&_.section-header]:[justify-content:space-between]
-      [&_.section-header]:[align-items:center]
-      [&_.section-header]:[margin-bottom:24px]
-      [&_.section-header_h2]:[margin:0]
-      [&_.settings-form]:[max-width:600px]
-      [&_.form-group]:[margin-bottom:24px]
-      [&_.form-group_label]:[display:block]
-      [&_.form-group_label]:[margin-bottom:8px]
-      [&_.form-group_label]:[font-size:14px]
-      [&_.form-group_label]:[font-weight:500]
-      [&_.form-group_label]:[color:#333]
-      [&_.form-group_input[type="text"]]:[width:100%]
-      [&_.form-group_input[type="text"]]:[padding:10px_12px]
-      [&_.form-group_input[type="text"]]:[border:1px_solid_#ddd]
-      [&_.form-group_input[type="text"]]:[border-radius:6px]
-      [&_.form-group_input[type="text"]]:[font-size:14px]
-      [&_.form-group_input[type="text"]]:[font-family:inherit]
-      [&_.form-group_input[type="text"]]:[background:white]
-      [&_.form-group_input[type="text"]]:[color:#333]
-      [&_.form-group_input[type="text"]]:[box-sizing:border-box]
-      [&_.form-group_input[type="url"]]:[width:100%]
-      [&_.form-group_input[type="url"]]:[padding:10px_12px]
-      [&_.form-group_input[type="url"]]:[border:1px_solid_#ddd]
-      [&_.form-group_input[type="url"]]:[border-radius:6px]
-      [&_.form-group_input[type="url"]]:[font-size:14px]
-      [&_.form-group_input[type="url"]]:[font-family:inherit]
-      [&_.form-group_input[type="url"]]:[background:white]
-      [&_.form-group_input[type="url"]]:[color:#333]
-      [&_.form-group_input[type="url"]]:[box-sizing:border-box]
-      [&_.form-group_input[type="number"]]:[width:100%]
-      [&_.form-group_input[type="number"]]:[padding:10px_12px]
-      [&_.form-group_input[type="number"]]:[border:1px_solid_#ddd]
-      [&_.form-group_input[type="number"]]:[border-radius:6px]
-      [&_.form-group_input[type="number"]]:[font-size:14px]
-      [&_.form-group_input[type="number"]]:[font-family:inherit]
-      [&_.form-group_input[type="number"]]:[background:white]
-      [&_.form-group_input[type="number"]]:[color:#333]
-      [&_.form-group_input[type="number"]]:[box-sizing:border-box]
-      [&_.form-group_textarea]:[width:100%]
-      [&_.form-group_textarea]:[padding:10px_12px]
-      [&_.form-group_textarea]:[border:1px_solid_#ddd]
-      [&_.form-group_textarea]:[border-radius:6px]
-      [&_.form-group_textarea]:[font-size:14px]
-      [&_.form-group_textarea]:[font-family:inherit]
-      [&_.form-group_textarea]:[background:white]
-      [&_.form-group_textarea]:[color:#333]
-      [&_.form-group_textarea]:[box-sizing:border-box]
-      [&_.form-group_input:focus]:[outline:none]
-      [&_.form-group_input:focus]:[border-color:#667eea]
-      [&_.form-group_input:focus]:[box-shadow:0_0_0_3px_rgba(102,_126,_234,_0.1)]
-      [&_.form-group_textarea:focus]:[outline:none]
-      [&_.form-group_textarea:focus]:[border-color:#667eea]
-      [&_.form-group_textarea:focus]:[box-shadow:0_0_0_3px_rgba(102,_126,_234,_0.1)]
-      [&_.form-group_small]:[display:block]
-      [&_.form-group_small]:[margin-top:6px]
-      [&_.form-group_small]:[font-size:12px]
-      [&_.form-group_small]:[color:#888]
-      [&_.toggle-group]:[margin-bottom:24px]
-      [&_.toggle-group_label]:[display:flex]
-      [&_.toggle-group_label]:[align-items:center]
-      [&_.toggle-group_label]:[gap:10px]
-      [&_.toggle-group_label]:[margin-bottom:0]
-      [&_.toggle-group_label]:[cursor:pointer]
-      [&_.toggle-group_label]:[font-weight:500]
-      [&_.toggle-group_label]:[color:#333]
-      [&_.toggle-group_input[type="checkbox"]]:[width:18px]
-      [&_.toggle-group_input[type="checkbox"]]:[height:18px]
-      [&_.toggle-group_input[type="checkbox"]]:[cursor:pointer]
-      [&_.toggle-group_small]:[display:block]
-      [&_.toggle-group_small]:[margin-top:6px]
-      [&_.toggle-group_small]:[margin-left:28px]
-      [&_.toggle-group_small]:[font-size:12px]
-      [&_.toggle-group_small]:[color:#888]
-      [&_.divider]:[height:1px]
-      [&_.divider]:[background:#e0e0e0]
-      [&_.divider]:[margin:32px_0]
-      [&_.form-card]:[border:1px_solid_#e0e0e0]
-      [&_.form-card]:[border-radius:6px]
-      [&_.form-card]:[padding:20px]
-      [&_.form-card]:[margin-bottom:24px]
-      [&_.form-card]:[background:#f9f9f9]
-      [&_.form-card_h3]:[margin-top:0]
-      [&_.form-actions]:[display:flex]
-      [&_.form-actions]:[gap:12px]
-      [&_.form-actions]:[justify-content:flex-end]
-      [&_.form-actions]:[margin-top:16px]
-      [&_.form-actions_.btn-primary]:[min-width:100px]
-      [&_.form-actions_.btn-secondary]:[min-width:100px]
-      [&_.api-keys-list]:[display:grid]
-      [&_.api-keys-list]:[gap:16px]
-      [&_.api-key-card]:[border:1px_solid_#e0e0e0]
-      [&_.api-key-card]:[border-radius:6px]
-      [&_.api-key-card]:[padding:16px]
-      [&_.api-key-card]:[display:flex]
-      [&_.api-key-card]:[justify-content:space-between]
-      [&_.api-key-card]:[align-items:flex-start]
-      [&_.api-key-card]:[transition:all_0.2s_ease]
-      [&_.api-key-card:hover]:[border-color:#667eea]
-      [&_.api-key-card:hover]:[box-shadow:0_2px_8px_rgba(102,_126,_234,_0.1)]
-      [&_.key-info_h3]:[margin:0_0_12px_0]
-      [&_.key-info_h3]:[font-size:15px]
-      [&_.key-value]:[display:flex]
-      [&_.key-value]:[align-items:center]
-      [&_.key-value]:[gap:10px]
-      [&_.key-value]:[margin-bottom:8px]
-      [&_.key-value_code]:[background:#f5f5f5]
-      [&_.key-value_code]:[padding:8px_12px]
-      [&_.key-value_code]:[border-radius:4px]
-      [&_.key-value_code]:[font-size:12px]
-      [&_.key-value_code]:[color:#333]
-      [&_.key-value_code]:[font-family:Courier_New,_monospace]
-      [&_.key-value_code]:[flex:1]
-      [&_.key-value_code]:[word-break:break-all]
-      [&_.copy-btn]:[background:none]
-      [&_.copy-btn]:[border:none]
-      [&_.copy-btn]:[font-size:16px]
-      [&_.copy-btn]:[cursor:pointer]
-      [&_.copy-btn]:[padding:4px_8px]
-      [&_.copy-btn]:[transition:all_0.2s_ease]
-      [&_.copy-btn:hover]:[background:#e0e0e0]
-      [&_.copy-btn:hover]:[border-radius:4px]
-      [&_.key-meta]:[display:flex]
-      [&_.key-meta]:[gap:16px]
-      [&_.key-meta]:[font-size:12px]
-      [&_.key-meta]:[color:#888]
-      [&_.key-actions]:[display:flex]
-      [&_.key-actions]:[gap:8px]
-      [&_.key-actions]:[flex-direction:column]
-      [&_.key-actions]:[align-items:flex-end]
-      [&_.status-btn]:[padding:8px_12px]
-      [&_.status-btn]:[border-radius:4px]
-      [&_.status-btn]:[border:1px_solid_#ddd]
-      [&_.status-btn]:[background:white]
-      [&_.status-btn]:[color:#333]
-      [&_.status-btn]:[font-size:12px]
-      [&_.status-btn]:[font-weight:500]
-      [&_.status-btn]:[cursor:pointer]
-      [&_.status-btn]:[transition:all_0.2s_ease]
-      [&_.status-btn]:[white-space:nowrap]
-      [&_.delete-btn]:[padding:8px_12px]
-      [&_.delete-btn]:[border-radius:4px]
-      [&_.delete-btn]:[border:1px_solid_#ddd]
-      [&_.delete-btn]:[background:white]
-      [&_.delete-btn]:[color:#333]
-      [&_.delete-btn]:[font-size:12px]
-      [&_.delete-btn]:[font-weight:500]
-      [&_.delete-btn]:[cursor:pointer]
-      [&_.delete-btn]:[transition:all_0.2s_ease]
-      [&_.delete-btn]:[white-space:nowrap]
-      [&_.status-btn.active:hover]:[background:#dcfce7]
-      [&_.status-btn.active:hover]:[border-color:#166534]
-      [&_.status-btn.active:hover]:[color:#166534]
-      [&_.status-btn.inactive:hover]:[background:#fee2e2]
-      [&_.status-btn.inactive:hover]:[border-color:#991b1b]
-      [&_.status-btn.inactive:hover]:[color:#991b1b]
-      [&_.delete-btn:hover]:[background:#fee2e2]
-      [&_.delete-btn:hover]:[border-color:#991b1b]
-      [&_.delete-btn:hover]:[color:#991b1b]
-      [&_.notifications-grid]:[display:grid]
-      [&_.notifications-grid]:[grid-template-columns:repeat(auto-fit,_minmax(300px,_1fr))]
-      [&_.notifications-grid]:[gap:20px]
-      [&_.notification-item]:[border:1px_solid_#e0e0e0]
-      [&_.notification-item]:[border-radius:6px]
-      [&_.notification-item]:[padding:16px]
-      [&_.notification-item]:[transition:all_0.2s_ease]
-      [&_.notification-item:hover]:[border-color:#667eea]
-      [&_.notification-item:hover]:[box-shadow:0_2px_8px_rgba(102,_126,_234,_0.1)]
-      [&_.notification-item_label]:[display:flex]
-      [&_.notification-item_label]:[align-items:center]
-      [&_.notification-item_label]:[gap:10px]
-      [&_.notification-item_label]:[margin:0]
-      [&_.notification-item_label]:[cursor:pointer]
-      [&_.notification-item_label]:[font-weight:500]
-      [&_.notification-item_label]:[color:#333]
-      [&_.notification-item_label]:[margin-bottom:8px]
-      [&_.notification-item_input[type="checkbox"]]:[width:18px]
-      [&_.notification-item_input[type="checkbox"]]:[height:18px]
-      [&_.notification-item_input[type="checkbox"]]:[cursor:pointer]
-      [&_.notification-item_small]:[display:block]
-      [&_.notification-item_small]:[font-size:12px]
-      [&_.notification-item_small]:[color:#888]
-      [&_.security-options]:[display:grid]
-      [&_.security-options]:[gap:20px]
-      [&_.security-item]:[border:1px_solid_#e0e0e0]
-      [&_.security-item]:[border-radius:6px]
-      [&_.security-item]:[padding:20px]
-      [&_.security-item]:[transition:all_0.2s_ease]
-      [&_.security-item:hover]:[border-color:#667eea]
-      [&_.security-item:hover]:[box-shadow:0_2px_8px_rgba(102,_126,_234,_0.1)]
-      [&_.item-header]:[display:flex]
-      [&_.item-header]:[justify-content:space-between]
-      [&_.item-header]:[align-items:center]
-      [&_.item-header]:[margin-bottom:12px]
-      [&_.item-header_h3]:[margin:0]
-      [&_.item-header_h3]:[font-size:16px]
-      [&_.badge]:[display:inline-block]
-      [&_.badge]:[padding:4px_12px]
-      [&_.badge]:[background:#f0f0f0]
-      [&_.badge]:[color:#333]
-      [&_.badge]:[border-radius:20px]
-      [&_.badge]:[font-size:11px]
-      [&_.badge]:[font-weight:600]
-      [&_.badge]:[text-transform:uppercase]
-      [&_.badge]:[letter-spacing:0.3px]
-      [&_.badge.enabled]:[background:#dcfce7]
-      [&_.badge.enabled]:[color:#166534]
-      [&_.security-item_p]:[margin:0_0_16px_0]
-      [&_.security-item_p]:[font-size:14px]
-      [&_.security-item_p]:[color:#666]
-      [&_.security-item_.btn-secondary]:[font-size:13px]
-      [&_.security-item_.btn-secondary]:[padding:8px_16px]
-      max-[768px]:[&_.gs-header]:[flex-direction:column]
-      max-[768px]:[&_.gs-header]:[gap:16px]
-      max-[768px]:[&_.gs-tabs]:[flex-wrap:wrap]
-      max-[768px]:[&_.tab]:[padding:12px_16px]
-      max-[768px]:[&_.tab]:[font-size:13px]
-      max-[768px]:[&_.settings-form]:[max-width:100%]
-      [.ain-app.theme-dark_&]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&]:[background:transparent]
-      [.ain-app.theme-dark_&_.gs-header_h1]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.gs-section_h2]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.gs-section_h3]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.item-header_h3]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.gs-header_p]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.form-group_label]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.toggle-group_label]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.notification-item_label]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.gs-tabs]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.gs-tabs]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.gs-tabs]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.gs-section]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.gs-section]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.gs-section]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.tab]:[color:#c1c8d3]
-      [.ain-app.theme-dark_&_.tab:hover]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.form-group_input]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.form-group_input]:[background:#111827]
-      [.ain-app.theme-dark_&_.form-group_input]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.form-group_textarea]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.form-group_textarea]:[background:#111827]
-      [.ain-app.theme-dark_&_.form-group_textarea]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.key-value_code]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.key-value_code]:[background:#111827]
-      [.ain-app.theme-dark_&_.key-value_code]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.form-group_small]:[color:#9ca3af]
-      [.ain-app.theme-dark_&_.toggle-group_small]:[color:#9ca3af]
-      [.ain-app.theme-dark_&_.notification-item_small]:[color:#9ca3af]
-      [.ain-app.theme-dark_&_.security-item_p]:[color:#9ca3af]
-      [.ain-app.theme-dark_&_.key-meta]:[color:#9ca3af]
-      [.ain-app.theme-dark_&_.form-card]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.form-card]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.form-card]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.api-key-card]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.api-key-card]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.api-key-card]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.notification-item]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.notification-item]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.notification-item]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.security-item]:[color:#f3f4f6]
-      [.ain-app.theme-dark_&_.security-item]:[background:#1f2937]
-      [.ain-app.theme-dark_&_.security-item]:[border-color:#374151]
-      [.ain-app.theme-dark_&_.divider]:[background:#374151]
-      [.ain-app.theme-dark_&_.status-btn]:[color:#e5e7eb]
-      [.ain-app.theme-dark_&_.status-btn]:[background:#273449]
-      [.ain-app.theme-dark_&_.status-btn]:[border-color:#4b5563]
-      [.ain-app.theme-dark_&_.delete-btn]:[color:#e5e7eb]
-      [.ain-app.theme-dark_&_.delete-btn]:[background:#273449]
-      [.ain-app.theme-dark_&_.delete-btn]:[border-color:#4b5563]
-      [.ain-app.theme-dark_&_.btn-secondary]:[color:#e5e7eb]
-      [.ain-app.theme-dark_&_.btn-secondary]:[background:#273449]
-      [.ain-app.theme-dark_&_.btn-secondary]:[border-color:#4b5563]
-      [.ain-app.theme-dark_&_.status-btn:hover]:[background:#374151]
-      [.ain-app.theme-dark_&_.delete-btn:hover]:[background:#374151]
-      [.ain-app.theme-dark_&_.btn-secondary:hover]:[background:#374151]
-      [.ain-app.theme-dark_&_.badge:not(.enabled)]:[color:#e5e7eb]
-      [.ain-app.theme-dark_&_.badge:not(.enabled)]:[background:#374151]
-      max-[768px]:[&_.notifications-grid]:[grid-template-columns:1fr]
-      max-[768px]:[&_.key-actions]:[flex-direction:row]
-      max-[768px]:[&_.key-actions]:[align-items:center]
-      max-[768px]:[&_.api-key-card]:[flex-direction:column]
-      max-[768px]:[&_.api-key-card]:[gap:12px]
-      max-[768px]:[&_.key-value]:[flex-direction:column]
-      max-[768px]:[&_.key-value]:[align-items:flex-start]
-      max-[768px]:[&_.key-value_code]:[width:100%]
-      max-[768px]:[&_.key-meta]:[flex-direction:column]
-      max-[768px]:[&_.key-meta]:[gap:4px]`}>
-      <div className="gs-header">
-        <div>
-          <h2 className="break-words !text-xl !font-bold leading-tight tracking-tight text-slate-700  dark:text-white">
-            Global Settings
-          </h2>
-          <p className="mb-4  font-normal !text-slate-500 text-[15px]  sm:mb-5  !dark:text-slate-400">
-            System configuration and admin preferences
-          </p>
-        </div>
-        <button className="btn-primary" onClick={handleSaveSettings}>
-          💾 Save Changes
-        </button>
-      </div>
+      <style>{keyframes}</style>
 
-      <div className="gs-tabs">
-        <button
-          className={`tab ${activeTab === 'general' ? 'active' : ''}`}
-          onClick={() => setActiveTab('general')}
-        >
-          General
-        </button>
-        <button
-          className={`tab ${activeTab === 'api' ? 'active' : ''}`}
-          onClick={() => setActiveTab('api')}
-        >
-          API Keys
-        </button>
-        <button
-          className={`tab ${activeTab === 'notifications' ? 'active' : ''}`}
-          onClick={() => setActiveTab('notifications')}
-        >
-          Notifications
-        </button>
-        <button
-          className={`tab ${activeTab === 'security' ? 'active' : ''}`}
-          onClick={() => setActiveTab('security')}
-        >
-          Security
-        </button>
-      </div>
-
-      {/* General Settings */}
-      {activeTab === 'general' && (
-        <div className="gs-section">
-          <h2>General Settings</h2>
-          <div className="settings-form">
-            <div className="form-group">
-              <label>Site Name</label>
-              <input
-                type="text"
-                value={config.siteName}
-                onChange={(e) => handleConfigChange('siteName', e.target.value)}
-              />
-              <small>The name displayed across the platform</small>
-            </div>
-
-            <div className="form-group">
-              <label>Site URL</label>
-              <input
-                type="url"
-                value={config.siteUrl}
-                onChange={(e) => handleConfigChange('siteUrl', e.target.value)}
-              />
-              <small>Base URL for your platform</small>
-            </div>
-
-            <div className="form-group">
-              <label>Allowed Domains</label>
-              <textarea
-                value={config.allowedDomains}
-                onChange={(e) => handleConfigChange('allowedDomains', e.target.value)}
-                rows={3}
-              />
-              <small>Comma-separated list of allowed domains</small>
-            </div>
-
-            <div className="form-group">
-              <label>Log Retention (days)</label>
-              <input
-                type="number"
-                value={config.logRetention}
-                onChange={(e) => handleConfigChange('logRetention', parseInt(e.target.value))}
-              />
-              <small>How long to keep system logs (90 days recommended)</small>
-            </div>
-
-            <div className="toggle-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={config.maintenanceMode}
-                  onChange={(e) => handleConfigChange('maintenanceMode', e.target.checked)}
-                />
-                <span>Maintenance Mode</span>
-              </label>
-              <small>Disable user access during maintenance</small>
-            </div>
-
-            <div className="toggle-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={config.emailNotifications}
-                  onChange={(e) => handleConfigChange('emailNotifications', e.target.checked)}
-                />
-                <span>Email Notifications</span>
-              </label>
-              <small>Send system notifications via email</small>
-            </div>
-
-            <div className="divider"></div>
-
-            <h3>Rate Limiting</h3>
-            <div className="form-group">
-              <label>Default Rate Limit (requests/min)</label>
-              <input
-                type="number"
-                value={config.defaultRateLimit}
-                onChange={(e) => handleConfigChange('defaultRateLimit', parseInt(e.target.value))}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Max API Calls per Month</label>
-              <input
-                type="number"
-                value={config.maxApiCalls}
-                onChange={(e) => handleConfigChange('maxApiCalls', parseInt(e.target.value))}
-              />
-            </div>
+      <div className="gs-root relative min-h-screen">
+        {/* Header */}
+        <header className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="break-words [font-size:1.2rem]! font-bold leading-tight tracking-tight text-[color:black]!  dark:text-white">Global Settings</h2>
+            <p className="mt-0.5 mb-0 text-[color:#6b7280]">System configuration and admin preferences</p>
           </div>
-        </div>
-      )}
+          <button className={btnPrimary} onClick={() => setToast('Settings saved')}>
+            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
+              <path d="M3 4a1 1 0 0 1 1-1h9.6a1 1 0 0 1 .7.3l2.4 2.4a1 1 0 0 1 .3.7V16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4Zm4 0v3h5V4H7Zm3 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z" />
+            </svg>
+            Save changes
+          </button>
+        </header>
 
-      {/* API Keys */}
-      {activeTab === 'api' && (
-        <div className="gs-section">
-          <div className="section-header">
-            <h2>API Keys Management</h2>
-            <button className="btn-primary" onClick={() => setShowApiForm(!showApiForm)}>
-              + Generate New Key
+        {/* Tabs with sliding indicator */}
+        <nav
+          role="tablist"
+          className={`relative mb-2 flex overflow-x-auto p-1.5 ${card}`}
+        >
+          <span
+            aria-hidden
+            className="absolute bottom-1.5 top-1.5 rounded-xl bg-indigo-600/10 ring-1 ring-indigo-600/20 transition-all duration-300 ease-[cubic-bezier(.4,0,.2,1)]"
+            style={{ left: indicator.left, width: indicator.width }}
+          />
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              ref={(el) => {
+                tabRefs.current[t.id] = el;
+              }}
+              role="tab"
+              aria-selected={activeTab === t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`relative z-10 whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 ${activeTab === t.id
+                  ? 'text-indigo-600 [.ain-app.theme-dark_&]:text-indigo-300'
+                  : `${muted} hover:text-slate-800 [.ain-app.theme-dark_&]:hover:text-slate-200`
+                }`}
+            >
+              {t.label}
             </button>
-          </div>
+          ))}
+        </nav>
 
-          {showApiForm && (
-            <div className="form-card">
-              <h3>Generate New API Key</h3>
-              <div className="form-group">
-                <label>Key Name</label>
-                <input
-                  type="text"
-                  value={newApiName}
-                  onChange={(e) => setNewApiName(e.target.value)}
-                  placeholder="e.g., Production Key"
+        {/* Panels: keyed so the entrance replays on every tab change */}
+        <section
+          key={activeTab}
+          role="tabpanel"
+          className={`${card} p-6 [animation:gs-panel_.35s_cubic-bezier(.2,.7,.2,1)_both]`}
+        >
+          {/* ── General ── */}
+          {activeTab === 'general' && (
+            <div className="max-w-2xl space-y-6">
+              <h2 className={`[font-size:1.5rem]!
+                 font-semibold ${heading}`}>General</h2>
+
+              <Field title="Site name" hint="The name displayed across the platform">
+                <input className={input} value={config.siteName} onChange={(e) => setCfg('siteName', e.target.value)} />
+              </Field>
+              <Field title="Site URL" hint="Base URL for your platform">
+                <input type="url" className={input} value={config.siteUrl} onChange={(e) => setCfg('siteUrl', e.target.value)} />
+              </Field>
+              <Field title="Allowed domains" hint="Comma-separated list of allowed domains">
+                <textarea rows={3} className={`${input} resize-y`} value={config.allowedDomains} onChange={(e) => setCfg('allowedDomains', e.target.value)} />
+              </Field>
+              <Field title="Log retention (days)" hint="90 days is recommended">
+                <input type="number" className={input} value={config.logRetention} onChange={(e) => setCfg('logRetention', num(e.target.value))} />
+              </Field>
+
+              <div className="space-y-3">
+                <Toggle
+                  checked={config.maintenanceMode}
+                  onChange={(v) => setCfg('maintenanceMode', v)}
+                  title="Maintenance mode"
+                  hint="Disable user access during maintenance"
+                />
+                <Toggle
+                  checked={config.emailNotifications}
+                  onChange={(v) => setCfg('emailNotifications', v)}
+                  title="Email notifications"
+                  hint="Send system notifications via email"
                 />
               </div>
-              <div className="form-actions">
-                <button className="btn-secondary" onClick={() => setShowApiForm(false)}>Cancel</button>
-                <button className="btn-primary" onClick={handleGenerateApiKey}>Generate</button>
+
+              <div className="h-px bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700" />
+
+              <h3 className={`[font-size:1.3rem]! font-semibold ${heading}`}>Rate limiting</h3>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <Field title="Default rate limit (requests/min)">
+                  <input type="number" className={input} value={config.defaultRateLimit} onChange={(e) => setCfg('defaultRateLimit', num(e.target.value))} />
+                </Field>
+                <Field title="Max API calls per month">
+                  <input type="number" className={input} value={config.maxApiCalls} onChange={(e) => setCfg('maxApiCalls', num(e.target.value))} />
+                </Field>
               </div>
             </div>
           )}
 
-          <div className="api-keys-list">
-            {apiKeys.map(apiKey => (
-              <div key={apiKey.id} className="api-key-card">
-                <div className="key-info">
-                  <h3>{apiKey.name}</h3>
-                  <div className="key-value">
-                    <code>{apiKey.key}</code>
-                    <button className="copy-btn" title="Copy key">
-                      📋
-                    </button>
-                  </div>
-                  <div className="key-meta">
-                    <span>Created: {apiKey.createdAt}</span>
-                    <span>Last used: {apiKey.lastUsed}</span>
+          {/* ── API keys ── */}
+          {activeTab === 'api' && (
+            <div>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h2 className={`[font-size:1.5rem]! font-semibold ${heading}`}>API keys</h2>
+                <button className={btnPrimary} onClick={() => setShowApiForm((s) => !s)}>
+                  <span
+                    className={`inline-block text-base leading-none transition-transform duration-300 ${showApiForm ? 'rotate-45' : ''}`}
+                  >
+                    +
+                  </span>
+                  {showApiForm ? 'Close' : 'Generate key'}
+                </button>
+              </div>
+
+              {/* Animated collapse using grid-rows */}
+              <div
+                className={`grid transition-all duration-300 ease-out ${showApiForm ? 'mb-2 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                  }`}
+              >
+                <div className="overflow-hidden">
+                  <div className={`${row} bg-slate-50 [.ain-app.theme-dark_&]:bg-slate-900/50`}>
+                    <Field title="Key name" hint={undefined}>
+                      <input
+                        className={`${input} ${nameError ? 'border-red-400 focus:border-red-500 focus:ring-red-500/15' : ''}`}
+                        value={newApiName}
+                        placeholder="e.g. Production key"
+                        onChange={(e) => {
+                          setNewApiName(e.target.value);
+                          setNameError(false);
+                        }}
+                        onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                        tabIndex={showApiForm ? 0 : -1}
+                      />
+                      {nameError && <p className="mt-1.5 text-xs text-red-500">Enter a name so you can recognise this key later.</p>}
+                    </Field>
+                    <div className="mt-4 flex justify-end gap-3">
+                      <button className={btnGhost} tabIndex={showApiForm ? 0 : -1} onClick={() => { setShowApiForm(false); setNameError(false); }}>
+                        Cancel
+                      </button>
+                      <button className={btnPrimary} tabIndex={showApiForm ? 0 : -1} onClick={handleGenerate}>
+                        Generate
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="key-actions">
-                  <button
-                    className={`status-btn ${apiKey.isActive ? 'active' : 'inactive'}`}
-                    onClick={() => handleToggleApiKey(apiKey.id)}
+              </div>
+
+              <ul className="grid gap-3 p-0!">
+                {apiKeys.length === 0 && (
+                  <li className={`rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm [.ain-app.theme-dark_&]:border-slate-600 ${muted}`}>
+                    No API keys yet. Generate one to start making requests.
+                  </li>
+                )}
+                {apiKeys.map((k, i) => (
+                  <li
+                    key={k.id}
+                    style={{ animationDelay: removingId ? undefined : `${i * 50}ms` }}
+                    className={`${row} [border-radius:10px]! flex flex-col gap-4 p-3! sm:flex-row sm:items-center sm:justify-between ${removingId === k.id
+                        ? '[animation:gs-out_.28s_ease_forwards]'
+                        : '[animation:gs-pop_.35s_cubic-bezier(.2,.7,.2,1)_both]'
+                      } ${k.isActive ? '' : 'opacity-70'}`}
                   >
-                    {apiKey.isActive ? '✓ Active' : '○ Inactive'}
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDeleteApiKey(apiKey.id)}
-                  >
-                    🗑️ Delete
-                  </button>
-                </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className={`mb-2 [font-size:1.3rem]! font-semibold ${heading}`}>{k.name}</h3>
+                      <div className="mb-2 flex items-center gap-2">
+                        <code className="min-w-0 flex-1 truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-200">
+                          {revealed[k.id] ? k.key : maskKey(k.key)}
+                        </code>
+                        <button
+                          className="rounded-lg px-2.5 py-2 text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 active:scale-95 [.ain-app.theme-dark_&]:hover:bg-slate-700"
+                          onClick={() => setRevealed((r) => ({ ...r, [k.id]: !r[k.id] }))}
+                        >
+                          {revealed[k.id] ? 'Hide' : 'Show'}
+                        </button>
+                        <button
+                          className={`w-16 rounded-lg px-2.5 py-2 text-xs font-medium transition-all duration-200 active:scale-95 ${copiedId === k.id
+                              ? 'bg-emerald-100 text-emerald-700 [.ain-app.theme-dark_&]:bg-emerald-500/15 [.ain-app.theme-dark_&]:text-emerald-300'
+                              : 'text-slate-500 hover:bg-slate-100 [.ain-app.theme-dark_&]:hover:bg-slate-700'
+                            }`}
+                          onClick={() => handleCopy(k)}
+                        >
+                          {copiedId === k.id ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
+                      <p className={`flex flex-wrap gap-x-4 text-xs ${muted}`}>
+                        <span>Created {k.createdAt}</span>
+                        <span>Last used {k.lastUsed}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+                      <button
+                        onClick={() => setApiKeys((ks) => ks.map((x) => (x.id === k.id ? { ...x, isActive: !x.isActive } : x)))}
+                        className={`[border-radius:10px]! px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 ${k.isActive
+                            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 [.ain-app.theme-dark_&]:bg-emerald-500/15 [.ain-app.theme-dark_&]:text-emerald-300'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700 [.ain-app.theme-dark_&]:text-slate-300'
+                          }`}
+                      >
+                        {k.isActive ? 'Active' : 'Inactive'}
+                      </button>
+
+                      {confirmId === k.id ? (
+                        <span className="flex items-center gap-1 [animation:gs-pop_.2s_ease_both]">
+                          <button
+                            className="[border-radius:10px]! bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-red-500 active:scale-95"
+                            onClick={() => handleDelete(k.id)}
+                          >
+                            Delete key
+                          </button>
+                          <button className="rounded-lg px-2 py-1.5 text-xs text-slate-500 hover:bg-slate-100 [.ain-app.theme-dark_&]:hover:bg-slate-700" onClick={() => setConfirmId(null)}>
+                            Keep
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          className="[border-radius:10px]! px-3 py-1.5 text-xs font-medium text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 active:scale-95 [.ain-app.theme-dark_&]:hover:bg-red-500/10 [.ain-app.theme-dark_&]:hover:text-red-400"
+                          onClick={() => setConfirmId(k.id)}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* ── Notifications ── */}
+          {activeTab === 'notifications' && (
+            <div>
+              <h2 className={`mb-2 [font-size:1.5rem]! font-semibold ${heading}`}>Notifications</h2>
+              <div className="grid gap-3   md:grid-cols-2">
+                {notificationItems.map((n) => (
+                  <Toggle
+                    key={n.key}
+                    checked={notifications[n.key]}
+                    onChange={(v) => setNotifications((s) => ({ ...s, [n.key]: v }))}
+                    title={n.title}
+                    hint={n.hint}
+                  />
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* ── Security ── */}
+          {activeTab === 'security' && (
+            <div>
+              <h2 className={`mb-1 [font-size:1.5rem]! font-semibold ${heading}`}>Security</h2>
+              <div className="grid gap-3">
+                {securityItems.map((s) => (
+                  <div key={s.title} className={`${row} flex items-center justify-between gap-4`}>
+                    <div>
+                      <div className="mb-1 flex items-center gap-3">
+                        <h3 className={`[font-size:1.3rem]! font-semibold ${heading}`}>{s.title}</h3>
+                        {s.badge && <Badge on={s.on}>{s.badge}</Badge>}
+                      </div>
+                      <p className={`text-sm ${muted}`}>{s.text}</p>
+                    </div>
+                    <button className={`${btnGhost} shrink-0 !px-3.5 !py-2 text-[13px]`}>{s.action}</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Toast */}
+        {toast && (
+          <div
+            role="status"
+            key={toast}
+            className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl [animation:gs-toast_.3s_cubic-bezier(.2,.7,.2,1)_both]"
+          >
+            {toast}
           </div>
-        </div>
-      )}
-
-      {/* Notifications */}
-      {activeTab === 'notifications' && (
-        <div className="gs-section">
-          <h2>Notification Preferences</h2>
-          <div className="notifications-grid">
-            <div className="notification-item">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={notifications.emailOnErrors}
-                  onChange={(e) => setNotifications({ ...notifications, emailOnErrors: e.target.checked })}
-                />
-                <span>Email on Errors</span>
-              </label>
-              <small>Get notified when critical errors occur</small>
-            </div>
-
-            <div className="notification-item">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={notifications.emailOnLimits}
-                  onChange={(e) => setNotifications({ ...notifications, emailOnLimits: e.target.checked })}
-                />
-                <span>Email on Rate Limit Alerts</span>
-              </label>
-              <small>Notify when users approach rate limits</small>
-            </div>
-
-            <div className="notification-item">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={notifications.criticalAlerts}
-                  onChange={(e) => setNotifications({ ...notifications, criticalAlerts: e.target.checked })}
-                />
-                <span>Critical Alerts</span>
-              </label>
-              <small>High priority system alerts</small>
-            </div>
-
-            <div className="notification-item">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={notifications.dailySummary}
-                  onChange={(e) => setNotifications({ ...notifications, dailySummary: e.target.checked })}
-                />
-                <span>Daily Summary</span>
-              </label>
-              <small>Daily usage and analytics summary</small>
-            </div>
-
-            <div className="notification-item">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={notifications.weeklyReport}
-                  onChange={(e) => setNotifications({ ...notifications, weeklyReport: e.target.checked })}
-                />
-                <span>Weekly Report</span>
-              </label>
-              <small>Comprehensive weekly analytics</small>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Security */}
-      {activeTab === 'security' && (
-        <div className="gs-section">
-          <h2>Security Settings</h2>
-          <div className="security-options">
-            <div className="security-item">
-              <div className="item-header">
-                <h3>Two-Factor Authentication</h3>
-                <span className="badge enabled">Enabled</span>
-              </div>
-              <p>2FA is enabled for all admin accounts</p>
-              <button className="btn-secondary">Configure</button>
-            </div>
-
-            <div className="security-item">
-              <div className="item-header">
-                <h3>IP Whitelist</h3>
-                <span className="badge">5 IPs</span>
-              </div>
-              <p>Restrict API access to specific IP addresses</p>
-              <button className="btn-secondary">Manage IPs</button>
-            </div>
-
-            <div className="security-item">
-              <div className="item-header">
-                <h3>SSL/TLS Certificate</h3>
-                <span className="badge enabled">Valid</span>
-              </div>
-              <p>Expires: 2025-09-22</p>
-              <button className="btn-secondary">View Details</button>
-            </div>
-
-            <div className="security-item">
-              <div className="item-header">
-                <h3>Data Encryption</h3>
-                <span className="badge enabled">Active</span>
-              </div>
-              <p>All sensitive data is encrypted at rest and in transit</p>
-              <button className="btn-secondary">View Policy</button>
-            </div>
-
-            <div className="security-item">
-              <div className="item-header">
-                <h3>Audit Logs</h3>
-              </div>
-              <p>View all admin actions and system events</p>
-              <button className="btn-secondary">View Logs</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </AdminLayout>
   );
 };
