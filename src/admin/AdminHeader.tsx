@@ -1,13 +1,5 @@
-import { useEffect, useRef, type FormEvent, type KeyboardEvent } from "react";
-import { Bell, Search, X } from "lucide-react";
+import { Bell } from "lucide-react";
 import { GlobalThemeToggle } from "../user/ThemeToggle";
-
-interface AdminHeaderProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  /** Optional: called on Enter / search button click with the trimmed query */
-  onSearchSubmit?: (value: string) => void;
-}
 
 const headerStyles = `
 .ain-admin-header {
@@ -159,47 +151,7 @@ const headerStyles = `
 }
 `;
 
-function AdminHeader({
-  searchQuery,
-  onSearchChange,
-  onSearchSubmit,
-}: AdminHeaderProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Ctrl/Cmd + K focuses the search box
-  useEffect(() => {
-    const handler = (event: globalThis.KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = searchQuery.trim();
-    if (trimmed !== searchQuery) onSearchChange(trimmed);
-    onSearchSubmit?.(trimmed);
-    inputRef.current?.focus();
-  };
-
-  const handleClear = () => {
-    onSearchChange("");
-    onSearchSubmit?.("");
-    inputRef.current?.focus();
-  };
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Escape" && searchQuery) {
-      event.preventDefault();
-      handleClear();
-    }
-  };
-
+function AdminHeader() {
   return (
     <header className="ain-admin-header">
       <style>{headerStyles}</style>
@@ -211,44 +163,6 @@ function AdminHeader({
       >
         <Bell strokeWidth={1.5} aria-hidden="true" />
       </button>
-
-      {/* <form
-        className="ain-admin-search-box"
-        role="search"
-        onSubmit={handleSubmit}
-      >
-        <label htmlFor="admin-search-input" className="visually-hidden">
-          Search
-        </label>
-        <button
-          type="submit"
-          className="ain-admin-search-submit"
-          aria-label="Search"
-        >
-          <Search size={18} aria-hidden="true" />
-        </button>
-        <input
-          ref={inputRef}
-          id="admin-search-input"
-          type="search"
-          className="form-control ain-admin-search-input"
-          placeholder="Search"
-          autoComplete="off"
-          value={searchQuery}
-          onChange={(event) => onSearchChange(event.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        {searchQuery && (
-          <button
-            type="button"
-            className="ain-admin-search-clear"
-            aria-label="Clear search"
-            onClick={handleClear}
-          >
-            <X size={16} aria-hidden="true" />
-          </button>
-        )}
-      </form> */}
 
       <div className="ain-admin-theme-toggle">
         <GlobalThemeToggle />

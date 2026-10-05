@@ -9,7 +9,6 @@ interface AdminLayoutProps {
 }
 
 function AdminLayout({ children }: AdminLayoutProps) {
-  const [searchQuery, setSearchQuery] = useState("");
   const [collapsed, setCollapsed] = useState(() => {
     try {
       return localStorage.getItem("ain-sidebar-collapsed") === "1";
@@ -395,10 +394,7 @@ function AdminLayout({ children }: AdminLayoutProps) {
         onToggle={() => setCollapsed((c) => !c)}
       />
       <main className="ain-main flex-grow-1">
-        <AdminHeader
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
+        <AdminHeader />
         <div className="ain-content-wrapper">{children}</div>
       </main>
     </div>
