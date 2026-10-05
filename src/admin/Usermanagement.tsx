@@ -51,15 +51,16 @@ const ROOT_VARS = [
   '[.ain-app.theme-dark_&]:[--off-fg:#fda4af]',
 ].join(' ');
 
-const ROOT = `um user-management ${ROOT_VARS} bg-[var(--bg)] text-[color:var(--text)] min-h-screen text-[14px]`;
+// min-h uses dvh so mobile browser toolbars don't cause extra scroll; overflow-x-hidden prevents sideways scroll
+const ROOT = `um user-management ${ROOT_VARS} bg-[var(--bg)] text-[color:var(--text)] min-h-screen min-h-[100dvh] w-full max-w-full overflow-x-hidden text-[14px]`;
 const cardBase = 'rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] shadow-[0_1px_2px_rgba(16,24,40,0.04)]';
 
 const FOCUS_RING = 'focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--ring)]';
 
-// Buttons
-const BTN_BASE = `inline-flex items-center gap-1.5 rounded-[10px]! border font-medium cursor-pointer whitespace-nowrap transition-[background,box-shadow,border-color] duration-150 disabled:opacity-50 disabled:cursor-not-allowed enabled:active:translate-y-px ${FOCUS_RING}`;
-const BTN_MD = 'px-[14px] py-2 text-[13px]';
-const BTN_SM = 'px-2.5 py-1 text-xs';
+// Buttons (min touch height 40px on mobile, compact on >= sm)
+const BTN_BASE = `inline-flex items-center justify-center gap-1.5 rounded-[10px]! border font-medium cursor-pointer whitespace-nowrap transition-[background,box-shadow,border-color] duration-150 disabled:opacity-50 disabled:cursor-not-allowed enabled:active:translate-y-px ${FOCUS_RING}`;
+const BTN_MD = 'px-[14px] py-2.5 sm:py-2 text-[13px] min-h-[40px] sm:min-h-0';
+const BTN_SM = 'px-3 py-2 sm:px-2.5 sm:py-1 text-xs min-h-[36px] sm:min-h-0';
 const BTN_PRIMARY = 'bg-[var(--accent)] text-white border-transparent enabled:hover:bg-[var(--accent-h)] enabled:hover:text-white';
 const BTN_SECONDARY = 'bg-[var(--surface)] text-[color:var(--text)] border-[color:var(--border)] enabled:hover:bg-[var(--hover)] enabled:hover:border-[color:var(--accent)] enabled:hover:text-[color:var(--accent)]';
 const BTN_DANGER = 'bg-[var(--danger)] text-white border-transparent enabled:hover:bg-[var(--danger-h)] enabled:hover:text-white';
@@ -67,20 +68,20 @@ const BTN_DANGER = 'bg-[var(--danger)] text-white border-transparent enabled:hov
 const btn = (variant: string, size: string = BTN_MD, extra = '') =>
   `${BTN_BASE} ${size} ${variant} ${extra}`.trim();
 
-// Inputs / selects
-const FIELD_BASE = `border rounded-[10px] bg-[var(--input)] text-[color:var(--text)] text-[13px] transition-[border-color,box-shadow] duration-150 placeholder:text-[color:var(--muted)] placeholder:opacity-80 ${FOCUS_RING}`;
+// Inputs / selects — 16px on mobile prevents iOS Safari auto-zoom on focus
+const FIELD_BASE = `border rounded-[10px] bg-[var(--input)] text-[color:var(--text)] text-base sm:text-[13px] transition-[border-color,box-shadow] duration-150 placeholder:text-[color:var(--muted)] placeholder:opacity-80 ${FOCUS_RING}`;
 const FIELD_NORMAL = 'border-[color:var(--border)] focus:border-[color:var(--accent)]';
 const FIELD_INVALID = 'border-[color:var(--danger)]';
 
-// Controls row (rounded, taller – matches the new table look)
-const CONTROL_SELECT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 px-3.5 py-0 text-sm cursor-pointer`;
-const SEARCH_INPUT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 w-full py-2 pl-10 pr-[30px] text-sm`;
+// Controls row
+const CONTROL_SELECT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 px-3.5 py-0 text-base sm:text-sm cursor-pointer max-sm:flex-1 max-sm:min-w-0`;
+const SEARCH_INPUT = `${FIELD_BASE} ${FIELD_NORMAL} rounded-xl! h-11 w-full py-2 pl-10 pr-[34px] text-base sm:text-sm`;
 const formField = (invalid: boolean, extra = '') =>
-  `${FIELD_BASE} ${invalid ? FIELD_INVALID : FIELD_NORMAL} w-full px-2.5 py-2 ${extra}`.trim();
+  `${FIELD_BASE} ${invalid ? FIELD_INVALID : FIELD_NORMAL} w-full px-2.5 py-2.5 sm:py-2 ${extra}`.trim();
 
-// Table (new look)
-const TH = 'px-4 py-3 text-left font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
-const TD = 'px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
+// Table
+const TH = 'px-3 lg:px-4 py-3 text-left font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
+const TD = 'px-3 lg:px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
 const STATUS_CLS: Record<User['status'], string> = {
   active: 'bg-[var(--ok-bg)] text-[color:var(--ok-fg)]',
@@ -91,21 +92,21 @@ const STATUS_LABEL: Record<User['status'], string> = {
   inactive: 'Suspended',
 };
 
-// Icon buttons
-const ICON_BTN = `group bg-transparent border-0 p-1.5 rounded-lg cursor-pointer grid place-items-center transition-colors duration-150 hover:bg-[var(--hover)] ${FOCUS_RING}`;
+// Icon buttons (44px touch target on mobile)
+const ICON_BTN = `group bg-transparent border-0 p-2.5 sm:p-1.5 rounded-lg cursor-pointer grid place-items-center transition-colors duration-150 hover:bg-[var(--hover)] ${FOCUS_RING}`;
 const ICON_SVG = 'w-[18px] h-[18px] transition-transform duration-150 group-hover:scale-110';
 
-// Modal
-const OVERLAY = 'fixed inset-0 bg-[rgba(15,23,42,.5)] flex items-center justify-center z-[1000] p-3 animate-um-fade motion-reduce:animate-none';
-const MODAL = 'bg-[var(--surface)] text-[color:var(--text)] border border-[color:var(--border)] rounded-[10px] p-5 w-full shadow-[0_20px_40px_rgba(0,0,0,.2)] animate-um-pop motion-reduce:animate-none';
-const MODAL_TITLE = 'm-0 mb-0.5 text-[17px] font-bold text-[color:var(--text)]';
+// Modal — bottom sheet on phones, centered dialog on >= sm; scrolls if content exceeds the viewport
+const OVERLAY = 'fixed inset-0 bg-[rgba(15,23,42,.5)] flex items-end justify-center sm:items-center z-[1000] p-0 sm:p-4 animate-um-fade motion-reduce:animate-none';
+const MODAL = 'bg-[var(--surface)] text-[color:var(--text)] border border-[color:var(--border)] rounded-t-2xl sm:rounded-[10px] p-4 sm:p-5 pb-[max(1rem,env(safe-area-inset-bottom))] w-full max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_20px_40px_rgba(0,0,0,.2)] animate-um-pop motion-reduce:animate-none';
+const MODAL_TITLE = 'm-0 mb-0.5 text-[17px] font-bold text-[color:var(--text)] break-words';
 const MODAL_SUB = 'mt-0 text-[color:var(--muted)] text-[13px]';
 const FORM_LABEL = 'block mb-1 text-xs font-medium text-[color:var(--muted)]';
 const FIELD_ERROR = 'mt-1 text-xs text-[color:var(--danger)]';
-const FORM_ACTIONS = 'flex gap-2 justify-end mt-4';
+const FORM_ACTIONS = 'flex gap-2 justify-end mt-4 max-[400px]:flex-col-reverse max-[400px]:[&>button]:w-full';
 
 /* ------------------------------------------------------------------ */
-/* Inline action icons (replace the PNG images)                        */
+/* Inline action icons                                                 */
 /* ------------------------------------------------------------------ */
 const svgProps = {
   viewBox: '0 0 24 24',
@@ -136,6 +137,7 @@ const CheckCircleIcon = () => (
     <path d="m8 12.5 2.8 2.8L16 9.5" />
   </svg>
 );
+
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([
     {
@@ -199,6 +201,14 @@ const UserManagement: React.FC = () => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, [showForm, deleteTarget]);
+
+  // Lock background scroll while a modal is open (important on mobile)
+  useEffect(() => {
+    if (!showForm && !deleteTarget) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
   }, [showForm, deleteTarget]);
 
   const filteredUsers = useMemo(() => {
@@ -352,22 +362,58 @@ const UserManagement: React.FC = () => {
     );
   };
 
+  // Shared by the desktop table and the mobile cards
+  const renderActions = (user: User, className = '') => (
+    <div className={`flex items-center ${className}`}>
+      <button
+        className={`${ICON_BTN} text-[color:var(--text)]`}
+        onClick={() => handleEditUser(user)}
+        title="View / Edit"
+        aria-label={`View ${user.name}`}
+      >
+        <EyeIcon />
+      </button>
+      <button
+        className={`${ICON_BTN} ${user.status === 'active' ? 'text-orange-500' : 'text-emerald-600'}`}
+        onClick={() => handleStatusToggle(user.id)}
+        title={user.status === 'active' ? 'Suspend' : 'Activate'}
+        aria-label={`${user.status === 'active' ? 'Suspend' : 'Activate'} ${user.name}`}
+      >
+        {user.status === 'active' ? <BanIcon /> : <CheckCircleIcon />}
+      </button>
+      <button
+        className={`${ICON_BTN} text-rose-600`}
+        onClick={() => setDeleteTarget(user)}
+        title="Delete"
+        aria-label={`Delete ${user.name}`}
+      >
+        <DeleteIcon className={ICON_SVG} />
+      </button>
+    </div>
+  );
+
+  const statusBadge = (status: User['status']) => (
+    <span className={`inline-block px-3 py-0.5 rounded-full text-[13px] font-medium whitespace-nowrap ${STATUS_CLS[status]}`}>
+      {STATUS_LABEL[status]}
+    </span>
+  );
+
   return (
     <AdminLayout>
       <div className={ROOT}>
         {/* Header */}
-        <div className="flex justify-between items-center gap-3 mb-2 max-md:flex-col max-md:items-start">
-          <div>
-            <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">User Management</h2>
+        <div className="flex justify-between items-center gap-3 mb-3 max-sm:flex-col max-sm:items-stretch">
+          <div className="min-w-0">
+            <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">User Management</h2>
             <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Manage and monitor user accounts</p>
           </div>
-          <button className={btn(BTN_PRIMARY)} onClick={handleAddUser}>
+          <button className={btn(BTN_PRIMARY, BTN_MD, 'max-sm:w-full')} onClick={handleAddUser}>
             + Add user
           </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 mb-3 gap-4  [height:100px]! min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+        {/* Stats: 2 cols on phones, 4 on large screens; height follows content (no fixed height) */}
+        <div className="grid grid-cols-2 mb-4 gap-2.5 min-[480px]:gap-4 xl:grid-cols-4 sm:gap-5">
           {[
             { label: 'Total users', value: stats.totalUsers, icon: 'bi-people', healthy: false },
             { label: 'Active', value: stats.activeUsers, icon: 'bi-person-check', healthy: true },
@@ -376,10 +422,10 @@ const UserManagement: React.FC = () => {
           ].map((s) => (
             <div
               key={s.label}
-              className={`${cardBase} flex items-center gap-3 px-2 py-2 transition-shadow hover:shadow-md sm:gap-4 sm:px-6 sm:py-6`}
+              className={`${cardBase} flex min-w-0 items-center gap-2.5 p-3 transition-shadow hover:shadow-md max-[360px]:flex-col max-[360px]:items-start sm:gap-4 sm:p-5 lg:p-6`}
             >
               <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
                     ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
                     : "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
                   }`}
@@ -387,10 +433,10 @@ const UserManagement: React.FC = () => {
                 <i className={`bi ${s.icon}`} />
               </span>
               <div className="min-w-0">
-                <div className="truncate text-sm text-slate-500 sm:text-[15px] dark:text-slate-400">
+                <div className="truncate text-xs text-slate-500 sm:text-[15px] dark:text-slate-400">
                   {s.label}
                 </div>
-                <div className="!text-xl font-bold leading-tight text-slate-900 sm:text-[25px] dark:text-white">
+                <div className="!text-lg font-bold leading-tight text-slate-900 sm:!text-[25px] dark:text-white">
                   {s.value}
                 </div>
               </div>
@@ -399,8 +445,8 @@ const UserManagement: React.FC = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="relative flex-[1_1_240px] max-w-[400px] max-md:max-w-none max-md:basis-full">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-4">
+          <div className="relative flex-[1_1_240px] sm:max-w-[400px] max-sm:basis-full">
             <svg
               className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[color:var(--muted)] pointer-events-none"
               width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"
@@ -418,7 +464,7 @@ const UserManagement: React.FC = () => {
             />
             {searchTerm && (
               <button
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 border-0 bg-transparent text-[color:var(--muted)] cursor-pointer text-base leading-none px-1.5 py-0.5 rounded hover:bg-[var(--hover)]"
+                className="absolute right-1 top-1/2 -translate-y-1/2 border-0 bg-transparent text-[color:var(--muted)] cursor-pointer text-xl leading-none px-2.5 py-1.5 rounded hover:bg-[var(--hover)]"
                 aria-label="Clear search"
                 onClick={() => { setSearchTerm(''); setPage(1); }}
               >×</button>
@@ -435,16 +481,16 @@ const UserManagement: React.FC = () => {
             <option value="inactive">Suspended</option>
           </select>
           {hasFilters && (
-            <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl!')} onClick={resetFilters}>Clear filters</button>
+            <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl! max-sm:flex-1')} onClick={resetFilters}>Clear filters</button>
           )}
           <span className="flex-1 max-md:hidden" />
-          <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl!')} onClick={handleExport}>Export CSV</button>
+          <button className={btn(BTN_SECONDARY, BTN_MD, 'h-11 rounded-xl! max-sm:w-full')} onClick={handleExport}>Export CSV</button>
         </div>
 
         {/* Add / Edit modal */}
         {showForm && (
           <div className={OVERLAY} onMouseDown={(e) => { if (e.target === e.currentTarget) setShowForm(false); }}>
-            <div className={`${MODAL} max-w-[440px]`} role="dialog" aria-modal="true" aria-labelledby="um-form-title">
+            <div className={`${MODAL} sm:max-w-[440px]`} role="dialog" aria-modal="true" aria-labelledby="um-form-title">
               <h2 id="um-form-title" className={MODAL_TITLE}>{editingId ? 'Edit user' : 'Add user'}</h2>
               <p className={`${MODAL_SUB} mb-3.5`}>{editingId ? 'Update this user’s details and access.' : 'Create an account and set its access level.'}</p>
               <div className="mb-3">
@@ -467,6 +513,8 @@ const UserManagement: React.FC = () => {
                   id="um-email"
                   className={formField(!!errors.email)}
                   type="email"
+                  inputMode="email"
+                  autoCapitalize="none"
                   value={formData.email}
                   onChange={(e) => { setFormData({ ...formData, email: e.target.value }); if (errors.email) setErrors({ ...errors, email: undefined }); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSaveUser(); }}
@@ -474,7 +522,7 @@ const UserManagement: React.FC = () => {
                 />
                 {errors.email && <div className={FIELD_ERROR}>{errors.email}</div>}
               </div>
-              <div className="grid grid-cols-2 gap-3 max-md:grid-cols-1">
+              <div className="grid grid-cols-1 gap-x-3 min-[420px]:grid-cols-2">
                 <div className="mb-3">
                   <label className={FORM_LABEL} htmlFor="um-role">Role</label>
                   <select
@@ -514,7 +562,7 @@ const UserManagement: React.FC = () => {
         {/* Delete confirmation */}
         {deleteTarget && (
           <div className={OVERLAY} onMouseDown={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null); }}>
-            <div className={`${MODAL} max-w-[380px]`} role="alertdialog" aria-modal="true" aria-labelledby="um-del-title">
+            <div className={`${MODAL} sm:max-w-[380px]`} role="alertdialog" aria-modal="true" aria-labelledby="um-del-title">
               <h2 id="um-del-title" className={MODAL_TITLE}>Delete {deleteTarget.name}?</h2>
               <p className={`${MODAL_SUB} mb-0`}>
                 This removes the account and its access. This can’t be undone.
@@ -527,62 +575,83 @@ const UserManagement: React.FC = () => {
           </div>
         )}
 
-        {/* Table */}
+        {/* Results */}
         <div className="bg-[var(--surface)] border border-[color:var(--border)] rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Mobile: card list (< md) */}
+          {filteredUsers.length > 0 && (
+            <>
+              <div className="md:hidden flex items-center gap-2 px-4 py-2.5 border-b border-[color:var(--border)] bg-[var(--surface-2)]">
+                <label htmlFor="um-sort" className="text-xs font-medium text-[color:var(--muted)] shrink-0">Sort by</label>
+                <select
+                  id="um-sort"
+                  className={`${FIELD_BASE} ${FIELD_NORMAL} h-9 flex-1 min-w-0 px-2.5 py-0 cursor-pointer`}
+                  value={`${sort.key}:${sort.dir}`}
+                  onChange={(e) => {
+                    const [key, dir] = e.target.value.split(':') as [SortKey, 'asc' | 'desc'];
+                    setSort({ key, dir });
+                  }}
+                >
+                  <option value="name:asc">Name (A–Z)</option>
+                  <option value="name:desc">Name (Z–A)</option>
+                  <option value="status:asc">Status (A–Z)</option>
+                  <option value="status:desc">Status (Z–A)</option>
+                  <option value="apiUsage:desc">Requests (high–low)</option>
+                  <option value="apiUsage:asc">Requests (low–high)</option>
+                </select>
+              </div>
+              <ul className="md:hidden m-0 p-0 list-none">
+                {pagedUsers.map(user => (
+                  <li key={user.id} className="px-4 py-3.5 border-b border-[color:var(--border)] last:border-b-0">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-[15px] font-medium text-[color:var(--text)] leading-snug break-words">{user.name}</div>
+                        <div className="text-[13px] text-[color:var(--muted)] break-all">{user.email}</div>
+                      </div>
+                      {statusBadge(user.status)}
+                    </div>
+                    <div className="mt-2.5 grid grid-cols-2 gap-3 text-[13px]">
+                      <div>
+                        <div className="text-xs text-[color:var(--muted)]">Requests</div>
+                        <div className="text-[color:var(--text)] font-medium">{user.apiUsage.toLocaleString('en-US')}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[color:var(--muted)]">Last active</div>
+                        <div className="text-[color:var(--text)]">{user.lastActive}</div>
+                      </div>
+                    </div>
+                    {renderActions(user, 'justify-end gap-1 mt-2 -mr-2')}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* Tablet / desktop: table (>= md). Last active column hides below lg to fit tablets */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full border-collapse text-sm">
               <thead className="bg-[var(--surface-2)]">
                 <tr>
                   {renderSortHeader('User', 'name')}
                   {renderSortHeader('Status', 'status')}
                   {renderSortHeader('Requests', 'apiUsage')}
-                  <th className={TH}>Last active</th>
+                  <th className={`${TH} hidden lg:table-cell`}>Last active</th>
                   <th className={`${TH} text-right`}><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
                 {pagedUsers.map(user => (
                   <tr key={user.id} className="transition-colors duration-[120ms] hover:bg-[var(--hover)] last:[&>td]:border-b-0">
-                    <td className={TD}>
-                      <div className="text-[15px] font-medium text-[color:var(--text)] leading-snug">{user.name}</div>
-                      <div className="text-[13px] text-[color:var(--muted)]">{user.email}</div>
+                    <td className={`${TD} max-w-[260px] lg:max-w-none`}>
+                      <div className="text-[15px] font-medium text-[color:var(--text)] leading-snug truncate">{user.name}</div>
+                      <div className="text-[13px] text-[color:var(--muted)] truncate">{user.email}</div>
                     </td>
-                    <td className={TD}>
-                      <span className={`inline-block px-3 py-0.5 rounded-full text-[13px] font-medium ${STATUS_CLS[user.status]}`}>
-                        {STATUS_LABEL[user.status]}
-                      </span>
-                    </td>
+                    <td className={TD}>{statusBadge(user.status)}</td>
                     <td className={`${TD} text-[15px] text-[color:var(--text)]`}>
                       {user.apiUsage.toLocaleString('en-US')}
                     </td>
-                    <td className={`${TD} text-[15px]`}>{user.lastActive}</td>
+                    <td className={`${TD} hidden lg:table-cell text-[15px] whitespace-nowrap`}>{user.lastActive}</td>
                     <td className={TD}>
-                      <div className="flex justify-end gap-3 pr-2">
-                        <button
-                          className={`${ICON_BTN} text-[color:var(--text)]`}
-                          onClick={() => handleEditUser(user)}
-                          title="View / Edit"
-                          aria-label={`View ${user.name}`}
-                        >
-                          <EyeIcon />
-                        </button>
-                        <button
-                          className={`${ICON_BTN} ${user.status === 'active' ? 'text-orange-500' : 'text-emerald-600'}`}
-                          onClick={() => handleStatusToggle(user.id)}
-                          title={user.status === 'active' ? 'Suspend' : 'Activate'}
-                          aria-label={`${user.status === 'active' ? 'Suspend' : 'Activate'} ${user.name}`}
-                        >
-                          {user.status === 'active' ? <BanIcon /> : <CheckCircleIcon />}
-                        </button>
-                        <button
-                          className={`${ICON_BTN} text-rose-600`}
-                          onClick={() => setDeleteTarget(user)}
-                          title="Delete"
-                          aria-label={`Delete ${user.name}`}
-                        >
-                          <DeleteIcon className={ICON_SVG} />
-                        </button>
-                      </div>
+                      {renderActions(user, 'justify-end gap-1 lg:gap-3 lg:pr-2')}
                     </td>
                   </tr>
                 ))}
@@ -605,15 +674,15 @@ const UserManagement: React.FC = () => {
           )}
 
           {filteredUsers.length > 0 && (
-            <div className="flex justify-between items-center gap-2 px-6 py-3 border-t border-[color:var(--border)] text-[color:var(--muted)] text-xs flex-wrap">
+            <div className="flex justify-between items-center gap-2 px-4 sm:px-6 py-3 border-t border-[color:var(--border)] text-[color:var(--muted)] text-xs flex-wrap max-sm:flex-col max-sm:items-stretch max-sm:text-center">
               <span>
                 Showing {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredUsers.length)} of {filteredUsers.length}
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center justify-between sm:justify-end gap-1.5">
                 <button className={btn(BTN_SECONDARY, BTN_SM)} disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>
                   Previous
                 </button>
-                <span>Page {currentPage} of {totalPages}</span>
+                <span className="whitespace-nowrap">Page {currentPage} of {totalPages}</span>
                 <button className={btn(BTN_SECONDARY, BTN_SM)} disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>
                   Next
                 </button>
@@ -624,7 +693,7 @@ const UserManagement: React.FC = () => {
 
         {toast && (
           <div
-            className="fixed bottom-4 right-4 bg-[#111827] text-white px-3.5 py-[9px] rounded-[10px] text-[13px] shadow-[0_8px_20px_rgba(0,0,0,.25)] z-[1100] animate-um-pop motion-reduce:animate-none"
+            className="fixed left-4 right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] sm:left-auto sm:right-4 sm:bottom-4 bg-[#111827] text-white px-3.5 py-[9px] rounded-[10px] text-[13px] text-center sm:text-left shadow-[0_8px_20px_rgba(0,0,0,.25)] z-[1100] animate-um-pop motion-reduce:animate-none"
             role="status"
           >
             {toast}
