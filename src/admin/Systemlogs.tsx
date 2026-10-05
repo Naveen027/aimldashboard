@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { aiModelCatalog } from '../data/aiModels';
+import DeleteIcon from '../components/DeleteIcon';
 interface SystemLog {
   id: string;
   timestamp: string;
@@ -426,7 +427,7 @@ const SystemLogs: React.FC = () => {
             📥 Export Logs
           </button>
           <button className="btn-secondary [border-radius:10px]!" onClick={handleClearOldLogs}>
-            🗑️ Clear Old Logs
+            <DeleteIcon className="mr-1 inline-block h-5 w-4 align-[-3px]" /> Clear Old Logs
           </button>
         </div>
       </div>

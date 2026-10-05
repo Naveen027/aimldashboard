@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import AdminLayout from './AdminLayout';
+import DeleteIcon from '../components/DeleteIcon';
 import { aiModelCatalog, type AiModelType } from '../data/aiModels';
 
 interface Model {
@@ -411,7 +412,7 @@ const ModelControl: React.FC = () => {
                     onClick={() => handleDeleteModel(selectedModel.id)}
                     title="Delete"
                   >
-                    🗑️ Delete
+                    <DeleteIcon className="mr-1 inline-block h-4 w-4 align-[-3px]" /> Delete
                   </button>
                 </div>
               </div>

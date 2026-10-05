@@ -788,7 +788,7 @@ const AdminDashboard: React.FC = () => {
           </span> */}
         </div>
 
-         <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
+         <p className="mt-0.5 mb-1 text-sm text-[color:#6b7280] dark:text-slate-400">
           System-wide Summary
         </p>
 

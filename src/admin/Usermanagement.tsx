@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import AdminLayout from './AdminLayout';
+import DeleteIcon from '../components/DeleteIcon';
 
 interface User {
   id: string;
@@ -135,15 +136,6 @@ const CheckCircleIcon = () => (
     <path d="m8 12.5 2.8 2.8L16 9.5" />
   </svg>
 );
-const TrashIcon = () => (
-  <svg {...svgProps}>
-    <path d="M3 6h18" />
-    <path d="M8 6V4h8v2" />
-    <path d="M6 6l1 14h10l1-14" />
-    <path d="M10 10.5v6M14 10.5v6" />
-  </svg>
-);
-
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([
     {
@@ -588,7 +580,7 @@ const UserManagement: React.FC = () => {
                           title="Delete"
                           aria-label={`Delete ${user.name}`}
                         >
-                          <TrashIcon />
+                          <DeleteIcon className={ICON_SVG} />
                         </button>
                       </div>
                     </td>
