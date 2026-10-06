@@ -70,6 +70,7 @@ const RESPONSIVE_CSS = `
 .system-logs .sl-header .header-actions button {
   display: inline-flex; align-items: center; justify-content: center;
   white-space: nowrap; min-height: 40px;
+  background-color: indigo-600;
 }
 
 /* ---------- Controls ---------- */
@@ -379,7 +380,7 @@ const SystemLogs: React.FC = () => {
       [&_.btn-secondary]:[font-weight:500]
       [&_.btn-secondary]:[cursor:pointer]
       [&_.btn-secondary]:[transition:all_0.3s_ease]
-      [&_.btn-primary]:[background:#667eea]
+      [&_.btn-primary]:[background:#4F46E5]
       [&_.btn-primary]:[color:white]
       [&_.btn-primary:hover]:[background:#5568d3]
       [&_.btn-primary:hover]:[box-shadow:0_4px_12px_rgba(102,_126,_234,_0.3)]
