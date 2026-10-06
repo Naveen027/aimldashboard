@@ -1,559 +1,681 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Tooltip,
-  Legend,
-  Filler,
-  type ChartOptions,
-} from "chart.js";
-import { Line, Radar, Bar } from "react-chartjs-2";
-import {
-  Bot,
-  Zap,
-  Clock,
-  CalendarDays,
-  Activity,
-  Radio,
-  FileSearch,
-  Fingerprint,
-  Languages,
-  MessageSquareText,
-  ScanFace,
+    Activity,
+    ArrowDown,
+    ArrowUp,
+    Bot,
+    CalendarDays,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight,
+    Clock,
+    Download,
+    FileSearch,
+    Fingerprint,
+    Languages,
+    MessageSquareText,
+    Radio,
+    ScanFace,
+    Search,
+    Zap,
+    type LucideIcon,
 } from "lucide-react";
 import { useDashboardTheme } from "./ThemeToggle";
 import { aiModelCatalog } from "../data/aiModels";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-
-
-interface ModelMeta {
-  id: string;
-  name: string;
-  category: string;
-  description: string;
-  highlights: string[];
-  color: string;
-  icon: React.ReactNode;
-}
-
-const modelColors = ["#4285f4", "#34a853", "#fbbc04", "#9c27b0", "#1ba098", "#ea4335"];
-const modelIcons = [
-  ScanFace,
-  Fingerprint,
-  MessageSquareText,
-  FileSearch,
-  Bot,
-  Languages,
-];
-const MODELS: ModelMeta[] = aiModelCatalog.map((model, index) => {
-  const Icon = modelIcons[index];
-  return {
-    ...model,
-    color: modelColors[index],
-    icon: <Icon size={16} />,
-  };
-});
-
-const RADAR_AXES = ["Speed", "Accuracy", "Efficiency", "Reliability", "Cost Control"];
-
 /* ------------------------------------------------------------------ */
-/*  Deterministic mock telemetry generator                             */
-/*  (swap this section out for a real API/analytics call)              */
+/* Model metadata (same catalog, colors and icons as before)           */
 /* ------------------------------------------------------------------ */
 
-function seededRandom(seed: number): number {
-  let t = (seed += 0x6d2b79f5);
-  t = Math.imul(t ^ (t >>> 15), t | 1);
-  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-}
+const MODEL_COLORS = ["#4285f4", "#34a853", "#fbbc04", "#9c27b0", "#1ba098", "#ea4335"];
+const MODEL_ICONS: LucideIcon[] = [ScanFace, Fingerprint, MessageSquareText, FileSearch, Bot, Languages];
 
 interface ModelStats {
-  meta: ModelMeta;
-  dailyTokens: number[]; // 14 days, in K tokens
-  totalTokens: number; // K tokens
-  timeSpentHours: number;
-  daysActive: number; // out of last 30
-  requests: number;
-  lastUsedDaysAgo: number;
-  radar: Record<string, number>; // 0-100 per axis
+    id: string;
+    name: string;
+    category: string;
+    description: string;
+    highlights: string[];
+    color: string;
+    Icon: LucideIcon;
+    totalTokens: number; // K tokens
+    timeSpentHours: number;
+    daysActive: number; // out of last 30
+    requests: number;
+    lastUsedDaysAgo: number;
+}
+
+/* Deterministic mock telemetry (swap for your real API call) */
+function seededRandom(seed: number): number {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
 function buildStats(): ModelStats[] {
-  return MODELS.map((meta, i) => {
-    const base = 40 + i * 22;
-    const volatility = 12 + seededRandom(i * 97 + 3) * 18;
-    const dailyTokens = Array.from({ length: 14 }, (_, d) => {
-      const wave = Math.sin(d / 2.1 + i) * volatility;
-      const noise = (seededRandom(i * 1000 + d) - 0.5) * volatility * 0.8;
-      return Math.max(4, Math.round(base + wave + noise));
+    return aiModelCatalog.map((model, i) => {
+        const base = 40 + i * 22;
+        const volatility = 12 + seededRandom(i * 97 + 3) * 18;
+        const daily = Array.from({ length: 14 }, (_, d) => {
+            const wave = Math.sin(d / 2.1 + i) * volatility;
+            const noise = (seededRandom(i * 1000 + d) - 0.5) * volatility * 0.8;
+            return Math.max(4, Math.round(base + wave + noise));
+        });
+        const totalTokens = daily.reduce((a, b) => a + b, 0);
+        return {
+            ...model,
+            color: MODEL_COLORS[i],
+            Icon: MODEL_ICONS[i],
+            totalTokens,
+            timeSpentHours: Math.round((totalTokens / (6 + i)) * 3.4) / 10,
+            daysActive: 9 + Math.floor(seededRandom(i * 55 + 2) * 20),
+            requests: Math.round(totalTokens * (4 + seededRandom(i * 13) * 3)),
+            lastUsedDaysAgo: Math.floor(seededRandom(i * 8 + 5) * 3),
+        };
     });
-    const totalTokens = dailyTokens.reduce((a, b) => a + b, 0);
-    const timeSpentHours = Math.round((totalTokens / (6 + i)) * 3.4) / 10;
-    const daysActive = 9 + Math.floor(seededRandom(i * 55 + 2) * 20);
-    const requests = Math.round(totalTokens * (4 + seededRandom(i * 13) * 3));
-    const lastUsedDaysAgo = Math.floor(seededRandom(i * 8 + 5) * 3);
-    const radar: Record<string, number> = {};
-    RADAR_AXES.forEach((axis, ai) => {
-      radar[axis] = Math.round(45 + seededRandom(i * 31 + ai * 7) * 50);
-    });
-    return { meta, dailyTokens, totalTokens, timeSpentHours, daysActive, requests, lastUsedDaysAgo, radar };
-  });
 }
 
+type Metric = "Tokens" | "Requests" | "Hours";
+const METRIC_KEY: Record<Metric, (s: ModelStats) => number> = {
+    Tokens: (s) => s.totalTokens,
+    Requests: (s) => s.requests,
+    Hours: (s) => s.timeSpentHours,
+};
+const METRIC_UNIT: Record<Metric, string> = { Tokens: "K", Requests: "", Hours: "h" };
+
+const PAGE_SIZE = 4;
+
 /* ------------------------------------------------------------------ */
-/*  Small presentational helpers                                       */
+/* Shared bits                                                         */
 /* ------------------------------------------------------------------ */
 
-function useCountUp(target: number, duration = 1200): number {
-  const [value, setValue] = useState(0);
-  const start = useRef<number | null>(null);
-  useEffect(() => {
-    let raf: number;
-    const step = (ts: number) => {
-      if (start.current === null) start.current = ts;
-      const progress = Math.min(1, (ts - start.current) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(target * eased));
-      if (progress < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
-  }, [target, duration]);
-  return value;
+function useMounted(delay = 60) {
+    const [m, setM] = useState(false);
+    useEffect(() => {
+        const t = setTimeout(() => setM(true), delay);
+        return () => clearTimeout(t);
+    }, [delay]);
+    return m;
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  suffix,
-  accent,
-  textValue,
-  valueColor,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value?: number;
-  suffix?: string;
-  accent: string;
-  textValue?: string;
-  valueColor?: string;
-}) {
-  const animated = useCountUp(value ?? 0);
-  return (
-    <div className="relative flex min-h-[116px] items-center gap-3.5 overflow-hidden rounded-2xl !border !border-[#eef0f4] border-l-4 bg-[color-mix(in_srgb,var(--accent)_9%,white)] p-[18px_20px] shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-[transform,box-shadow] duration-200 hover:-translate-y-[3px] hover:shadow-[0_8px_20px_rgba(20,30,60,0.1)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]" style={{ ["--accent" as any]: accent, borderLeftColor: accent }}>
-      <div className="grid size-10 shrink-0 place-items-center rounded-lg text-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_12%,white)] [.theme-dark_&]:!bg-[color-mix(in_srgb,var(--accent)_18%,#1f2937)]">{icon}</div>
-      <div className="flex min-w-0 flex-col gap-1">
-        <span className="text-[0.82rem] font-medium text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">{label}</span>
-        <span
-          className="text-2xl font-bold text-[var(--accent)]"
-          style={valueColor ? { color: valueColor } : undefined}
+function useCountUp(target: number, duration = 1000) {
+    const [v, setV] = useState(0);
+    useEffect(() => {
+        let raf = 0;
+        let start: number | null = null;
+        const step = (ts: number) => {
+            if (start === null) start = ts;
+            const p = Math.min(1, (ts - start) / duration);
+            setV(Math.round(target * (1 - Math.pow(1 - p, 3))));
+            if (p < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+        return () => cancelAnimationFrame(raf);
+    }, [target, duration]);
+    return v;
+}
+
+function Clock_() {
+    const { isDarkMode: d } = useDashboardTheme();
+    const [now, setNow] = useState(new Date());
+    useEffect(() => {
+        const t = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(t);
+    }, []);
+    return (
+        <div
+            className={`rounded-xl border px-3 py-2 text-lg font-semibold tabular-nums text-indigo-500 ${
+                d ? "border-gray-700 bg-gray-800" : "border-slate-200 bg-white"
+            }`}
         >
-          {textValue ? (
-            <span className="block truncate text-lg whitespace-nowrap">{textValue}</span>
-          ) : (
-            <>
-              {animated.toLocaleString()}
-              {suffix ? <em className="ml-0.5 text-[0.9rem] not-italic opacity-70">{suffix}</em> : null}
-            </>
-          )}
-        </span>
-      </div>
-    </div>
-  );
+            {now.toLocaleTimeString([], { hour12: false })}
+        </div>
+    );
+}
+
+function Panel({
+    title,
+    hint,
+    action,
+    children,
+    className = "",
+}: {
+    title: string;
+    hint?: string;
+    action?: React.ReactNode;
+    children: React.ReactNode;
+    className?: string;
+}) {
+    const { isDarkMode: d } = useDashboardTheme();
+    return (
+        <section
+            className={`min-w-0 rounded-xl border p-[15px] ${
+                d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700"
+            } ${className}`}
+        >
+            <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <h2 className={`text-sm font-semibold sm:text-base ${d ? "text-white" : "text-slate-900"}`}>{title}</h2>
+                    {hint && <p className={`text-xs ${d ? "text-slate-400" : "text-slate-500"}`}>{hint}</p>}
+                </div>
+                {action}
+            </header>
+            {children}
+        </section>
+    );
+}
+
+function Segmented<T extends string>({
+    options,
+    value,
+    onChange,
+}: {
+    options: readonly T[];
+    value: T;
+    onChange: (v: T) => void;
+}) {
+    const { isDarkMode: d } = useDashboardTheme();
+    return (
+        <div className={`flex rounded-lg p-0.5 ${d ? "bg-gray-700" : "bg-slate-100"}`}>
+            {options.map((o) => (
+                <button
+                    key={o}
+                    type="button"
+                    onClick={() => onChange(o)}
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
+                        value === o
+                            ? "bg-gradient-to-br from-violet-500 to-indigo-500 text-white shadow"
+                            : d
+                              ? "text-slate-300 hover:text-white"
+                              : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                    {o}
+                </button>
+            ))}
+        </div>
+    );
 }
 
 /* ------------------------------------------------------------------ */
-/*  HUD-style external tooltip (shared by Line / Radar / Bar)          */
+/* Profile card (from your original, 15px padding)                     */
 /* ------------------------------------------------------------------ */
 
-function getOrCreateTooltipEl(chart: any): HTMLDivElement {
-  const parent = chart.canvas.parentNode as HTMLElement;
-  let el = parent.querySelector<HTMLDivElement>(".hud-tooltip");
-  if (!el) {
-    el = document.createElement("div");
-    el.className =
-      "hud-tooltip absolute z-20 pointer-events-none min-w-40 px-3 py-2.5 rounded-xl border border-[#eef0f4] bg-white shadow-lg transition-[opacity,left,top] duration-[120ms] opacity-0 [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937]";
-    parent.appendChild(el);
-  }
-  return el;
+interface ProfileCardProps {
+    label: string;
+    value: string;
+    Icon: LucideIcon;
+    gradient?: string;
+    live?: boolean;
 }
 
-function makeExternalTooltip(headFormatter: (ctx: any) => string) {
-  return (context: any) => {
-    const { chart, tooltip } = context;
-    const el = getOrCreateTooltipEl(chart);
+export function ProfileCard({
+    label,
+    value,
+    Icon,
+    gradient = "from-violet-500 to-indigo-500",
+    live = false,
+}: ProfileCardProps) {
+    const { isDarkMode: d } = useDashboardTheme();
+    return (
+        <div
+            className={`group flex min-w-0 items-center gap-3 rounded-xl border p-[15px] transition-shadow hover:shadow-md max-[360px]:flex-col max-[360px]:items-start ${
+                d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700"
+            }`}
+        >
+            <span
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md transition-transform duration-300 group-hover:scale-105 sm:h-[50px] sm:w-[50px] ${gradient}`}
+            >
+                <Icon size={20} strokeWidth={1.8} aria-hidden="true" className="sm:h-6 sm:w-6" />
+            </span>
+            <div className="min-w-0 flex-1">
+                <div className={`truncate text-xs sm:text-[15px] ${d ? "text-slate-400" : "text-slate-500"}`}>{label}</div>
+                <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                    {live && (
+                        <span className="relative flex h-2 w-2 shrink-0">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                        </span>
+                    )}
+                    <span className={`truncate text-lg font-bold leading-tight sm:text-2xl ${d ? "text-white" : "text-slate-900"}`}>
+                        {value}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+}
 
-    if (tooltip.opacity === 0) {
-      el.style.opacity = "0";
-      return;
-    }
+function CountCard({
+    label,
+    target,
+    suffix = "",
+    Icon,
+    gradient,
+}: {
+    label: string;
+    target: number;
+    suffix?: string;
+    Icon: LucideIcon;
+    gradient: string;
+}) {
+    const v = useCountUp(target);
+    return <ProfileCard label={label} value={`${v.toLocaleString()}${suffix}`} Icon={Icon} gradient={gradient} />;
+}
 
-    const points = [...(tooltip.dataPoints || [])].sort(
-      (a, b) => (b.parsed.y ?? b.parsed.r ?? b.parsed.x ?? 0) - (a.parsed.y ?? a.parsed.r ?? a.parsed.x ?? 0)
+/* ------------------------------------------------------------------ */
+/* Bar chart (horizontal, animated, metric switch)                     */
+/* ------------------------------------------------------------------ */
+
+function BarChart({
+    stats,
+    metric,
+    selected,
+    onSelect,
+}: {
+    stats: ModelStats[];
+    metric: Metric;
+    selected: string | "All";
+    onSelect: (id: string | "All") => void;
+}) {
+    const { isDarkMode: d } = useDashboardTheme();
+    const mounted = useMounted();
+    const get = METRIC_KEY[metric];
+    const sorted = [...stats].sort((a, b) => get(b) - get(a));
+    const max = Math.max(...sorted.map(get)) || 1;
+
+    return (
+        <ul className="flex flex-col gap-2.5">
+            {sorted.map((s, i) => {
+                const dim = selected !== "All" && selected !== s.id;
+                return (
+                    <li key={s.id}>
+                        <button
+                            type="button"
+                            onClick={() => onSelect(selected === s.id ? "All" : s.id)}
+                            className={`group grid w-full grid-cols-[96px_1fr_64px] items-center gap-2 text-left transition-opacity duration-300 sm:grid-cols-[130px_1fr_72px] ${
+                                dim ? "opacity-40" : "opacity-100"
+                            }`}
+                            aria-label={`Filter table by ${s.name}`}
+                        >
+                            <span className={`truncate text-xs ${d ? "text-slate-300" : "text-slate-600"}`}>{s.name}</span>
+                            <span className={`h-5 overflow-hidden rounded-md ${d ? "bg-gray-700" : "bg-slate-100"}`}>
+                                <span
+                                    className="block h-full rounded-md transition-[width] duration-700 ease-out group-hover:brightness-110"
+                                    style={{
+                                        width: mounted ? `${(get(s) / max) * 100}%` : "0%",
+                                        background: s.color,
+                                        transitionDelay: `${i * 70}ms`,
+                                    }}
+                                />
+                            </span>
+                            <span className={`text-right text-xs font-semibold tabular-nums ${d ? "text-white" : "text-slate-900"}`}>
+                                {get(s).toLocaleString()}
+                                {METRIC_UNIT[metric]}
+                            </span>
+                        </button>
+                    </li>
+                );
+            })}
+        </ul>
+    );
+}
+
+/* ------------------------------------------------------------------ */
+/* Donut chart (token share)                                           */
+/* ------------------------------------------------------------------ */
+
+function DonutChart({
+    stats,
+    selected,
+    onSelect,
+}: {
+    stats: ModelStats[];
+    selected: string | "All";
+    onSelect: (id: string | "All") => void;
+}) {
+    const { isDarkMode: d } = useDashboardTheme();
+    const mounted = useMounted();
+    const total = stats.reduce((a, s) => a + s.totalTokens, 0) || 1;
+    const R = 54;
+    const C = 2 * Math.PI * R;
+    let offset = 0;
+    const toggle = (id: string) => onSelect(selected === id ? "All" : id);
+
+    return (
+        <div className="flex flex-col items-center gap-4">
+            <div className="relative h-40 w-40">
+                <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
+                    <circle cx="70" cy="70" r={R} fill="none" strokeWidth="16" stroke={d ? "#374151" : "#f1f5f9"} />
+                    {stats.map((s) => {
+                        const len = (s.totalTokens / total) * C;
+                        const el = (
+                            <circle
+                                key={s.id}
+                                cx="70"
+                                cy="70"
+                                r={R}
+                                fill="none"
+                                stroke={s.color}
+                                strokeWidth={selected === s.id ? 20 : 16}
+                                strokeDasharray={`${mounted ? Math.max(len - 2, 0) : 0} ${C}`}
+                                strokeDashoffset={-offset}
+                                className="cursor-pointer transition-all duration-700 ease-out"
+                                onClick={() => toggle(s.id)}
+                            />
+                        );
+                        offset += len;
+                        return el;
+                    })}
+                </svg>
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <span className={`text-xl font-bold ${d ? "text-white" : "text-slate-900"}`}>{total.toLocaleString()}K</span>
+                    <span className={`text-xs ${d ? "text-slate-400" : "text-slate-500"}`}>Tokens</span>
+                </div>
+            </div>
+            <div className="flex flex-wrap justify-center gap-1.5">
+                {stats.map((s) => (
+                    <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => toggle(s.id)}
+                        className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs transition-colors ${
+                            selected === s.id
+                                ? "border-indigo-500 text-indigo-500"
+                                : d
+                                  ? "border-gray-700 text-slate-300 hover:bg-gray-700"
+                                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                        }`}
+                    >
+                        <i className="h-2 w-2 rounded-full" style={{ background: s.color }} />
+                        {s.name}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+/* ------------------------------------------------------------------ */
+/* Model registry table                                                */
+/* ------------------------------------------------------------------ */
+
+type SortKey = "name" | "category" | "totalTokens" | "timeSpentHours" | "daysActive" | "requests" | "lastUsedDaysAgo";
+
+function ModelTable({
+    stats,
+    topId,
+    selected,
+    onSelect,
+}: {
+    stats: ModelStats[];
+    topId: string;
+    selected: string | "All";
+    onSelect: (id: string | "All") => void;
+}) {
+    const { isDarkMode: d } = useDashboardTheme();
+    const [query, setQuery] = useState("");
+    const [view, setView] = useState<"All" | "Most used" | "Active">("All");
+    const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "totalTokens", dir: -1 });
+    const [page, setPage] = useState(1);
+    const [open, setOpen] = useState<string | null>(null);
+
+    const filtered = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        return stats
+            .filter((s) => selected === "All" || s.id === selected)
+            .filter((s) => view === "All" || (view === "Most used" ? s.id === topId : s.id !== topId))
+            .filter((s) => !q || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q))
+            .sort((x, y) => {
+                const a = x[sort.key];
+                const b = y[sort.key];
+                return (typeof a === "number" ? a - (b as number) : String(a).localeCompare(String(b))) * sort.dir;
+            });
+    }, [stats, query, view, selected, sort, topId]);
+
+    const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const safePage = Math.min(page, pages);
+    const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+    useEffect(() => {
+        setPage(1);
+        setOpen(null);
+    }, [query, view, selected]);
+
+    const toggleSort = (key: SortKey) =>
+        setSort((s) => (s.key === key ? { key, dir: (s.dir * -1) as 1 | -1 } : { key, dir: 1 }));
+
+    const exportCsv = () => {
+        const head = "Model,Category,Tokens (K),Hours,Days active,Requests,Last used";
+        const body = filtered
+            .map((s) => `${s.name},${s.category},${s.totalTokens},${s.timeSpentHours},${s.daysActive}/30,${s.requests},${s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}`)
+            .join("\n");
+        const url = URL.createObjectURL(new Blob([`${head}\n${body}`], { type: "text/csv" }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "model-usage.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const iconBtn = `rounded-lg p-1.5 transition-all duration-200 active:scale-90 ${
+        d ? "text-slate-300 hover:bg-gray-700" : "text-slate-500 hover:bg-slate-100"
+    }`;
+
+    const Th = ({ k, children }: { k: SortKey; children: React.ReactNode }) => (
+        <th className="whitespace-nowrap px-2 py-2 text-left font-medium">
+            <button type="button" onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-indigo-500">
+                {children}
+                {sort.key === k && (sort.dir === 1 ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+            </button>
+        </th>
     );
 
-    let rows = "";
-    points.forEach((p: any) => {
-      const color = p.dataset.borderColor || p.dataset.backgroundColor;
-      const raw = p.parsed.y ?? p.parsed.r ?? p.parsed.x ?? 0;
-      const unit = p.chart?.config?._config?.__hudUnit ?? "";
-      rows += `<div class="flex items-center gap-2 text-[0.78rem] py-0.5 whitespace-nowrap">
-          <span class="inline-block size-2 rounded-full" style="background:${color}"></span>
-          <span class="flex-1 text-[#1c2033] [.theme-dark_&]:text-[#f3f4f6]">${p.dataset.label}</span>
-          <span class="font-bold text-[#3d7bfc]">${Number(raw).toLocaleString()}${unit}</span>
-        </div>`;
-    });
+    return (
+        <Panel
+            title="Model registry"
+            hint="Open a row for full details"
+            action={
+                <div className="flex flex-wrap items-center gap-2">
+                    <label className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs ${d ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-slate-50"}`}>
+                        <Search size={13} aria-hidden="true" />
+                        <input
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search"
+                            aria-label="Search models"
+                            className="w-24 bg-transparent outline-none sm:w-36"
+                        />
+                    </label>
+                    <Segmented options={["All", "Most used", "Active"] as const} value={view} onChange={setView} />
+                    <button
+                        type="button"
+                        onClick={exportCsv}
+                        className="flex items-center gap-1.5 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-500 px-2.5 py-1.5 text-xs font-medium text-white shadow transition-transform active:scale-95"
+                    >
+                        <Download size={13} aria-hidden="true" /> Export
+                    </button>
+                </div>
+            }
+        >
+            {selected !== "All" && (
+                <button
+                    type="button"
+                    onClick={() => onSelect("All")}
+                    className="mb-2 rounded-lg border border-indigo-500 px-2 py-1 text-xs text-indigo-500 transition-colors hover:bg-indigo-500/10"
+                >
+                    Showing one model. Clear
+                </button>
+            )}
 
-    el.innerHTML = `<div class="text-[0.68rem] tracking-[0.06em] text-[#667085] mb-1.5 whitespace-nowrap">${headFormatter(context)}</div>${rows}`;
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[760px] text-sm">
+                    <thead className={d ? "text-slate-400" : "text-slate-500"}>
+                        <tr>
+                            <Th k="name">Model</Th>
+                            <Th k="category">Category</Th>
+                            <Th k="totalTokens">Tokens</Th>
+                            <Th k="timeSpentHours">Time spent</Th>
+                            <Th k="daysActive">Days active</Th>
+                            <Th k="requests">Requests</Th>
+                            <Th k="lastUsedDaysAgo">Last used</Th>
+                            <th className="px-2 py-2 text-left font-medium">Status</th>
+                            <th className="px-2 py-2 text-right font-medium">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {visible.map((s) => (
+                            <React.Fragment key={s.id}>
+                                <tr className={`row-in border-t transition-colors ${d ? "border-gray-700 hover:bg-gray-700/40" : "border-slate-100 hover:bg-slate-50"}`}>
+                                    <td className={`px-2 py-2.5 font-medium ${d ? "text-white" : "text-slate-900"}`}>
+                                        <span className="flex items-center gap-2">
+                                            <span style={{ color: s.color }}>
+                                                <s.Icon size={16} aria-hidden="true" />
+                                            </span>
+                                            {s.name}
+                                        </span>
+                                    </td>
+                                    <td className="px-2 py-2.5">{s.category}</td>
+                                    <td className="px-2 py-2.5">{s.totalTokens.toLocaleString()}K</td>
+                                    <td className="px-2 py-2.5">{s.timeSpentHours}h</td>
+                                    <td className="px-2 py-2.5">{s.daysActive}/30</td>
+                                    <td className="px-2 py-2.5">{s.requests.toLocaleString()}</td>
+                                    <td className="px-2 py-2.5">{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
+                                    <td className="px-2 py-2.5">
+                                        {s.id === topId ? (
+                                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${d ? "bg-amber-500/15 text-amber-300" : "bg-amber-50 text-amber-700"}`}>
+                                                <Zap size={11} aria-hidden="true" /> Most used
+                                            </span>
+                                        ) : (
+                                            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${d ? "bg-emerald-500/15 text-emerald-300" : "bg-emerald-50 text-emerald-700"}`}>
+                                                Active
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-2 py-2.5">
+                                        <div className="flex justify-end">
+                                            <button
+                                                type="button"
+                                                className={iconBtn}
+                                                onClick={() => setOpen(open === s.id ? null : s.id)}
+                                                aria-expanded={open === s.id}
+                                                aria-label={`${open === s.id ? "Hide" : "Show"} details for ${s.name}`}
+                                            >
+                                                <ChevronDown size={16} className={`transition-transform duration-300 ${open === s.id ? "rotate-180" : ""}`} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {open === s.id && (
+                                    <tr className={d ? "bg-gray-900/40" : "bg-slate-50"}>
+                                        <td colSpan={9} className="row-in px-3 py-2.5">
+                                            <div className={`flex flex-wrap items-center gap-2 text-xs ${d ? "text-slate-300" : "text-slate-600"}`}>
+                                                <span className="inline-flex items-center gap-1.5">
+                                                    <Clock size={13} aria-hidden="true" />
+                                                    {s.description}
+                                                </span>
+                                                {s.highlights.map((h) => (
+                                                    <span key={h} className={`rounded-full px-2 py-0.5 ${d ? "bg-gray-700 text-indigo-200" : "bg-indigo-50 text-indigo-700"}`}>
+                                                        {h}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+                        {visible.length === 0 && (
+                            <tr>
+                                <td colSpan={9} className={`px-2 py-8 text-center text-sm ${d ? "text-slate-400" : "text-slate-500"}`}>
+                                    No models match. Clear the search or filters to see all models.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-    const { offsetLeft: canvasX, offsetTop: canvasY } = chart.canvas;
-    const parent = chart.canvas.parentNode as HTMLElement;
-    const preferredLeft = canvasX + tooltip.caretX + 14;
-    const preferredTop = canvasY + tooltip.caretY - 10;
-    const maxLeft = Math.max(8, parent.clientWidth - el.offsetWidth - 8);
-    const maxTop = Math.max(8, parent.clientHeight - el.offsetHeight - 8);
-    el.style.opacity = "1";
-    el.style.left = Math.min(Math.max(8, preferredLeft), maxLeft) + "px";
-    el.style.top = Math.min(Math.max(8, preferredTop), maxTop) + "px";
-  };
+            <footer className={`mt-3 flex items-center justify-between text-xs ${d ? "text-slate-400" : "text-slate-500"}`}>
+                <span>
+                    {filtered.length} model{filtered.length === 1 ? "" : "s"} · Page {safePage} of {pages}
+                </span>
+                <div className="flex gap-1">
+                    <button type="button" className={`${iconBtn} disabled:opacity-40`} disabled={safePage === 1} onClick={() => setPage(safePage - 1)} aria-label="Previous page">
+                        <ChevronLeft size={16} />
+                    </button>
+                    <button type="button" className={`${iconBtn} disabled:opacity-40`} disabled={safePage === pages} onClick={() => setPage(safePage + 1)} aria-label="Next page">
+                        <ChevronRight size={16} />
+                    </button>
+                </div>
+            </footer>
+        </Panel>
+    );
 }
 
-/* Glow plugin: adds a soft canvas shadow behind lines/points/bars so the
-   sci-fi accent colors read as glowing rather than flat vector strokes. */
 /* ------------------------------------------------------------------ */
-/*  Main dashboard                                                      */
+/* Page                                                                */
 /* ------------------------------------------------------------------ */
 
 export default function AIModelsDashboard() {
-  const { isDarkMode } = useDashboardTheme();
-  const chartTextColor = isDarkMode ? "#c1c8d3" : "#667085";
-  const chartGridColor = isDarkMode ? "#374151" : "#eef0f4";
-  const stats = useMemo(buildStats, []);
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
-  const hoverTimeoutRef = useRef<number | undefined>(undefined);
-  const [clock, setClock] = useState(new Date());
+    const { isDarkMode: d } = useDashboardTheme();
+    const stats = useMemo(buildStats, []);
+    const [metric, setMetric] = useState<Metric>("Hours");
+    const [selected, setSelected] = useState<string | "All">("All");
 
-  useEffect(() => {
-    const t = setInterval(() => setClock(new Date()), 1000);
-    return () => {
-      clearInterval(t);
-      if (hoverTimeoutRef.current) {
-        window.clearTimeout(hoverTimeoutRef.current);
-      }
-    };
-  }, []);
+    const top = useMemo(() => [...stats].sort((a, b) => b.totalTokens - a.totalTokens)[0], [stats]);
+    const totalTokens = stats.reduce((a, s) => a + s.totalTokens, 0);
+    const totalRequests = stats.reduce((a, s) => a + s.requests, 0);
 
-  const showRowDetails = (id: string) => {
-    if (hoverTimeoutRef.current) {
-      window.clearTimeout(hoverTimeoutRef.current);
-    }
-    setHoveredRow(id);
-  };
+    return (
+        <main className={`min-h-screen p-[15px] ${d ? "bg-gray-900" : "bg-slate-50"}`}>
+            <style>{`
+                @keyframes dash-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+                .dash-in { animation: dash-rise .5s ease-out both; }
+                .row-in { animation: dash-rise .35s ease-out both; }
+                @media (prefers-reduced-motion: reduce) { .dash-in, .row-in { animation: none; } }
+            `}</style>
 
-  const hideRowDetails = () => {
-    hoverTimeoutRef.current = window.setTimeout(() => {
-      setHoveredRow(null);
-    }, 100);
-  };
+            <div className="mx-auto flex max-w-6xl flex-col gap-[15px]">
+                <header className="dash-in flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <span className="mb-1 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600">
+                            <Radio size={14} aria-hidden="true" /> Model usage
+                        </span>
+                        <h1 className={`text-xl font-bold sm:text-[25px] ${d ? "text-white" : "text-slate-900"}`}>AI model activity</h1>
+                        <p className={`text-sm ${d ? "text-slate-400" : "text-slate-500"}`}>
+                            Usage across your connected models, updated in real time.
+                        </p>
+                    </div>
+                    <Clock_ />
+                </header>
 
-  const topModel = useMemo(() => [...stats].sort((a, b) => b.totalTokens - a.totalTokens)[0], [stats]);
-  const totalTokens = stats.reduce((a, s) => a + s.totalTokens, 0);
-  const totalRequests = stats.reduce((a, s) => a + s.requests, 0);
-  const daysMonitored = 30;
+                <div className="dash-in grid grid-cols-1 gap-[15px] sm:grid-cols-2 lg:grid-cols-4" style={{ animationDelay: "80ms" }}>
+                    <CountCard label="Total tokens processed" target={totalTokens} suffix="K" Icon={Zap} gradient="from-blue-500 to-indigo-500" />
+                    <CountCard label="Total requests" target={totalRequests} Icon={Activity} gradient="from-emerald-500 to-teal-500" />
+                    <CountCard label="Days monitored" target={30} Icon={CalendarDays} gradient="from-amber-500 to-orange-500" />
+                    <ProfileCard label="Most used model" value={top.name} Icon={top.Icon} gradient="from-violet-500 to-fuchsia-500" />
+                </div>
 
-  /* ---------------- Line: token throughput ---------------- */
-  const lineData = {
-    labels: Array.from({ length: 14 }, (_, d) => `D${d + 1}`),
-    datasets: stats.map((s) => ({
-      label: s.meta.name,
-      data: s.dailyTokens,
-      borderColor: s.meta.color,
-      backgroundColor: s.meta.color + "22",
-      borderWidth: 2.5,
-      pointRadius: 0,
-      pointHoverRadius: 5,
-      pointHoverBackgroundColor: s.meta.color,
-      tension: 0.35,
-      fill: false,
-    })),
-  };
+                <div className="dash-in grid grid-cols-1 gap-[15px] lg:grid-cols-3" style={{ animationDelay: "160ms" }}>
+                    <Panel
+                        title="Time allocation"
+                        hint="Click a bar to filter the registry"
+                        className="lg:col-span-2"
+                        action={<Segmented options={["Hours", "Tokens", "Requests"] as const} value={metric} onChange={setMetric} />}
+                    >
+                        <BarChart stats={stats} metric={metric} selected={selected} onSelect={setSelected} />
+                    </Panel>
+                    <Panel title="Token share" hint="Click a segment to filter">
+                        <DonutChart stats={stats} selected={selected} onSelect={setSelected} />
+                    </Panel>
+                </div>
 
-  const lineOptions: ChartOptions<"line"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 1400, easing: "easeOutQuart" },
-    interaction: { mode: "index", intersect: false },
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: chartTextColor,
-          usePointStyle: true,
-          pointStyle: "rectRounded",
-          font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 },
-        },
-      },
-      tooltip: {
-        enabled: false,
-        external: makeExternalTooltip((ctx) => `${ctx.tooltip.title?.[0] ?? ""} · TOKEN THROUGHPUT`),
-        itemSort: (a: any, b: any) => b.parsed.y - a.parsed.y,
-      },
-    },
-    scales: {
-      x: {
-        grid: { color: chartGridColor, display: true },
-        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
-      },
-      y: {
-        grid: { color: chartGridColor },
-        ticks: {
-          color: chartTextColor,
-          font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 },
-          callback: (v) => `${v}K`,
-        },
-      },
-    },
-  };
-
-  /* ---------------- Radar: capability matrix ---------------- */
-  const radarData = {
-    labels: RADAR_AXES,
-    datasets: stats.map((s) => ({
-      label: s.meta.name,
-      data: RADAR_AXES.map((axis) => s.radar[axis]),
-      borderColor: s.meta.color,
-      backgroundColor: s.meta.color + "14",
-      borderWidth: 2,
-      pointRadius: 3,
-      pointBackgroundColor: s.meta.color,
-      pointHoverRadius: 6,
-    })),
-  };
-
-  const radarOptions: ChartOptions<"radar"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 1200, easing: "easeOutQuart" },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: false,
-        external: makeExternalTooltip((ctx) => ctx.tooltip.title?.[0] ?? ""),
-        itemSort: (a: any, b: any) => b.parsed.r - a.parsed.r,
-      },
-    },
-    scales: {
-      r: {
-        min: 0,
-        max: 100,
-        angleLines: { color: chartGridColor },
-        grid: { color: chartGridColor },
-        pointLabels: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
-        ticks: { display: false, backdropColor: "transparent" },
-      },
-    },
-  };
-
-  /* ---------------- Bar: time allocation ---------------- */
-  const barSorted = [...stats].sort((a, b) => b.timeSpentHours - a.timeSpentHours);
-  const barData = {
-    labels: barSorted.map((s) => s.meta.name),
-    datasets: [
-      {
-        label: "Hours",
-        data: barSorted.map((s) => s.timeSpentHours),
-        backgroundColor: barSorted.map((s) => s.meta.color),
-        borderRadius: 4,
-        barThickness: 22,
-      },
-    ],
-  };
-
-  const barOptions: ChartOptions<"bar"> = {
-    indexAxis: "y",
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 1200, easing: "easeOutQuart" },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: false,
-        external: makeExternalTooltip((ctx) => ctx.tooltip.dataPoints?.[0]?.label ?? ""),
-      },
-    },
-    scales: {
-      x: {
-        grid: { color: chartGridColor },
-        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 }, callback: (v) => `${v}h` },
-      },
-      y: {
-        grid: { display: false },
-        ticks: { color: chartTextColor, font: { family: "Inter, 'Segoe UI', sans-serif", size: 11 } },
-      },
-    },
-  };
-
-  return (
-    <div className="relative min-h-screen overflow-x-hidden p-0 text-[#1c2033] [.theme-dark_&]:text-[#f3f4f6]">
-
-      <header className="relative z-[2] mb-5 flex flex-wrap items-start justify-between gap-4 max-[560px]:flex-col">
-        <div>
-          <span className="mb-2.5 inline-flex items-center gap-1.5 text-[15px] font-semibold uppercase text-[#1ba098]">
-            <Radio size={14} /> Model usage
-          </span>
-          <h2 className="m-0 text-[25px] font-bold">AI model activity</h2>
-          <p className="mb-0 mt-2 text-[0.92rem] text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Usage across your connected models, updated in real time.</p>
-        </div>
-        <div className="rounded-xl border border-[#eef0f4] bg-white px-4 py-2.5 text-xl font-semibold tabular-nums text-[#3d7bfc] shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937]">{clock.toLocaleTimeString([], { hour12: false })}</div>
-      </header>
-
-      <section className="relative z-[2] mb-6 grid grid-cols-4 gap-3 max-[980px]:grid-cols-2 max-[560px]:grid-cols-1">
-        <StatCard icon={<Zap size={18} />} label="Total tokens processed" value={totalTokens} suffix="K" accent="#4285f4" />
-        <StatCard icon={<Activity size={18} />} label="Total requests" value={totalRequests} accent="#34a853" />
-        <StatCard icon={<CalendarDays size={18} />} label="Days monitored" value={daysMonitored} accent="#fbbc04" />
-        <StatCard icon={topModel.meta.icon} label="Most used model" textValue={topModel.meta.name} accent={topModel.meta.color} />
-      </section>
-
-      <section className="relative z-[2] mb-5 rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
-        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="m-0 text-base font-semibold">Token throughput — last 14 days</h2>
-          <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Click a legend tag to isolate a model</span>
-        </div>
-        <div className="relative" style={{ height: 320 }}>
-          <Line data={lineData} options={lineOptions} />
-        </div>
-      </section>
-
-      <section className="relative z-[2] mb-5 grid grid-cols-[1.1fr_0.9fr] gap-4 max-[980px]:grid-cols-1">
-        <div className="relative z-[2] rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
-          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="m-0 text-base font-semibold">Capability matrix</h2>
-            <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hover a vertex for exact scores</span>
-          </div>
-          <div className="relative overflow-hidden rounded-xl">
-            <div className="relative z-[1]" style={{ height: 340 }}>
-              <Radar data={radarData} options={radarOptions} />
+                <div className="dash-in" style={{ animationDelay: "240ms" }}>
+                    <ModelTable stats={stats} topId={top.id} selected={selected} onSelect={setSelected} />
+                </div>
             </div>
-          </div>
-          <div className="mt-2.5 flex flex-wrap gap-x-[18px] gap-y-3 text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">
-            {stats.map((s) => (
-              <span key={s.meta.id} className="inline-flex items-center gap-1.5">
-                <span className="inline-block size-2 rounded-full" style={{ background: s.meta.color }} />
-                {s.meta.name}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-[2] rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
-          <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="m-0 text-base font-semibold">Time allocation</h2>
-            <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hours spent per model</span>
-          </div>
-          <div className="relative" style={{ height: 340 }}>
-            <Bar data={barData} options={barOptions} />
-          </div>
-        </div>
-      </section>
-
-      <section className="relative z-[2] mb-5 rounded-2xl !border !border-[#eef0f4] bg-white p-5 shadow-[0_1px_3px_rgba(20,30,60,0.08)] [.theme-dark_&]:!border-[#374151] [.theme-dark_&]:!bg-[#1f2937]">
-        <div className="mb-3.5 flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="m-0 text-base font-semibold">Model registry</h2>
-          <span className="text-xs text-[#667085] [.theme-dark_&]:text-[#c1c8d3]">Hover a row for full diagnostics</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-[0.85rem]">
-            <thead>
-              <tr>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Model</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Category</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Tokens</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Time spent</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Days active</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Requests</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Last used</th>
-                <th className="border-b border-[#eef0f4] px-3 py-2.5 text-left text-xs font-medium text-[#667085] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#c1c8d3]">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.map((s) => {
-                const isTop = s.meta.id === topModel.meta.id;
-                const isHover = hoveredRow === s.meta.id;
-                return (
-                  <React.Fragment key={s.meta.id}>
-                    <tr
-                      className={`border-l-2 border-transparent transition-colors duration-150 hover:bg-[#fafbfd] [.theme-dark_&]:hover:bg-[#273449] ${isHover ? "border-l-[#3d7bfc] bg-[#fafbfd] [.theme-dark_&]:bg-[#273449]" : ""}`}
-                      onMouseEnter={() => showRowDetails(s.meta.id)}
-                      onMouseLeave={hideRowDetails}
-                    >
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] transition-colors [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">
-                        <span className="mr-2 inline-grid place-items-center text-[#3d7bfc]">{s.meta.icon}</span>
-                        {s.meta.name}
-                      </td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.meta.category}</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.totalTokens.toLocaleString()}K</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.timeSpentHours}h</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.daysActive}/30</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.requests.toLocaleString()}</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
-                      <td className="border-b border-[#eef0f4] px-3 py-3 text-[#1c2033] [.theme-dark_&]:border-[#374151] [.theme-dark_&]:text-[#f3f4f6]">
-                        {isTop ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#fff6e5] px-2.5 py-1 text-[0.68rem] font-semibold text-[#a3690f]">
-                            <Zap size={11} /> Most used
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#e8f5f3] px-2.5 py-1 text-[0.68rem] font-semibold text-[#1ba098]">Active</span>
-                        )}
-                      </td>
-                    </tr>
-                    <tr
-                      className={`transition-[height,padding] duration-[250ms] [&>td]:h-0 [&>td]:px-3 [&>td]:py-0 [&>td]:border-b [&>td]:border-white/[0.04] ${isHover ? "[&>td]:h-[62px] [&>td]:pb-3" : ""}`}
-                      onMouseEnter={() => showRowDetails(s.meta.id)}
-                      onMouseLeave={hideRowDetails}
-                    >
-                        <td colSpan={8}>
-                          <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.82rem] text-[#7f93bd] max-h-0 opacity-0 overflow-hidden -translate-y-1 transition-[opacity,max-height,transform] duration-[250ms] [.theme-light_&]:text-[#53657b] ${isHover ? "max-h-[56px] opacity-100 translate-y-0" : ""}`}>
-                            <span className="inline-flex items-center gap-2">
-                              <Clock size={13} />
-                              {s.meta.description}
-                            </span>
-                            {s.meta.highlights.map((highlight) => (
-                              <span
-                                key={highlight}
-                                className="rounded-full bg-[#eef4ff] px-2 py-0.5 text-[0.68rem] font-medium text-[#3d5fa8] [.theme-dark_&]:bg-[#273449] [.theme-dark_&]:text-[#c1d2f5]"
-                              >
-                                {highlight}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
+        </main>
+    );
 }

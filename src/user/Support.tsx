@@ -28,7 +28,7 @@ function Support() {
                 userName={userName}
                 onLogout={handleLogout}
             />
-            <main className="main-content min-h-screen min-w-0 flex-1 bg-transparent ml-[260px] max-[991px]:ml-[240px] max-[767px]:ml-0">
+            <main className="main-content min-h-screen min-w-0 flex-1 bg-transparent ml-[var(--user-sidebar-width,260px)] transition-[margin] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-[767px]:ml-0">
                 <UserHeader
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
