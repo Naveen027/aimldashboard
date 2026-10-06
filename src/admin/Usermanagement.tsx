@@ -81,7 +81,7 @@ const formField = (invalid: boolean, extra = '') =>
 
 // Table
 const TH = 'px-3 lg:px-4 py-3 text-left [background:#6976b5]! font-medium text-xs uppercase tracking-wider text-[color:white] border-b border-[color:var(--border)] whitespace-nowrap';
-const TD = 'px-3 lg:px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
+const TD = 'px-3 lg:px-4 py-3 border-b [border:1px_solid_#e3e3e3]! border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
 const STATUS_CLS: Record<User['status'], string> = {
   active: 'bg-[var(--ok-bg)] text-[color:var(--ok-fg)]',

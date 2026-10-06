@@ -90,11 +90,11 @@ const RESPONSIVE_CSS = `
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  border:1px solid lightgrey;
 }
 .system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px;  }
 .system-logs .sl-logs-container .logs-table th { white-space: nowrap; }
 .system-logs .sl-logs-container .logs-table td { vertical-align: middle; }
+.system-logs .sl-logs-container .logs-table td { border:1px solid #e3e3e3; }
 .system-logs .sl-logs-container .logs-table .details { max-width: 260px; }
 .system-logs .sl-logs-container .logs-table td.no-logs { white-space: normal; }
 
@@ -428,7 +428,7 @@ const SystemLogs: React.FC = () => {
       [&_.logs-table_th]:[font-size:11px]
       [&_.logs-table_th]:[letter-spacing:0.5px]
       [&_.logs-table_td]:[padding:12px]
-      [&_.logs-table_td]:[border-bottom:1px_solid_#e8e8e8]
+      [&_.logs-table_td]:[border:1px_solid_#e8e8e8]
       [&_.logs-table_td]:[color:#555]
       [&_.logs-table_tbody_tr:hover]:[background:#fafafa;]
       [&_.logs-table_tbody]:[border:2px_solid_#d1d5db]!
@@ -665,7 +665,7 @@ const SystemLogs: React.FC = () => {
                         {' '}{log.status.charAt(0).toUpperCase() + log.status.slice(1)}
                       </span>
                     </td>
-                    <td className="details" data-label="Details" title={log.details}>{log.details}</td>
+                    <td className="details"  data-label="Details" title={log.details}>{log.details}</td>
                     <td className="ip-address" data-label="IP">{log.ipAddress}</td>
                   </tr>
                 ))
