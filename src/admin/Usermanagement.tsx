@@ -35,6 +35,7 @@ const ROOT_VARS = [
   '[--danger:#dc2626]', '[--danger-h:#b91c1c]',
   '[--ok-fg:#15803d]', '[--ok-bg:rgba(34,197,94,.14)]',
   '[--off-fg:#be123c]', '[--off-bg:rgba(244,63,94,.12)]',
+  '[--table-border:#e3e3e3]',
   // dark
   '[.ain-app.theme-dark_&]:[--bg:transparent]',
   '[.ain-app.theme-dark_&]:[--surface:#1f2937]',
@@ -49,6 +50,7 @@ const ROOT_VARS = [
   '[.ain-app.theme-dark_&]:[--ring:rgba(124,136,240,.25)]',
   '[.ain-app.theme-dark_&]:[--ok-fg:#86efac]',
   '[.ain-app.theme-dark_&]:[--off-fg:#fda4af]',
+  '[.ain-app.theme-dark_&]:[--table-border:rgba(55,65,81,.6)]',
 ].join(' ');
 
 // min-h uses dvh so mobile browser toolbars don't cause extra scroll; overflow-x-hidden prevents sideways scroll
@@ -81,7 +83,7 @@ const formField = (invalid: boolean, extra = '') =>
 
 // Table
 const TH = 'px-3 lg:px-4 py-3 text-left [background:#6976b5]! font-medium text-xs uppercase tracking-wider text-[color:white] border-b border-[color:var(--border)] whitespace-nowrap';
-const TD = 'px-3 lg:px-4 py-3 border-b [border:1px_solid_#e3e3e3]! border-[color:var(--border)] text-[color:var(--muted)] align-middle';
+const TD = 'px-3 lg:px-4 py-3 border-b [border:1px_solid_var(--table-border)]! border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
 const STATUS_CLS: Record<User['status'], string> = {
   active: 'bg-[var(--ok-bg)] text-[color:var(--ok-fg)]',

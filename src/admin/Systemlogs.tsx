@@ -103,8 +103,15 @@ const RESPONSIVE_CSS = `
 .ain-app.theme-dark .system-logs .sl-card {
   border-color: rgba(55, 65, 81, .6) !important;
 }
-.ain-app.theme-dark .system-logs .logs-table :is(thead, tbody, th, td) {
+.ain-app.theme-dark .system-logs .sl-logs-container {
   border-color: rgba(55, 65, 81, .6) !important;
+}
+.ain-app.theme-dark .system-logs .logs-table :is(table, thead, tbody, tr, th, td) {
+  border-color: rgba(55, 65, 81, .6) !important;
+}
+.ain-app.theme-dark .system-logs .logs-table tbody,
+.ain-app.theme-dark .system-logs .logs-table td {
+  border: 1px solid rgba(55, 65, 81, .6) !important;
 }
 
 @media (max-width: 1023px) {

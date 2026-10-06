@@ -405,6 +405,17 @@ function AdminLayout({ children }: AdminLayoutProps) {
         .ain-app.theme-dark .ain-main .border {
           border-color: rgba(55, 65, 81, .6) !important;
         }
+        .ain-app.theme-dark .user-management table,
+        .ain-app.theme-dark .user-management thead,
+        .ain-app.theme-dark .user-management tbody,
+        .ain-app.theme-dark .user-management tr,
+        .ain-app.theme-dark .user-management th,
+        .ain-app.theme-dark .user-management td {
+          border-color: rgba(55, 65, 81, .6) !important;
+        }
+        .ain-app.theme-dark .user-management td {
+          border-bottom-color: rgba(55, 65, 81, .6) !important;
+        }
       `}</style>
       <AdminSidebar
         adminUsername={adminUsername}
