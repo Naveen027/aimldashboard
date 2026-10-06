@@ -400,7 +400,10 @@ function AdminLayout({ children }: AdminLayoutProps) {
           color: var(--ain-text) !important;
         }
         .ain-app.theme-dark .ain-main :is(.border-slate-100, .border-slate-200, .border-gray-200) {
-          border-color: var(--ain-border) !important;
+          border-color: rgba(55, 65, 81, .6) !important;
+        }
+        .ain-app.theme-dark .ain-main .border {
+          border-color: rgba(55, 65, 81, .6) !important;
         }
       `}</style>
       <AdminSidebar

@@ -327,6 +327,15 @@ const ModelControl: React.FC = () => {
         .mc-fill { animation: mc-fill 1s cubic-bezier(.22,1,.36,1) .35s both }
         .mc-sheen { animation: mc-sheen 2.4s ease-in-out infinite }
         .mc-ping { animation: mc-ping 1.8s cubic-bezier(0,0,.2,1) infinite }
+        .ain-app.theme-dark .mc-stat-icon-healthy {
+          background-color: rgba(16, 185, 129, .16) !important;
+          color: #6ee7b7 !important;
+        }
+        .ain-app.theme-dark .mc-model-icon {
+          background: #374151 !important;
+          border-color: #4b5563 !important;
+          color: #a5b4fc !important;
+        }
         /* never allow sideways page scroll from this screen */
         .mc-root { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
         .mc-root h2, .mc-root h3 { overflow-wrap: anywhere; }
@@ -355,7 +364,7 @@ const ModelControl: React.FC = () => {
               className={`mc-rise flex min-w-0 items-center gap-2 rounded-[10px] border border-slate-200 bg-white px-3 py-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:gap-4 sm:px-5 sm:py-4 ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
             >
               <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
+                className={`mc-stat-icon ${s.healthy ? 'mc-stat-icon-healthy' : ''} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
                     ? `bg-emerald-50 text-emerald-600 ${dark}:bg-emerald-500/10 ${dark}:text-emerald-400`
                     : `bg-indigo-50 text-indigo-600 ${dark}:bg-indigo-500/10 ${dark}:text-indigo-300`
                   }`}
@@ -748,7 +757,7 @@ const ModelControl: React.FC = () => {
                   {/* top row: icon + title + status pill (pill wraps below on very narrow cards) */}
                   <div className="mb-2 flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                     <div className="flex min-w-0 flex-1 basis-[180px] items-center gap-3 sm:gap-4">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]">
+                      <span className="mc-model-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]">
                         <ModelIcon size={24} strokeWidth={2} aria-hidden="true" />
                       </span>
                       <div className="min-w-0">

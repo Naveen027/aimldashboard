@@ -97,6 +97,12 @@ const RESPONSIVE_CSS = `
 .system-logs .sl-logs-container .logs-table td { border:1px solid #e3e3e3; }
 .system-logs .sl-logs-container .logs-table .details { max-width: 260px; }
 .system-logs .sl-logs-container .logs-table td.no-logs { white-space: normal; }
+.ain-app.theme-dark .system-logs .sl-card {
+  border-color: rgba(55, 65, 81, .6) !important;
+}
+.ain-app.theme-dark .system-logs .logs-table :is(thead, tbody, th, td) {
+  border-color: rgba(55, 65, 81, .6) !important;
+}
 
 @media (max-width: 1023px) {
   .system-logs .sl-logs-container .logs-table { font-size: 12px; }
