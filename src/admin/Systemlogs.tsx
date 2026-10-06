@@ -75,10 +75,12 @@ const RESPONSIVE_CSS = `
 /* ---------- Controls ---------- */
 .system-logs .sl-controls {
   grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  font-size:14px;
 }
 .system-logs .sl-controls .controls-group { flex-wrap: wrap; min-width: 0; }
 .system-logs .sl-controls .search-input { flex: 1 1 100%; width: 100%; min-width: 0; }
 .system-logs .sl-controls .filter-select { flex: 1 1 130px; min-width: 0; }
+
 .system-logs .sl-controls .date-input { flex: 1 1 130px; min-width: 0; }
 .system-logs .sl-controls input,
 .system-logs .sl-controls select { min-height: 40px; max-width: 100%; }
@@ -90,6 +92,7 @@ const RESPONSIVE_CSS = `
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  border: 1px solid #e5e7eb;
 }
 .system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px;  }
 .system-logs .sl-logs-container .logs-table th { white-space: nowrap; }
@@ -376,6 +379,7 @@ const SystemLogs: React.FC = () => {
       [&_.btn-secondary]:[background:#f0f0f0]
       [&_.btn-secondary]:[color:#333]
       [&_.btn-secondary:hover]:[background:#e8e8e8]
+      
       [&_.sl-controls]:[display:grid]
       [&_.sl-controls]:[gap:16px]
       [&_.sl-controls]:[margin-bottom:24px]
@@ -437,7 +441,6 @@ const SystemLogs: React.FC = () => {
       [&_.logs-table_td]:[border:1px_solid_#e8e8e8]
       [&_.logs-table_td]:[color:#555]
       [&_.logs-table_tbody_tr:hover]:[background:#fafafa;]
-      [&_.logs-table_tbody]:[border:2px_solid_#d1d5db]!
       [&_.timestamp]:[font-family:Courier_New,_monospace]
       [&_.timestamp]:[font-size:12px]
       [&_.timestamp]:[color:#667eea]

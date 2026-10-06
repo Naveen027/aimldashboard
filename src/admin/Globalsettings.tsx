@@ -12,7 +12,7 @@ const card =
   '[border-radius:10px] border border-slate-200 bg-white shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-800';
 const heading = 'text-slate-900 [.ain-app.theme-dark_&]:text-slate-100';
 const muted = 'text-slate-500 [.ain-app.theme-dark_&]:text-slate-400';
-const label = 'mb-1.5 block text-sm font-medium text-slate-700 [.ain-app.theme-dark_&]:text-slate-300';
+const label = 'mb-1.5 block [font-size:12px] font-medium text-slate-700 [.ain-app.theme-dark_&]:text-slate-300';
 const input =
   'block w-full min-w-0 max-w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-base text-slate-800 outline-none transition-all duration-200 hover:border-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-100 [.ain-app.theme-dark_&]:hover:border-slate-600';
 const button =
@@ -104,7 +104,7 @@ const GlobalSettings: React.FC = () => {
             </p>
           </div>
           <button className={`${button} w-full shrink-0 sm:w-auto`} onClick={() => setToast('Settings saved')}>
-            <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="h-6 w-6" aria-hidden="true">
               <path d="M3 4a1 1 0 0 1 1-1h9.6a1 1 0 0 1 .7.3l2.4 2.4a1 1 0 0 1 .3.7V16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4Zm4 0v3h5V4H7Zm3 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z" />
             </svg>
             Save changes
@@ -130,7 +130,7 @@ const GlobalSettings: React.FC = () => {
 
             <div className="h-px bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700" />
 
-            <h3 className={`m-0 text-base [font-size:1.125rem]! font-semibold ${heading}`}>Rate limiting</h3>
+            <h3 className={`m-0 text-base [font-size:18px]! [padding-bottom:5px] font-semibold ${heading}`}>Rate limiting</h3>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
               <Field title="Default rate limit (requests/min)">
                 <input
