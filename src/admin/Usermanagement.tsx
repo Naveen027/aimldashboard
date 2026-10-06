@@ -80,7 +80,7 @@ const formField = (invalid: boolean, extra = '') =>
   `${FIELD_BASE} ${invalid ? FIELD_INVALID : FIELD_NORMAL} w-full px-2.5 py-2.5 sm:py-2 ${extra}`.trim();
 
 // Table
-const TH = 'px-3 lg:px-4 py-3 text-left font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
+const TH = 'px-3 lg:px-4 py-3 text-left [background:lightgrey]! font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
 const TD = 'px-3 lg:px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
 const STATUS_CLS: Record<User['status'], string> = {
@@ -350,13 +350,28 @@ const UserManagement: React.FC = () => {
     return (
       <th className={TH} aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
         <button
-          className={`inline-flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer rounded uppercase tracking-wider font-medium text-xs hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
+          className={`inline-flex items-center gap-1 [font-size:13px]! bg-transparent [color:black]! border-0 p-0 cursor-pointer rounded uppercase tracking-wider font-medium text-xs hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
           onClick={() => handleSort(k)}
         >
           {label}
-          <span className={`text-[9px] ${active ? 'opacity-100 text-[color:var(--accent)]' : 'opacity-[.35]'}`}>
-            {active ? (sort.dir === 'asc' ? '▲' : '▼') : '▲▼'}
-          </span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className={`h-4 w-4 shrink-0 ${active ? 'text-[color:var(--accent)]' : 'opacity-50'}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {active ? (
+              sort.dir === 'asc'
+                ? <path d="M8 13V3m0 0L4.5 6.5M8 3l3.5 3.5" />
+                : <path d="M8 3v10m0 0 3.5-3.5M8 13l-3.5-3.5" />
+            ) : (
+              <path d="M5 6l3-3 3 3M8 3v10m0 0-3-3m3 3 3-3" />
+            )}
+          </svg>
         </button>
       </th>
     );

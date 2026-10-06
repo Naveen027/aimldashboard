@@ -16,7 +16,7 @@ const UserDashboard = lazy(() => import("./user/UserDashboard"));
 const AdminDashboard = lazy(() => import("./admin/AdminDashboard"));
 const Usermanagement = lazy(() => import("./admin/Usermanagement"));
 const Modelcontrol = lazy(() => import("./admin/Modelcontrol"));
-const Adminbilling = lazy(() => import("./admin/Adminbilling"));
+// const Adminbilling = lazy(() => import("./admin/Adminbilling"));
 const Globalsettings = lazy(() => import("./admin/Globalsettings"));
 const Systemlogs = lazy(() => import("./admin/Systemlogs"));
 const ApiKeys = lazy(() => import("./user/ApiKeys"));
@@ -55,7 +55,7 @@ function App() {
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin/user-management" element={<Usermanagement />} />
             <Route path="/admin/model-control" element={<Modelcontrol />} />
-            <Route path="/admin/billing" element={<Adminbilling />} />
+            {/* <Route path="/admin/billing" element={<Adminbilling />} /> */}
             <Route path="/admin/global-settings" element={<Globalsettings />} />
             <Route path="/admin/system-logs" element={<Systemlogs />} />
           </Route>

@@ -20,7 +20,7 @@ const navItems: NavItem[] = [
   { label: "Dashboard", icon: "bi-grid-1x2-fill", to: "/admin-dashboard" },
   { label: "User Management", icon: "bi-person", to: "/admin/user-management" },
   { label: "AI Products", icon: "bi-gear", to: "/admin/model-control" },
-  { label: "Billing Admin", icon: "bi-receipt", to: "/admin/billing" },
+  // { label: "Billing Admin", icon: "bi-receipt", to: "/admin/billing" },
   { label: "Global Settings", icon: "bi-sliders", to: "/admin/global-settings" },
   { label: "System Logs", icon: "bi-file-earmark-text", to: "/admin/system-logs" },
 ];

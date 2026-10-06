@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { aiModelCatalog } from '../data/aiModels';
-import DeleteIcon from '../components/DeleteIcon';
+import { Download } from 'lucide-react';
 
 interface SystemLog {
   id: string;
@@ -13,6 +13,9 @@ interface SystemLog {
   details: string;
   ipAddress: string;
 }
+
+type SortKey = 'timestamp' | 'user' | 'action' | 'resource' | 'status' | 'details' | 'ipAddress';
+type SortDirection = 'asc' | 'desc';
 
 /* ------------------------------------------------------------------ */
 /* Stat card tokens (same look as User Management cards)               */
@@ -87,6 +90,7 @@ const RESPONSIVE_CSS = `
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  border:1px solid lightgrey;
 }
 .system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px; }
 .system-logs .sl-logs-container .logs-table th { white-space: nowrap; }
@@ -206,18 +210,77 @@ const SystemLogs: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'success' | 'warning' | 'error' | 'info'>('all');
   const [filterAction, setFilterAction] = useState<'all' | string>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [dateRange, setDateRange] = useState({ start: '2024-09-22', end: '2024-09-22' });
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [sort, setSort] = useState<{ key: SortKey; direction: SortDirection }>({
+    key: 'timestamp',
+    direction: 'desc',
+  });
 
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
       const matchesStatus = filterStatus === 'all' || log.status === filterStatus;
       const matchesAction = filterAction === 'all' || log.action === filterAction;
+      const logDate = log.timestamp.slice(0, 10);
+      const matchesDate =
+        (!dateRange.start || logDate >= dateRange.start) &&
+        (!dateRange.end || logDate <= dateRange.end);
       const matchesSearch = log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.resource.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.details.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesStatus && matchesAction && matchesSearch;
+      return matchesStatus && matchesAction && matchesDate && matchesSearch;
     });
-  }, [logs, filterStatus, filterAction, searchTerm]);
+  }, [logs, filterStatus, filterAction, searchTerm, dateRange]);
+
+  const sortedLogs = useMemo(() => {
+    const direction = sort.direction === 'asc' ? 1 : -1;
+    return [...filteredLogs].sort((left, right) =>
+      left[sort.key].localeCompare(right[sort.key], undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      }) * direction,
+    );
+  }, [filteredLogs, sort]);
+
+  const handleSort = (key: SortKey) => {
+    setSort(current => ({
+      key,
+      direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const renderSortHeader = (label: string, key: SortKey) => {
+    const active = sort.key === key;
+    return (
+      <th aria-sort={active ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
+        <button
+          type="button"
+          className="inline-flex cursor-pointer [font-size:13px]! items-center gap-1 rounded border-0 bg-transparent p-0 text-inherit hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          onClick={() => handleSort(key)}
+          aria-label={`Sort by ${label}${active ? `, currently ${sort.direction}ending` : ''}`}
+        >
+          {label}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className={`h-4 w-4 shrink-0 ${active ? 'text-indigo-600' : 'opacity-50'}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {active ? (
+              sort.direction === 'asc'
+                ? <path d="M8 13V3m0 0L4.5 6.5M8 3l3.5 3.5" />
+                : <path d="M8 3v10m0 0 3.5-3.5M8 13l-3.5-3.5" />
+            ) : (
+              <path d="M5 6l3-3 3 3M8 3v10m0 0-3-3m3 3 3-3" />
+            )}
+          </svg>
+        </button>
+      </th>
+    );
+  };
 
   const stats = {
     totalLogs: logs.length,
@@ -260,15 +323,15 @@ const SystemLogs: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleClearOldLogs = () => {
-    if (window.confirm('Delete logs older than 30 days? This action cannot be undone.')) {
-      alert('Logs older than 30 days have been deleted');
-    }
-  };
+  // const handleClearOldLogs = () => {
+  //   if (window.confirm('Delete logs older than 30 days? This action cannot be undone.')) {
+  //     alert('Logs older than 30 days have been deleted');
+  //   }
+  // };
 
   return (
     <AdminLayout>
-    <div className={`system-logs mx-auto w-full max-w-[1520px] 2xl:max-w-[1760px]
+      <div className={`system-logs mx-auto w-full max-w-[1520px] 2xl:max-w-[1760px]
       [padding:0px]
       [background:#f5f5f5]
       [border-radius:10px]
@@ -355,7 +418,7 @@ const SystemLogs: React.FC = () => {
       [&_.logs-table]:[width:100%]
       [&_.logs-table]:[border-collapse:collapse]
       [&_.logs-table]:[font-size:13px]
-      [&_.logs-table_thead]:[background:#f9f9f9]
+      [&_.logs-table_thead]:[background:lightgrey]
       [&_.logs-table_thead]:[border-bottom:2px_solid_#e0e0e0]
       [&_.logs-table_th]:[padding:14px_12px]
       [&_.logs-table_th]:[text-align:left]
@@ -445,168 +508,174 @@ const SystemLogs: React.FC = () => {
       [.ain-app.theme-dark_&_.btn-secondary]:[background:#273449]
       [.ain-app.theme-dark_&_.btn-secondary]:[border-color:#4b5563]
       [.ain-app.theme-dark_&_.btn-secondary:hover]:[background:#374151]`}>
-      <style>{RESPONSIVE_CSS}</style>
+        <style>{RESPONSIVE_CSS}</style>
 
-      <div className="sl-header">
-        <div>
-          <h2 className="m-0 break-words text-[1.35rem] !font-bold leading-tight tracking-tight text-black sm:text-[1.6rem] dark:text-white">
-            System Logs
-          </h2>
-          <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
-            Monitor all system events and user activities
-          </p>
-        </div>
-        <div className="header-actions">
-          <button className="btn-primary [border-radius:10px]!" onClick={handleExportLogs}>
-            📥 Export Logs
-          </button>
-          <button className="btn-secondary [border-radius:10px]!" onClick={handleClearOldLogs}>
+        <div className="sl-header">
+          <div>
+            <h2 className="m-0 break-words text-[1.35rem] !font-bold leading-tight tracking-tight text-black sm:text-[1.6rem] dark:text-white">
+              System Logs
+            </h2>
+            <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
+              Monitor all system events and user activities
+            </p>
+          </div>
+          <div className="header-actions">
+            <button
+              className="btn-primary [border-radius:10px]! gap-1.5"
+              onClick={handleExportLogs}
+            >
+              <Download size={17} />
+              Export Logs
+            </button>
+            {/* <button className="btn-secondary [border-radius:10px]!" onClick={handleClearOldLogs}>
             <DeleteIcon className="mr-1 inline-block h-5 w-4 align-[-3px]" /> Clear Old Logs
-          </button>
+          </button> */}
+          </div>
         </div>
-      </div>
 
-      {/* Stat cards: 2 columns on phones, 4 on large screens */}
-      <div className="mb-3 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-        {statCards.map((s, i) => (
-          <div
-            key={s.label}
-            className={CARD}
-            style={{ animation: `sl-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${i * 90}ms both` }}
-          >
-            <span className={`${ICON_BOX} ${TONE[s.tone]}`}>
-              <i className={`bi ${s.icon}`} />
-            </span>
-            <div className="min-w-0">
-              <div className="truncate text-xs text-slate-500 sm:text-[15px] dark:text-slate-400">
-                {s.label}
-              </div>
-              <div
-                key={s.value}
-                className="sl-card-value !text-xl font-bold leading-tight text-slate-900 sm:!text-[25px] dark:text-white [.ain-app.theme-dark_&]:text-white"
-                style={{ animation: 'sl-value-in 0.4s ease-out both' }}
-              >
-                {s.value}
+        {/* Stat cards: 2 columns on phones, 4 on large screens */}
+        <div className="mb-3 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+          {statCards.map((s, i) => (
+            <div
+              key={s.label}
+              className={CARD}
+              style={{ animation: `sl-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${i * 90}ms both` }}
+            >
+              <span className={`${ICON_BOX} ${TONE[s.tone]}`}>
+                <i className={`bi ${s.icon}`} />
+              </span>
+              <div className="min-w-0">
+                <div className="truncate text-xs text-slate-500 sm:text-[15px] dark:text-slate-400">
+                  {s.label}
+                </div>
+                <div
+                  key={s.value}
+                  className="sl-card-value !text-xl font-bold leading-tight text-slate-900 sm:!text-[25px] dark:text-white [.ain-app.theme-dark_&]:text-white"
+                  style={{ animation: 'sl-value-in 0.4s ease-out both' }}
+                >
+                  {s.value}
+                </div>
               </div>
             </div>
+          ))}
+        </div>
+
+        <div className="sl-controls">
+          <div className="controls-group">
+            <input
+              type="text"
+              placeholder="Search logs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+              aria-label="Search logs"
+            />
           </div>
-        ))}
-      </div>
 
-      <div className="sl-controls">
-        <div className="controls-group">
-          <input
-            type="text"
-            placeholder="Search logs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-            aria-label="Search logs"
-          />
+          <div className="controls-group">
+            <select
+              value={filterStatus}
+              onChange={(e) =>
+                setFilterStatus(
+                  e.target.value as 'all' | 'success' | 'warning' | 'error' | 'info',
+                )
+              }
+              className="filter-select"
+              aria-label="Filter by status"
+            >
+              <option value="all">All Status</option>
+              <option value="success">Success</option>
+              <option value="warning">Warning</option>
+              <option value="error">Error</option>
+              <option value="info">Info</option>
+            </select>
+
+            <select
+              value={filterAction}
+              onChange={(e) => setFilterAction(e.target.value)}
+              className="filter-select"
+              aria-label="Filter by action"
+            >
+              <option value="all">All Actions</option>
+              {uniqueActions.map(action => (
+                <option key={action} value={action}>{action}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="controls-group">
+            <input
+              type="date"
+              value={dateRange.start}
+              max={dateRange.end || undefined}
+              onChange={(e) => setDateRange(current => ({ ...current, start: e.target.value }))}
+              className="date-input"
+              aria-label="Start date"
+            />
+            <span className="date-separator">to</span>
+            <input
+              type="date"
+              value={dateRange.end}
+              min={dateRange.start || undefined}
+              onChange={(e) => setDateRange(current => ({ ...current, end: e.target.value }))}
+              className="date-input"
+              aria-label="End date"
+            />
+          </div>
         </div>
 
-        <div className="controls-group">
-          <select
-            value={filterStatus}
-            onChange={(e) =>
-              setFilterStatus(
-                e.target.value as 'all' | 'success' | 'warning' | 'error' | 'info',
-              )
-            }
-            className="filter-select"
-            aria-label="Filter by status"
-          >
-            <option value="all">All Status</option>
-            <option value="success">Success</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
-            <option value="info">Info</option>
-          </select>
-
-          <select
-            value={filterAction}
-            onChange={(e) => setFilterAction(e.target.value)}
-            className="filter-select"
-            aria-label="Filter by action"
-          >
-            <option value="all">All Actions</option>
-            {uniqueActions.map(action => (
-              <option key={action} value={action}>{action}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="controls-group">
-          <input
-            type="date"
-            value={dateRange.start}
-            onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-            className="date-input"
-            aria-label="Start date"
-          />
-          <span className="date-separator">to</span>
-          <input
-            type="date"
-            value={dateRange.end}
-            onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-            className="date-input"
-            aria-label="End date"
-          />
-        </div>
-      </div>
-
-      <div className="sl-logs-container">
-        <table className="logs-table">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Resource</th>
-              <th>Status</th>
-              <th>Details</th>
-              <th>IP Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredLogs.length > 0 ? (
-              filteredLogs.map(log => (
-                <tr key={log.id} className={`row-${log.status}`}>
-                  <td className="timestamp" data-label="Time">{log.timestamp}</td>
-                  <td className="user" data-label="User">{log.user}</td>
-                  <td className="action" data-label="Action">{log.action}</td>
-                  <td className="resource" data-label="Resource">{log.resource}</td>
-                  <td data-label="Status">
-                    <span className={`status-badge ${log.status}`}>
-                      {log.status === 'success' && '✓'}
-                      {log.status === 'warning' && '⚠️'}
-                      {log.status === 'error' && '✕'}
-                      {log.status === 'info' && 'ℹ'}
-                      {' '}{log.status.charAt(0).toUpperCase() + log.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="details" data-label="Details" title={log.details}>{log.details}</td>
-                  <td className="ip-address" data-label="IP">{log.ipAddress}</td>
-                </tr>
-              ))
-            ) : (
+        <div className="sl-logs-container">
+          <table className="logs-table">
+            <thead>
               <tr>
-                <td colSpan={7} className="no-logs">
-                  No logs found matching your filters
-                </td>
+                {renderSortHeader('Timestamp', 'timestamp')}
+                {renderSortHeader('User', 'user')}
+                {renderSortHeader('Action', 'action')}
+                {renderSortHeader('Resource', 'resource')}
+                {renderSortHeader('Status', 'status')}
+                {renderSortHeader('Details', 'details')}
+                {renderSortHeader('IP Address', 'ipAddress')}
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {sortedLogs.length > 0 ? (
+                sortedLogs.map(log => (
+                  <tr key={log.id} className={`row-${log.status}`}>
+                    <td className="timestamp" data-label="Time">{log.timestamp}</td>
+                    <td className="user" data-label="User">{log.user}</td>
+                    <td className="action" data-label="Action">{log.action}</td>
+                    <td className="resource" data-label="Resource">{log.resource}</td>
+                    <td data-label="Status">
+                      <span className={`status-badge ${log.status}`}>
+                        {log.status === 'success' && '✓'}
+                        {log.status === 'warning' && '⚠️'}
+                        {log.status === 'error' && '✕'}
+                        {log.status === 'info' && 'ℹ'}
+                        {' '}{log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="details" data-label="Details" title={log.details}>{log.details}</td>
+                    <td className="ip-address" data-label="IP">{log.ipAddress}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="no-logs">
+                    No logs found matching your filters
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      <div className="sl-footer">
-        <small>
-          Showing {filteredLogs.length} of {logs.length} logs
-          {filteredLogs.length !== logs.length && ' (filtered)'}
-        </small>
+        <div className="sl-footer">
+          <small>
+            Showing {filteredLogs.length} of {logs.length} logs
+            {filteredLogs.length !== logs.length && ' (filtered)'}
+          </small>
+        </div>
       </div>
-    </div>
     </AdminLayout>
   );
 };

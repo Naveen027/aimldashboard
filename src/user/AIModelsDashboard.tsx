@@ -27,8 +27,14 @@ import { aiModelCatalog } from "../data/aiModels";
 /* Model metadata (same catalog, colors and icons as before)           */
 /* ------------------------------------------------------------------ */
 
-const MODEL_COLORS = ["#4285f4", "#34a853", "#fbbc04", "#9c27b0", "#1ba098", "#ea4335"];
-const MODEL_ICONS: LucideIcon[] = [ScanFace, Fingerprint, MessageSquareText, FileSearch, Bot, Languages];
+const MODEL_PRESENTATION: Record<string, { color: string; Icon: LucideIcon }> = {
+    "kartavya-face-matching": { color: "#4285f4", Icon: ScanFace },
+    "muzzle-print-identification": { color: "#34a853", Icon: Fingerprint },
+    "grievance-management": { color: "#fbbc04", Icon: MessageSquareText },
+    "government-order-information": { color: "#9c27b0", Icon: FileSearch },
+    "ai-enabled-chatbots": { color: "#1ba098", Icon: Bot },
+    "kannada-kasthuri": { color: "#ea4335", Icon: Languages },
+};
 
 interface ModelStats {
     id: string;
@@ -47,44 +53,83 @@ interface ModelStats {
 
 /* Deterministic mock telemetry (swap for your real API call) */
 function seededRandom(seed: number): number {
-    let t = (seed += 0x6d2b79f5);
+    let t = seed + 0x6d2b79f5;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 
 function buildStats(): ModelStats[] {
-    return aiModelCatalog.map((model, i) => {
-        const base = 40 + i * 22;
-        const volatility = 12 + seededRandom(i * 97 + 3) * 18;
+    return aiModelCatalog.map((model, index) => {
+        const presentation = MODEL_PRESENTATION[model.id];
+        if (!presentation) {
+            throw new Error(`Missing AI model presentation for "${model.id}".`);
+        }
+
+        const base = 40 + index * 22;
+        const volatility = 12 + seededRandom(index * 97 + 3) * 18;
         const daily = Array.from({ length: 14 }, (_, d) => {
-            const wave = Math.sin(d / 2.1 + i) * volatility;
-            const noise = (seededRandom(i * 1000 + d) - 0.5) * volatility * 0.8;
+            const wave = Math.sin(d / 2.1 + index) * volatility;
+            const noise = (seededRandom(index * 1000 + d) - 0.5) * volatility * 0.8;
             return Math.max(4, Math.round(base + wave + noise));
         });
         const totalTokens = daily.reduce((a, b) => a + b, 0);
         return {
             ...model,
-            color: MODEL_COLORS[i],
-            Icon: MODEL_ICONS[i],
+            ...presentation,
             totalTokens,
-            timeSpentHours: Math.round((totalTokens / (6 + i)) * 3.4) / 10,
-            daysActive: 9 + Math.floor(seededRandom(i * 55 + 2) * 20),
-            requests: Math.round(totalTokens * (4 + seededRandom(i * 13) * 3)),
-            lastUsedDaysAgo: Math.floor(seededRandom(i * 8 + 5) * 3),
+            timeSpentHours: Math.round((totalTokens / (6 + index)) * 3.4) / 10,
+            daysActive: 9 + Math.floor(seededRandom(index * 55 + 2) * 20),
+            requests: Math.round(totalTokens * (4 + seededRandom(index * 13) * 3)),
+            lastUsedDaysAgo: Math.floor(seededRandom(index * 8 + 5) * 3),
         };
     });
 }
 
 type Metric = "Tokens" | "Requests" | "Hours";
-const METRIC_KEY: Record<Metric, (s: ModelStats) => number> = {
-    Tokens: (s) => s.totalTokens,
-    Requests: (s) => s.requests,
-    Hours: (s) => s.timeSpentHours,
+const METRICS: Record<Metric, { getValue: (stats: ModelStats) => number; unit: string }> = {
+    Tokens: { getValue: (stats) => stats.totalTokens, unit: "K" },
+    Requests: { getValue: (stats) => stats.requests, unit: "" },
+    Hours: { getValue: (stats) => stats.timeSpentHours, unit: "h" },
 };
-const METRIC_UNIT: Record<Metric, string> = { Tokens: "K", Requests: "", Hours: "h" };
-
 const PAGE_SIZE = 4;
+const METRIC_OPTIONS = ["Hours", "Tokens", "Requests"] as const;
+const TABLE_VIEWS = ["All", "Most used", "Active"] as const;
+
+const DASHBOARD_COPY = {
+    eyebrow: "Model usage",
+    title: "AI model activity",
+    description: "Usage across your connected models, updated in real time.",
+    totalTokens: "Total tokens processed",
+    totalRequests: "Total requests",
+    daysMonitored: "Days monitored",
+    mostUsedModel: "Most used model",
+    timeAllocation: "Time allocation",
+    timeAllocationHint: "Click a bar to filter the registry",
+    tokenShare: "Token share",
+    tokenShareHint: "Click a segment to filter",
+    modelRegistry: "Model registry",
+    modelRegistryHint: "Open a row for full details",
+} as const;
+
+const SUMMARY_CARD_STYLES = {
+    tokens: { Icon: Zap, gradient: "from-blue-500 to-indigo-500" },
+    requests: { Icon: Activity, gradient: "from-emerald-500 to-teal-500" },
+    days: { Icon: CalendarDays, gradient: "from-amber-500 to-orange-500" },
+} as const;
+
+const CSV_HEADER = "Model,Category,Tokens (K),Hours,Days active,Requests,Last used";
+
+function getLastUsedLabel(daysAgo: number): string {
+    return daysAgo === 0 ? "Today" : `${daysAgo}d ago`;
+}
+
+function compareValues(a: string | number, b: string | number): number {
+    if (typeof a === "number" && typeof b === "number") {
+        return a - b;
+    }
+    return String(a).localeCompare(String(b));
+}
 
 /* ------------------------------------------------------------------ */
 /* Shared bits                                                         */
@@ -116,7 +161,7 @@ function useCountUp(target: number, duration = 1000) {
     return v;
 }
 
-function Clock_() {
+function LiveClock() {
     const { isDarkMode: d } = useDashboardTheme();
     const [now, setNow] = useState(new Date());
     useEffect(() => {
@@ -281,9 +326,9 @@ function BarChart({
 }) {
     const { isDarkMode: d } = useDashboardTheme();
     const mounted = useMounted();
-    const get = METRIC_KEY[metric];
-    const sorted = [...stats].sort((a, b) => get(b) - get(a));
-    const max = Math.max(...sorted.map(get)) || 1;
+    const { getValue, unit } = METRICS[metric];
+    const sorted = [...stats].sort((a, b) => getValue(b) - getValue(a));
+    const max = Math.max(...sorted.map(getValue)) || 1;
 
     return (
         <ul className="flex flex-col gap-2.5">
@@ -304,15 +349,15 @@ function BarChart({
                                 <span
                                     className="block h-full rounded-md transition-[width] duration-700 ease-out group-hover:brightness-110"
                                     style={{
-                                        width: mounted ? `${(get(s) / max) * 100}%` : "0%",
+                                        width: mounted ? `${(getValue(s) / max) * 100}%` : "0%",
                                         background: s.color,
                                         transitionDelay: `${i * 70}ms`,
                                     }}
                                 />
                             </span>
                             <span className={`text-right text-xs font-semibold tabular-nums ${d ? "text-white" : "text-slate-900"}`}>
-                                {get(s).toLocaleString()}
-                                {METRIC_UNIT[metric]}
+                                {getValue(s).toLocaleString()}
+                                {unit}
                             </span>
                         </button>
                     </li>
@@ -340,34 +385,35 @@ function DonutChart({
     const total = stats.reduce((a, s) => a + s.totalTokens, 0) || 1;
     const R = 54;
     const C = 2 * Math.PI * R;
-    let offset = 0;
     const toggle = (id: string) => onSelect(selected === id ? "All" : id);
+    const segments = stats.map((model, index) => {
+        const length = (model.totalTokens / total) * C;
+        const offset = stats
+            .slice(0, index)
+            .reduce((sum, previous) => sum + (previous.totalTokens / total) * C, 0);
+        return { model, length, offset };
+    });
 
     return (
         <div className="flex flex-col items-center gap-4">
             <div className="relative h-40 w-40">
                 <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
                     <circle cx="70" cy="70" r={R} fill="none" strokeWidth="16" stroke={d ? "#374151" : "#f1f5f9"} />
-                    {stats.map((s) => {
-                        const len = (s.totalTokens / total) * C;
-                        const el = (
-                            <circle
-                                key={s.id}
-                                cx="70"
-                                cy="70"
-                                r={R}
-                                fill="none"
-                                stroke={s.color}
-                                strokeWidth={selected === s.id ? 20 : 16}
-                                strokeDasharray={`${mounted ? Math.max(len - 2, 0) : 0} ${C}`}
-                                strokeDashoffset={-offset}
-                                className="cursor-pointer transition-all duration-700 ease-out"
-                                onClick={() => toggle(s.id)}
-                            />
-                        );
-                        offset += len;
-                        return el;
-                    })}
+                    {segments.map(({ model, length, offset }) => (
+                        <circle
+                            key={model.id}
+                            cx="70"
+                            cy="70"
+                            r={R}
+                            fill="none"
+                            stroke={model.color}
+                            strokeWidth={selected === model.id ? 20 : 16}
+                            strokeDasharray={`${mounted ? Math.max(length - 2, 0) : 0} ${C}`}
+                            strokeDashoffset={-offset}
+                            className="cursor-pointer transition-all duration-700 ease-out"
+                            onClick={() => toggle(model.id)}
+                        />
+                    ))}
                 </svg>
                 <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                     <span className={`text-xl font-bold ${d ? "text-white" : "text-slate-900"}`}>{total.toLocaleString()}K</span>
@@ -401,7 +447,37 @@ function DonutChart({
 /* Model registry table                                                */
 /* ------------------------------------------------------------------ */
 
-type SortKey = "name" | "category" | "totalTokens" | "timeSpentHours" | "daysActive" | "requests" | "lastUsedDaysAgo";
+type SortKey =
+    | "name"
+    | "category"
+    | "totalTokens"
+    | "timeSpentHours"
+    | "daysActive"
+    | "requests"
+    | "lastUsedDaysAgo";
+
+type SortState = { key: SortKey; dir: 1 | -1 };
+
+function SortableHeader({
+    sortKey,
+    label,
+    sort,
+    onSort,
+}: {
+    sortKey: SortKey;
+    label: string;
+    sort: SortState;
+    onSort: (key: SortKey) => void;
+}) {
+    return (
+        <th className="whitespace-nowrap px-2 py-2 text-left font-medium">
+            <button type="button" onClick={() => onSort(sortKey)} className="flex items-center gap-1 hover:text-indigo-500">
+                {label}
+                {sort.key === sortKey && (sort.dir === 1 ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+            </button>
+        </th>
+    );
+}
 
 function ModelTable({
     stats,
@@ -416,8 +492,8 @@ function ModelTable({
 }) {
     const { isDarkMode: d } = useDashboardTheme();
     const [query, setQuery] = useState("");
-    const [view, setView] = useState<"All" | "Most used" | "Active">("All");
-    const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: "totalTokens", dir: -1 });
+    const [view, setView] = useState<(typeof TABLE_VIEWS)[number]>("All");
+    const [sort, setSort] = useState<SortState>({ key: "totalTokens", dir: -1 });
     const [page, setPage] = useState(1);
     const [open, setOpen] = useState<string | null>(null);
 
@@ -428,9 +504,7 @@ function ModelTable({
             .filter((s) => view === "All" || (view === "Most used" ? s.id === topId : s.id !== topId))
             .filter((s) => !q || s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q))
             .sort((x, y) => {
-                const a = x[sort.key];
-                const b = y[sort.key];
-                return (typeof a === "number" ? a - (b as number) : String(a).localeCompare(String(b))) * sort.dir;
+                return compareValues(x[sort.key], y[sort.key]) * sort.dir;
             });
     }, [stats, query, view, selected, sort, topId]);
 
@@ -447,11 +521,10 @@ function ModelTable({
         setSort((s) => (s.key === key ? { key, dir: (s.dir * -1) as 1 | -1 } : { key, dir: 1 }));
 
     const exportCsv = () => {
-        const head = "Model,Category,Tokens (K),Hours,Days active,Requests,Last used";
         const body = filtered
-            .map((s) => `${s.name},${s.category},${s.totalTokens},${s.timeSpentHours},${s.daysActive}/30,${s.requests},${s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}`)
+            .map((s) => `${s.name},${s.category},${s.totalTokens},${s.timeSpentHours},${s.daysActive}/30,${s.requests},${getLastUsedLabel(s.lastUsedDaysAgo)}`)
             .join("\n");
-        const url = URL.createObjectURL(new Blob([`${head}\n${body}`], { type: "text/csv" }));
+        const url = URL.createObjectURL(new Blob([`${CSV_HEADER}\n${body}`], { type: "text/csv" }));
         const a = document.createElement("a");
         a.href = url;
         a.download = "model-usage.csv";
@@ -463,19 +536,10 @@ function ModelTable({
         d ? "text-slate-300 hover:bg-gray-700" : "text-slate-500 hover:bg-slate-100"
     }`;
 
-    const Th = ({ k, children }: { k: SortKey; children: React.ReactNode }) => (
-        <th className="whitespace-nowrap px-2 py-2 text-left font-medium">
-            <button type="button" onClick={() => toggleSort(k)} className="flex items-center gap-1 hover:text-indigo-500">
-                {children}
-                {sort.key === k && (sort.dir === 1 ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
-            </button>
-        </th>
-    );
-
     return (
         <Panel
-            title="Model registry"
-            hint="Open a row for full details"
+            title={DASHBOARD_COPY.modelRegistry}
+            hint={DASHBOARD_COPY.modelRegistryHint}
             action={
                 <div className="flex flex-wrap items-center gap-2">
                     <label className={`flex items-center gap-1.5 rounded-lg border px-2 py-1 text-xs ${d ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-slate-50"}`}>
@@ -488,7 +552,7 @@ function ModelTable({
                             className="w-24 bg-transparent outline-none sm:w-36"
                         />
                     </label>
-                    <Segmented options={["All", "Most used", "Active"] as const} value={view} onChange={setView} />
+                    <Segmented options={TABLE_VIEWS} value={view} onChange={setView} />
                     <button
                         type="button"
                         onClick={exportCsv}
@@ -513,13 +577,13 @@ function ModelTable({
                 <table className="w-full min-w-[760px] text-sm">
                     <thead className={d ? "text-slate-400" : "text-slate-500"}>
                         <tr>
-                            <Th k="name">Model</Th>
-                            <Th k="category">Category</Th>
-                            <Th k="totalTokens">Tokens</Th>
-                            <Th k="timeSpentHours">Time spent</Th>
-                            <Th k="daysActive">Days active</Th>
-                            <Th k="requests">Requests</Th>
-                            <Th k="lastUsedDaysAgo">Last used</Th>
+                            <SortableHeader sortKey="name" label="Model" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="category" label="Category" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="totalTokens" label="Tokens" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="timeSpentHours" label="Time spent" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="daysActive" label="Days active" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="requests" label="Requests" sort={sort} onSort={toggleSort} />
+                            <SortableHeader sortKey="lastUsedDaysAgo" label="Last used" sort={sort} onSort={toggleSort} />
                             <th className="px-2 py-2 text-left font-medium">Status</th>
                             <th className="px-2 py-2 text-right font-medium">Details</th>
                         </tr>
@@ -541,7 +605,7 @@ function ModelTable({
                                     <td className="px-2 py-2.5">{s.timeSpentHours}h</td>
                                     <td className="px-2 py-2.5">{s.daysActive}/30</td>
                                     <td className="px-2 py-2.5">{s.requests.toLocaleString()}</td>
-                                    <td className="px-2 py-2.5">{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
+                                    <td className="px-2 py-2.5">{getLastUsedLabel(s.lastUsedDaysAgo)}</td>
                                     <td className="px-2 py-2.5">
                                         {s.id === topId ? (
                                             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${d ? "bg-amber-500/15 text-amber-300" : "bg-amber-50 text-amber-700"}`}>
@@ -620,13 +684,31 @@ function ModelTable({
 
 export default function AIModelsDashboard() {
     const { isDarkMode: d } = useDashboardTheme();
-    const stats = useMemo(buildStats, []);
+    const stats = useMemo(() => buildStats(), []);
     const [metric, setMetric] = useState<Metric>("Hours");
     const [selected, setSelected] = useState<string | "All">("All");
 
     const top = useMemo(() => [...stats].sort((a, b) => b.totalTokens - a.totalTokens)[0], [stats]);
     const totalTokens = stats.reduce((a, s) => a + s.totalTokens, 0);
     const totalRequests = stats.reduce((a, s) => a + s.requests, 0);
+    const summaryCards = [
+        {
+            ...SUMMARY_CARD_STYLES.tokens,
+            label: DASHBOARD_COPY.totalTokens,
+            target: totalTokens,
+            suffix: "K",
+        },
+        {
+            ...SUMMARY_CARD_STYLES.requests,
+            label: DASHBOARD_COPY.totalRequests,
+            target: totalRequests,
+        },
+        {
+            ...SUMMARY_CARD_STYLES.days,
+            label: DASHBOARD_COPY.daysMonitored,
+            target: 30,
+        },
+    ];
 
     return (
         <main className={`min-h-screen p-[15px] ${d ? "bg-gray-900" : "bg-slate-50"}`}>
@@ -641,33 +723,40 @@ export default function AIModelsDashboard() {
                 <header className="dash-in flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <span className="mb-1 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600">
-                            <Radio size={14} aria-hidden="true" /> Model usage
+                            <Radio size={14} aria-hidden="true" /> {DASHBOARD_COPY.eyebrow}
                         </span>
-                        <h1 className={`text-xl font-bold sm:text-[25px] ${d ? "text-white" : "text-slate-900"}`}>AI model activity</h1>
+                        <h1 className={`text-xl font-bold sm:text-[25px] ${d ? "text-white" : "text-slate-900"}`}>
+                            {DASHBOARD_COPY.title}
+                        </h1>
                         <p className={`text-sm ${d ? "text-slate-400" : "text-slate-500"}`}>
-                            Usage across your connected models, updated in real time.
+                            {DASHBOARD_COPY.description}
                         </p>
                     </div>
-                    <Clock_ />
+                    <LiveClock />
                 </header>
 
                 <div className="dash-in grid grid-cols-1 gap-[15px] sm:grid-cols-2 lg:grid-cols-4" style={{ animationDelay: "80ms" }}>
-                    <CountCard label="Total tokens processed" target={totalTokens} suffix="K" Icon={Zap} gradient="from-blue-500 to-indigo-500" />
-                    <CountCard label="Total requests" target={totalRequests} Icon={Activity} gradient="from-emerald-500 to-teal-500" />
-                    <CountCard label="Days monitored" target={30} Icon={CalendarDays} gradient="from-amber-500 to-orange-500" />
-                    <ProfileCard label="Most used model" value={top.name} Icon={top.Icon} gradient="from-violet-500 to-fuchsia-500" />
+                    {summaryCards.map((card) => (
+                        <CountCard key={card.label} {...card} />
+                    ))}
+                    <ProfileCard
+                        label={DASHBOARD_COPY.mostUsedModel}
+                        value={top.name}
+                        Icon={top.Icon}
+                        gradient="from-violet-500 to-fuchsia-500"
+                    />
                 </div>
 
                 <div className="dash-in grid grid-cols-1 gap-[15px] lg:grid-cols-3" style={{ animationDelay: "160ms" }}>
                     <Panel
-                        title="Time allocation"
-                        hint="Click a bar to filter the registry"
+                        title={DASHBOARD_COPY.timeAllocation}
+                        hint={DASHBOARD_COPY.timeAllocationHint}
                         className="lg:col-span-2"
-                        action={<Segmented options={["Hours", "Tokens", "Requests"] as const} value={metric} onChange={setMetric} />}
+                        action={<Segmented options={METRIC_OPTIONS} value={metric} onChange={setMetric} />}
                     >
                         <BarChart stats={stats} metric={metric} selected={selected} onSelect={setSelected} />
                     </Panel>
-                    <Panel title="Token share" hint="Click a segment to filter">
+                    <Panel title={DASHBOARD_COPY.tokenShare} hint={DASHBOARD_COPY.tokenShareHint}>
                         <DonutChart stats={stats} selected={selected} onSelect={setSelected} />
                     </Panel>
                 </div>
