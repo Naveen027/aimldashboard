@@ -92,7 +92,7 @@ const RESPONSIVE_CSS = `
   overscroll-behavior-x: contain;
   border:1px solid lightgrey;
 }
-.system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px; }
+.system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px;  }
 .system-logs .sl-logs-container .logs-table th { white-space: nowrap; }
 .system-logs .sl-logs-container .logs-table td { vertical-align: middle; }
 .system-logs .sl-logs-container .logs-table .details { max-width: 260px; }
@@ -254,7 +254,7 @@ const SystemLogs: React.FC = () => {
       <th aria-sort={active ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}>
         <button
           type="button"
-          className="inline-flex cursor-pointer [font-size:13px]! items-center gap-1 rounded border-0 bg-transparent p-0 text-inherit hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="inline-flex cursor-pointer [font-size:13px]! items-center gap-1 rounded border-0 bg-transparent p-0 text-inherit  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-#b3beee"
           onClick={() => handleSort(key)}
           aria-label={`Sort by ${label}${active ? `, currently ${sort.direction}ending` : ''}`}
         >
@@ -262,7 +262,7 @@ const SystemLogs: React.FC = () => {
           <svg
             aria-hidden="true"
             viewBox="0 0 16 16"
-            className={`h-4 w-4 shrink-0 ${active ? 'text-indigo-600' : 'opacity-50'}`}
+            className={`h-4 w-4 shrink-0 ${active ? 'text-#b3beee' : 'opacity-50'}`}
             fill="none"
             stroke="currentColor"
             strokeWidth="2.5"
@@ -418,19 +418,20 @@ const SystemLogs: React.FC = () => {
       [&_.logs-table]:[width:100%]
       [&_.logs-table]:[border-collapse:collapse]
       [&_.logs-table]:[font-size:13px]
-      [&_.logs-table_thead]:[background:lightgrey]
-      [&_.logs-table_thead]:[border-bottom:2px_solid_#e0e0e0]
+      [&_.logs-table_thead]:[background:#6976b5]
+      [&_.logs-table_thead]:[border:1px_solid_e7e7e7]
       [&_.logs-table_th]:[padding:14px_12px]
       [&_.logs-table_th]:[text-align:left]
       [&_.logs-table_th]:[font-weight:600]
-      [&_.logs-table_th]:[color:#333]
+      [&_.logs-table_th]:[color:white]
       [&_.logs-table_th]:[text-transform:uppercase]
       [&_.logs-table_th]:[font-size:11px]
       [&_.logs-table_th]:[letter-spacing:0.5px]
       [&_.logs-table_td]:[padding:12px]
       [&_.logs-table_td]:[border-bottom:1px_solid_#e8e8e8]
       [&_.logs-table_td]:[color:#555]
-      [&_.logs-table_tbody_tr:hover]:[background:#fafafa]
+      [&_.logs-table_tbody_tr:hover]:[background:#fafafa;]
+      [&_.logs-table_tbody]:[border:2px_solid_#d1d5db]!
       [&_.timestamp]:[font-family:Courier_New,_monospace]
       [&_.timestamp]:[font-size:12px]
       [&_.timestamp]:[color:#667eea]
@@ -484,6 +485,8 @@ const SystemLogs: React.FC = () => {
       [.ain-app.theme-dark_&_.resource]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.date-separator]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.sl-footer_small]:[color:#c1c8d3]
+      [.ain-app.theme-dark_&_.ip-address]:[color:#9ca3af]
+      [.ain-app.theme-dark_&_.no-logs]:[color:#c1c8d3]
       [.ain-app.theme-dark_&_.sl-controls]:[color:#f3f4f6]
       [.ain-app.theme-dark_&_.sl-controls]:[background:#1f2937]
       [.ain-app.theme-dark_&_.sl-controls]:[border-color:#374151]
@@ -504,6 +507,14 @@ const SystemLogs: React.FC = () => {
       [.ain-app.theme-dark_&_.logs-table_thead]:[border-color:#374151]
       [.ain-app.theme-dark_&_.logs-table_td]:[border-color:#374151]
       [.ain-app.theme-dark_&_.logs-table_tbody_tr:hover]:[background:#273449]
+      [.ain-app.theme-dark_&_.status-badge.success]:[background:#064e3b]
+      [.ain-app.theme-dark_&_.status-badge.success]:[color:#a7f3d0]
+      [.ain-app.theme-dark_&_.status-badge.warning]:[background:#78350f]
+      [.ain-app.theme-dark_&_.status-badge.warning]:[color:#fde68a]
+      [.ain-app.theme-dark_&_.status-badge.error]:[background:#7f1d1d]
+      [.ain-app.theme-dark_&_.status-badge.error]:[color:#fecaca]
+      [.ain-app.theme-dark_&_.status-badge.info]:[background:#1e3a8a]
+      [.ain-app.theme-dark_&_.status-badge.info]:[color:#bfdbfe]
       [.ain-app.theme-dark_&_.btn-secondary]:[color:#e5e7eb]
       [.ain-app.theme-dark_&_.btn-secondary]:[background:#273449]
       [.ain-app.theme-dark_&_.btn-secondary]:[border-color:#4b5563]
@@ -512,7 +523,7 @@ const SystemLogs: React.FC = () => {
 
         <div className="sl-header">
           <div>
-            <h2 className="m-0 break-words text-[1.35rem] !font-bold leading-tight tracking-tight text-black sm:text-[1.6rem] dark:text-white">
+            <h2 className="m-0 break-words [font-size:clamp(1.25rem,1rem+1.2vw,1.6rem)]! !font-bold leading-tight tracking-tight text-black dark:text-white">
               System Logs
             </h2>
             <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
@@ -637,7 +648,7 @@ const SystemLogs: React.FC = () => {
                 {renderSortHeader('IP Address', 'ipAddress')}
               </tr>
             </thead>
-            <tbody>
+            <tbody >
               {sortedLogs.length > 0 ? (
                 sortedLogs.map(log => (
                   <tr key={log.id} className={`row-${log.status}`}>

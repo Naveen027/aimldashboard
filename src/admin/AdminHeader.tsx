@@ -17,6 +17,7 @@ const headerStyles = `
 
 :root[data-theme="dark"] .ain-admin-header,
 :root[data-bs-theme="dark"] .ain-admin-header,
+.ain-app.theme-dark .ain-admin-header,
 .dark .ain-admin-header,
 [data-theme="dark"] .ain-admin-header {
   --ain-hdr-border: rgba(255, 255, 255, 0.14);

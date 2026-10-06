@@ -69,9 +69,9 @@ const actionBtn =
   `${dark}:border-gray-600 ${dark}:bg-gray-700/60 ${dark}:text-gray-200`;
 
 const statusBadgeCls: Record<Model['status'], string> = {
-  active: 'bg-green-100 text-green-800',
-  disabled: 'bg-red-100 text-red-800',
-  maintenance: 'bg-amber-100 text-amber-800',
+  active: `bg-green-100 text-green-800 ${dark}:bg-green-500/15 ${dark}:text-green-300`,
+  disabled: `bg-red-100 text-red-800 ${dark}:bg-red-500/15 ${dark}:text-red-300`,
+  maintenance: `bg-amber-100 text-amber-800 ${dark}:bg-amber-500/15 ${dark}:text-amber-300`,
 };
 
 /* soft pill used on the cards (matches reference design) */
@@ -352,7 +352,7 @@ const ModelControl: React.FC = () => {
             <div
               key={s.label}
               style={delay(i + 1)}
-              className={`mc-rise flex min-w-0 items-center gap-3 rounded-[10px] border border-slate-200 bg-white px-3 py-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:gap-4 sm:px-5 sm:py-4 ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
+              className={`mc-rise flex min-w-0 items-center gap-2 rounded-[10px] border border-slate-200 bg-white px-3 py-3 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg sm:gap-4 sm:px-5 sm:py-4 ${dark}:border-gray-700 ${dark}:bg-gray-800 ${dark}:text-gray-100`}
             >
               <span
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg sm:h-[50px] sm:w-[50px] sm:text-2xl ${s.healthy
@@ -403,7 +403,7 @@ const ModelControl: React.FC = () => {
                 <span className="pointer-events-none absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-white/10" />
 
                 <div className="relative flex items-center gap-3 pr-11">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur sm:h-12 sm:w-12">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur sm:h-12 sm:w-12">
                     <SelectedIcon size={24} strokeWidth={2} aria-hidden="true" />
                   </span>
                   <div className="min-w-0">
@@ -748,20 +748,20 @@ const ModelControl: React.FC = () => {
                   {/* top row: icon + title + status pill (pill wraps below on very narrow cards) */}
                   <div className="mb-2 flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                     <div className="flex min-w-0 flex-1 basis-[180px] items-center gap-3 sm:gap-4">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]">
                         <ModelIcon size={24} strokeWidth={2} aria-hidden="true" />
                       </span>
                       <div className="min-w-0">
-                        <h3 className="m-0 line-clamp-2 !text-base font-semibold leading-tight text-slate-900 sm:!text-[18px] [.ain-app.theme-dark_&]:text-white">
+                        <h5 className="m-0 line-clamp-2  !text-[15px] font-semibold leading-tight text-slate-900 sm:text-[18px] [.ain-app.theme-dark_&]:text-white">
                           {model.name}
-                        </h3>
+                        </h5>
                         <p className="m-0 mt-1 truncate text-[13px] text-slate-500 sm:text-sm [.ain-app.theme-dark_&]:text-slate-300">
                           v{model.version} · {getTypeLabel(model.type)}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:px-3 sm:text-xs ${cardStatusCls[model.status]}`}
+                      className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-1.5 py-1 text-[11px] font-semibold sm:px-3 sm:text-xs ${cardStatusCls[model.status]}`}
                     >
                       {isActive && (
                         <span className="relative flex h-1.5 w-1.5">

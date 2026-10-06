@@ -80,7 +80,7 @@ const formField = (invalid: boolean, extra = '') =>
   `${FIELD_BASE} ${invalid ? FIELD_INVALID : FIELD_NORMAL} w-full px-2.5 py-2.5 sm:py-2 ${extra}`.trim();
 
 // Table
-const TH = 'px-3 lg:px-4 py-3 text-left [background:lightgrey]! font-medium text-xs uppercase tracking-wider text-[color:var(--muted)] border-b border-[color:var(--border)] whitespace-nowrap';
+const TH = 'px-3 lg:px-4 py-3 text-left [background:#6976b5]! font-medium text-xs uppercase tracking-wider text-[color:white] border-b border-[color:var(--border)] whitespace-nowrap';
 const TD = 'px-3 lg:px-4 py-3 border-b border-[color:var(--border)] text-[color:var(--muted)] align-middle';
 
 const STATUS_CLS: Record<User['status'], string> = {
@@ -350,14 +350,14 @@ const UserManagement: React.FC = () => {
     return (
       <th className={TH} aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
         <button
-          className={`inline-flex items-center gap-1 [font-size:13px]! bg-transparent [color:black]! border-0 p-0 cursor-pointer rounded uppercase tracking-wider font-medium text-xs hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
+          className={`inline-flex items-center gap-1 [font-size:13px]! bg-transparent [color:white]! border-0 p-0 cursor-pointer rounded uppercase tracking-wider font-medium text-xs hover:text-[color:var(--text)] ${FOCUS_RING} ${active ? 'text-[color:var(--text)]' : ''}`}
           onClick={() => handleSort(k)}
         >
           {label}
           <svg
             aria-hidden="true"
             viewBox="0 0 16 16"
-            className={`h-4 w-4 shrink-0 ${active ? 'text-[color:var(--accent)]' : 'opacity-50'}`}
+            className={`h-4 w-4 shrink-0 ${active ? 'text-#b3beee!' : 'opacity-50'}`}
             fill="none"
             stroke="currentColor"
             strokeWidth="2.5"
@@ -591,7 +591,7 @@ const UserManagement: React.FC = () => {
         )}
 
         {/* Results */}
-        <div className="bg-[var(--surface)] border border-[color:var(--border)] rounded-2xl overflow-hidden">
+        <div className="bg-[var(--surface)]  border border-[color:var(--border)] rounded-2xl overflow-hidden">
           {/* Mobile: card list (< md) */}
           {filteredUsers.length > 0 && (
             <>

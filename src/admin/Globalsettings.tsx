@@ -18,7 +18,7 @@ const input =
 const button =
   'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px]! bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-indigo-500 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 sm:min-h-0';
 const row =
-  'mb-2 rounded-xl border border-slate-200 p-3 transition-all duration-200 hover:border-indigo-300 hover:shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:hover:border-indigo-500/60';
+  'mb-2 [border-radius:10px]! border border-slate-200 p-3 transition-all duration-200 hover:border-indigo-300 hover:shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:hover:border-indigo-500/60';
 
 const keyframes = `
 @keyframes gs-panel { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
@@ -96,7 +96,7 @@ const GlobalSettings: React.FC = () => {
       <div className="gs-root relative min-h-screen w-full min-w-0">
         <header className="mb-3 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h2 className="m-0 break-words text-[1.35rem]! font-bold leading-tight tracking-tight text-black dark:text-white sm:text-[1.6rem]!">
+            <h2 className="m-0 break-words [font-size:clamp(1.25rem,1rem+1.2vw,1.6rem)]! !font-bold leading-tight tracking-tight text-black dark:text-white">
               Global Settings
             </h2>
             <p className="mb-0 mt-0.5 text-sm text-[#6b7280] dark:text-slate-400">
@@ -130,7 +130,7 @@ const GlobalSettings: React.FC = () => {
 
             <div className="h-px bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700" />
 
-            <h3 className={`m-0 text-base font-semibold ${heading}`}>Rate limiting</h3>
+            <h3 className={`m-0 text-base [font-size:1.125rem]! font-semibold ${heading}`}>Rate limiting</h3>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
               <Field title="Default rate limit (requests/min)">
                 <input

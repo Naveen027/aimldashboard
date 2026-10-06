@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import AdminLayout from "./AdminLayout";
+import { useDashboardTheme } from "../user/ThemeToggle";
 import { aiModelCatalog } from "../data/aiModels";
 
 interface UsageRow {
@@ -281,6 +282,7 @@ interface UserDetailModalProps {
 }
 
 const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
+  const { isDarkMode } = useDashboardTheme();
   const [visible, setVisible] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
@@ -347,11 +349,22 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
+      className={`${isDarkMode ? "theme-dark" : ""} admin-user-detail-modal fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="user-detail-title"
     >
+      <style>{`
+        .admin-user-detail-modal.theme-dark .bg-white {
+          background-color: #1f2937 !important;
+        }
+        .admin-user-detail-modal.theme-dark .text-black {
+          color: #f3f4f6 !important;
+        }
+        .admin-user-detail-modal.theme-dark .border-slate-200 {
+          border-color: #374151 !important;
+        }
+      `}</style>
       {/* Backdrop */}
       <div
         onClick={handleClose}

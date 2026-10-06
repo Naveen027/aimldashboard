@@ -386,6 +386,22 @@ function AdminLayout({ children }: AdminLayoutProps) {
         @keyframes ain-grow-bar {
           from { width: 0%; }
         }
+        .ain-app.theme-dark .ain-stat-grid > div:nth-child(-n + 4) .ain-stat-card {
+          background: var(--ain-surface) !important;
+        }
+        .ain-app.theme-dark .ain-stat-label,
+        .ain-app.theme-dark .ain-stat-value {
+          color: var(--ain-text) !important;
+        }
+        .ain-app.theme-dark .ain-main .bg-white {
+          background-color: var(--ain-surface) !important;
+        }
+        .ain-app.theme-dark .ain-main .text-black {
+          color: var(--ain-text) !important;
+        }
+        .ain-app.theme-dark .ain-main :is(.border-slate-100, .border-slate-200, .border-gray-200) {
+          border-color: var(--ain-border) !important;
+        }
       `}</style>
       <AdminSidebar
         adminUsername={adminUsername}
