@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { aiModelCatalog } from '../data/aiModels';
 import DeleteIcon from '../components/DeleteIcon';
+
 interface SystemLog {
   id: string;
   timestamp: string;
@@ -17,14 +18,14 @@ interface SystemLog {
 /* Stat card tokens (same look as User Management cards)               */
 /* ------------------------------------------------------------------ */
 const CARD =
-  'sl-card group flex h-[100px] items-center gap-3 px-2 py-2 sm:gap-4 sm:px-6 sm:py-6 ' +
+  'sl-card group flex min-h-[84px] min-w-0 items-center gap-2.5 p-3 sm:min-h-[100px] sm:gap-4 sm:px-6 sm:py-6 ' +
   'rounded-[10px] border border-[#e5e7eb] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] ' +
   '[.ain-app.theme-dark_&]:border-[#374151] [.ain-app.theme-dark_&]:bg-[#1f2937] ' +
   'transition-[transform,box-shadow] duration-300 ease-out ' +
   'hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0';
 
 const ICON_BOX =
-  'flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] text-xl ' +
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-lg ' +
   'sm:h-[50px] sm:w-[50px] sm:text-2xl ' +
   'transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none';
 
@@ -34,6 +35,89 @@ const TONE = {
   amber: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400',
   rose: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400',
 } as const;
+
+/* ------------------------------------------------------------------ */
+/* Responsive rules                                                    */
+/*  - < 640px   : table rows become stacked cards (no sideways scroll) */
+/*  - 640-1023px: table scrolls horizontally inside its container      */
+/*  - >= 1024px : full table                                           */
+/* ------------------------------------------------------------------ */
+const RESPONSIVE_CSS = `
+@keyframes sl-card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes sl-value-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sl-card, .sl-card-value { animation: none !important; }
+}
+
+.system-logs { box-sizing: border-box; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
+.system-logs *, .system-logs *::before, .system-logs *::after { box-sizing: border-box; }
+
+/* ---------- Header ---------- */
+.system-logs .sl-header { flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 12px; }
+.system-logs .sl-header > div:first-child { min-width: 0; flex: 1 1 auto; }
+.system-logs .sl-header h2 { margin: 0; }
+.system-logs .sl-header p { margin: 4px 0 0; }
+.system-logs .sl-header .header-actions { flex-wrap: wrap; gap: 10px; }
+.system-logs .sl-header .header-actions button {
+  display: inline-flex; align-items: center; justify-content: center;
+  white-space: nowrap; min-height: 40px;
+}
+
+/* ---------- Controls ---------- */
+.system-logs .sl-controls {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+}
+.system-logs .sl-controls .controls-group { flex-wrap: wrap; min-width: 0; }
+.system-logs .sl-controls .search-input { flex: 1 1 100%; width: 100%; min-width: 0; }
+.system-logs .sl-controls .filter-select { flex: 1 1 130px; min-width: 0; }
+.system-logs .sl-controls .date-input { flex: 1 1 130px; min-width: 0; }
+.system-logs .sl-controls input,
+.system-logs .sl-controls select { min-height: 40px; max-width: 100%; }
+
+/* ---------- Table: always scrolls on the X axis ---------- */
+.system-logs .sl-logs-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.system-logs .sl-logs-container .logs-table { width: 100%; min-width: 900px; }
+.system-logs .sl-logs-container .logs-table th { white-space: nowrap; }
+.system-logs .sl-logs-container .logs-table td { vertical-align: middle; }
+.system-logs .sl-logs-container .logs-table .details { max-width: 260px; }
+.system-logs .sl-logs-container .logs-table td.no-logs { white-space: normal; }
+
+@media (max-width: 1023px) {
+  .system-logs .sl-logs-container .logs-table { font-size: 12px; }
+  .system-logs .sl-logs-container .logs-table th,
+  .system-logs .sl-logs-container .logs-table td { padding: 10px 8px; }
+}
+
+@media (max-width: 639px) {
+  .system-logs .sl-header { flex-direction: column; align-items: stretch; }
+  .system-logs .sl-header .header-actions { width: 100%; }
+  .system-logs .sl-header .header-actions button { flex: 1 1 140px; padding: 10px 12px; }
+
+  .system-logs .sl-controls { grid-template-columns: 1fr; padding: 12px; gap: 12px; margin-bottom: 16px; }
+  .system-logs .sl-controls .date-separator { flex: 0 0 auto; align-self: center; }
+  /* 16px stops iOS Safari from zooming on focus */
+  .system-logs .sl-controls input,
+  .system-logs .sl-controls select { font-size: 16px; }
+
+  .system-logs .sl-footer { text-align: center; }
+}
+
+@media (max-width: 359px) {
+  .system-logs .sl-header .header-actions button { flex: 1 1 100%; }
+}
+`;
 
 const SystemLogs: React.FC = () => {
   const [logs] = useState<SystemLog[]>([
@@ -161,16 +245,19 @@ const SystemLogs: React.FC = () => {
         l.resource,
         l.status,
         l.details,
-        l.ipAddress
-      ])
-    ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-    
+        l.ipAddress,
+      ]),
+    ]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `system-logs-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleClearOldLogs = () => {
@@ -181,10 +268,9 @@ const SystemLogs: React.FC = () => {
 
   return (
     <AdminLayout>
-    <div className={`system-logs
+    <div className={`system-logs mx-auto w-full max-w-[1520px] 2xl:max-w-[1760px]
       [padding:0px]
       [background:#f5f5f5]
-      [min-height:100vh]
       [border-radius:10px]
       [&_div]:[border-radius:10px]
       [&_.sl-header]:[display:flex]
@@ -222,7 +308,6 @@ const SystemLogs: React.FC = () => {
       [&_.btn-secondary]:[color:#333]
       [&_.btn-secondary:hover]:[background:#e8e8e8]
       [&_.sl-controls]:[display:grid]
-      [&_.sl-controls]:[grid-template-columns:repeat(auto-fit,_minmax(250px,_1fr))]
       [&_.sl-controls]:[gap:16px]
       [&_.sl-controls]:[margin-bottom:24px]
       [&_.sl-controls]:[background:white]
@@ -250,10 +335,6 @@ const SystemLogs: React.FC = () => {
       [&_.date-input]:[font-size:14px]
       [&_.date-input]:[background:white]
       [&_.date-input]:[color:#333]
-      [&_.search-input]:[flex:1]
-      [&_.search-input]:[min-width:200px]
-      [&_.filter-select]:[min-width:140px]
-      [&_.date-input]:[min-width:140px]
       [&_.search-input::placeholder]:[color:#999]
       [&_.search-input:focus]:[outline:none]
       [&_.search-input:focus]:[border-color:#667eea]
@@ -269,7 +350,6 @@ const SystemLogs: React.FC = () => {
       [&_.date-separator]:[white-space:nowrap]
       [&_.sl-logs-container]:[background:white]
       [&_.sl-logs-container]:[border-radius:8px]
-      [&_.sl-logs-container]:[overflow:hidden]
       [&_.sl-logs-container]:[box-shadow:0_2px_4px_rgba(0,_0,_0,_0.05)]
       [&_.sl-logs-container]:[margin-bottom:16px]
       [&_.logs-table]:[width:100%]
@@ -298,7 +378,6 @@ const SystemLogs: React.FC = () => {
       [&_.action]:[font-weight:600]
       [&_.action]:[color:#1a1a1a]
       [&_.resource]:[color:#666]
-      [&_.details]:[max-width:200px]
       [&_.details]:[white-space:nowrap]
       [&_.details]:[overflow:hidden]
       [&_.details]:[text-overflow:ellipsis]
@@ -331,30 +410,6 @@ const SystemLogs: React.FC = () => {
       [&_.sl-footer]:[padding:8px_0]
       [&_.sl-footer_small]:[font-size:12px]
       [&_.sl-footer_small]:[color:#888]
-      max-[1024px]:[&_.logs-table]:[font-size:12px]
-      max-[1024px]:[&_.logs-table_th]:[padding:10px_8px]
-      max-[1024px]:[&_.logs-table_td]:[padding:10px_8px]
-      max-[1024px]:[&_.details]:[max-width:150px]
-      max-[1024px]:[&_.sl-controls]:[grid-template-columns:1fr]
-      max-[1024px]:[&_.controls-group]:[flex-wrap:wrap]
-      max-[768px]:[&_.sl-header]:[flex-direction:column]
-      max-[768px]:[&_.sl-header]:[gap:16px]
-      max-[768px]:[&_.header-actions]:[flex-direction:column]
-      max-[768px]:[&_.header-actions]:[width:100%]
-      max-[768px]:[&_.header-actions_.btn-primary]:[width:100%]
-      max-[768px]:[&_.header-actions_.btn-secondary]:[width:100%]
-      max-[768px]:[&_.sl-controls]:[grid-template-columns:1fr]
-      max-[768px]:[&_.controls-group]:[flex-direction:column]
-      max-[768px]:[&_.controls-group]:[align-items:stretch]
-      max-[768px]:[&_.search-input]:[width:100%]
-      max-[768px]:[&_.search-input]:[min-width:auto]
-      max-[768px]:[&_.filter-select]:[width:100%]
-      max-[768px]:[&_.filter-select]:[min-width:auto]
-      max-[768px]:[&_.date-input]:[width:100%]
-      max-[768px]:[&_.date-input]:[min-width:auto]
-      max-[768px]:[&_.date-separator]:[text-align:center]
-      max-[768px]:[&_.logs-table_.ip-address]:[display:none]
-      max-[768px]:[&_.logs-table_th:last-child]:[display:none]
       [.ain-app.theme-dark_&]:[color:#f3f4f6]
       [.ain-app.theme-dark_&]:[background:transparent]
       [.ain-app.theme-dark_&_.sl-header_h1]:[color:#f3f4f6]
@@ -389,35 +444,14 @@ const SystemLogs: React.FC = () => {
       [.ain-app.theme-dark_&_.btn-secondary]:[color:#e5e7eb]
       [.ain-app.theme-dark_&_.btn-secondary]:[background:#273449]
       [.ain-app.theme-dark_&_.btn-secondary]:[border-color:#4b5563]
-      [.ain-app.theme-dark_&_.btn-secondary:hover]:[background:#374151]
-      max-[768px]:[&_.logs-table_th:nth-child(6)]:[display:none]
-      max-[768px]:[&_.logs-table_td:nth-child(6)]:[display:none]
-      max-[768px]:[&_.details]:[max-width:120px]
-      max-[768px]:[&_.logs-table]:[font-size:11px]
-      max-[768px]:[&_.logs-table_th]:[padding:8px_4px]
-      max-[768px]:[&_.logs-table_td]:[padding:8px_4px]
-      max-[480px]:[&_.logs-table_.resource]:[display:none]
-      max-[480px]:[&_.logs-table_th:nth-child(4)]:[display:none]
-      max-[480px]:[&_.logs-table_th]:[padding:6px_4px]
-      max-[480px]:[&_.logs-table_td]:[padding:6px_4px]`}>
-      {/* Smooth card entrance animation */}
-      <style>{`
-        @keyframes sl-card-in {
-          from { opacity: 0; transform: translateY(14px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes sl-value-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .sl-card, .sl-card-value { animation: none !important; }
-        }
-      `}</style>
+      [.ain-app.theme-dark_&_.btn-secondary:hover]:[background:#374151]`}>
+      <style>{RESPONSIVE_CSS}</style>
 
       <div className="sl-header">
         <div>
-          <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">System Logs</h2>
+          <h2 className="m-0 break-words text-[1.35rem] !font-bold leading-tight tracking-tight text-black sm:text-[1.6rem] dark:text-white">
+            System Logs
+          </h2>
           <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
             Monitor all system events and user activities
           </p>
@@ -432,8 +466,8 @@ const SystemLogs: React.FC = () => {
         </div>
       </div>
 
-      {/* Stat cards */}
-      <div className="mb-3 grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+      {/* Stat cards: 2 columns on phones, 4 on large screens */}
+      <div className="mb-3 grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4 lg:gap-5">
         {statCards.map((s, i) => (
           <div
             key={s.label}
@@ -444,12 +478,12 @@ const SystemLogs: React.FC = () => {
               <i className={`bi ${s.icon}`} />
             </span>
             <div className="min-w-0">
-              <div className="truncate text-sm text-slate-500 sm:text-[15px] dark:text-slate-400">
+              <div className="truncate text-xs text-slate-500 sm:text-[15px] dark:text-slate-400">
                 {s.label}
               </div>
               <div
                 key={s.value}
-                className="sl-card-value !text-xl font-bold leading-tight text-slate-900 sm:text-[25px] dark:text-white [.ain-app.theme-dark_&]:text-white"
+                className="sl-card-value !text-xl font-bold leading-tight text-slate-900 sm:!text-[25px] dark:text-white [.ain-app.theme-dark_&]:text-white"
                 style={{ animation: 'sl-value-in 0.4s ease-out both' }}
               >
                 {s.value}
@@ -467,6 +501,7 @@ const SystemLogs: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            aria-label="Search logs"
           />
         </div>
 
@@ -479,6 +514,7 @@ const SystemLogs: React.FC = () => {
               )
             }
             className="filter-select"
+            aria-label="Filter by status"
           >
             <option value="all">All Status</option>
             <option value="success">Success</option>
@@ -491,6 +527,7 @@ const SystemLogs: React.FC = () => {
             value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
             className="filter-select"
+            aria-label="Filter by action"
           >
             <option value="all">All Actions</option>
             {uniqueActions.map(action => (
@@ -505,6 +542,7 @@ const SystemLogs: React.FC = () => {
             value={dateRange.start}
             onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
             className="date-input"
+            aria-label="Start date"
           />
           <span className="date-separator">to</span>
           <input
@@ -512,6 +550,7 @@ const SystemLogs: React.FC = () => {
             value={dateRange.end}
             onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
             className="date-input"
+            aria-label="End date"
           />
         </div>
       </div>
@@ -533,11 +572,11 @@ const SystemLogs: React.FC = () => {
             {filteredLogs.length > 0 ? (
               filteredLogs.map(log => (
                 <tr key={log.id} className={`row-${log.status}`}>
-                  <td className="timestamp">{log.timestamp}</td>
-                  <td className="user">{log.user}</td>
-                  <td className="action">{log.action}</td>
-                  <td className="resource">{log.resource}</td>
-                  <td>
+                  <td className="timestamp" data-label="Time">{log.timestamp}</td>
+                  <td className="user" data-label="User">{log.user}</td>
+                  <td className="action" data-label="Action">{log.action}</td>
+                  <td className="resource" data-label="Resource">{log.resource}</td>
+                  <td data-label="Status">
                     <span className={`status-badge ${log.status}`}>
                       {log.status === 'success' && '✓'}
                       {log.status === 'warning' && '⚠️'}
@@ -546,8 +585,8 @@ const SystemLogs: React.FC = () => {
                       {' '}{log.status.charAt(0).toUpperCase() + log.status.slice(1)}
                     </span>
                   </td>
-                  <td className="details" title={log.details}>{log.details}</td>
-                  <td className="ip-address">{log.ipAddress}</td>
+                  <td className="details" data-label="Details" title={log.details}>{log.details}</td>
+                  <td className="ip-address" data-label="IP">{log.ipAddress}</td>
                 </tr>
               ))
             ) : (

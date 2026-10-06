@@ -354,14 +354,14 @@ function AdminSidebar({
       [&_.ain-nav-link:focus]:[outline:none]
       [&_.ain-nav-link.active]:[background:rgba(255,_255,_255,_0.1)]
       [&_.ain-nav-link.active]:[color:#fff]!
+     [&_.ain-nav-link.active]:![border-left:2px_solid_#fff]
 
-      [&_.ain-footer-toggle]:[flex:0_0_32px]
-      [&_.ain-footer-toggle]:[width:32px]
+
       [&_.ain-footer-toggle]:[height:32px]
       [&_.ain-footer-toggle]:[margin-left:20px]
       [&_.ain-footer-toggle]:[display:flex]
-      [&_.ain-footer-toggle]:[align-items:center]
-      [&_.ain-footer-toggle]:[justify-content:center]
+      [&_.ain-footer-toggle]:[align-items:left]
+      [&_.ain-footer-toggle]:[justify-content:left]
       [&_.ain-footer-toggle]:[border:0]
       [&_.ain-footer-toggle]:[border-radius:8px]
       [&_.ain-footer-toggle]:[background:transparent]
@@ -369,9 +369,9 @@ function AdminSidebar({
       [&_.ain-footer-toggle]:[font-size:20px]
       [&_.ain-footer-toggle]:[line-height:1]
       [&_.ain-footer-toggle]:[cursor:pointer]
-      [&_.ain-footer-toggle]:[transform:translateX(20px)]
+      [&_.ain-footer-toggle]:[transform:translateX(26px)]
       [&_.ain-footer-toggle]:[transition:color_0.2s_ease,_background-color_0.2s_ease]
-      [&_.ain-footer-toggle:hover]:[background:rgba(255,_255,_255,_0.1)]
+
       [&_.ain-footer-toggle:hover]:[color:#fff]
       [&_.ain-footer-toggle:focus-visible]:[outline:2px_solid_rgba(255,_255,_255,_0.5)]
       [&_.ain-footer-toggle:focus-visible]:[outline-offset:2px]

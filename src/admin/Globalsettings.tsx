@@ -26,7 +26,11 @@ interface SystemConfig {
 type TabId = 'general' | 'api' | 'notifications' | 'security';
 
 /* ───────────── Shared class strings (full literals so Tailwind can see them) ─────────────
-   Dark mode follows your existing `.ain-app.theme-dark` ancestor class. */
+   Dark mode follows your existing `.ain-app.theme-dark` ancestor class.
+   Responsive notes:
+   - Inputs use text-base on mobile (prevents iOS Safari zoom-on-focus), text-sm from sm: up.
+   - Buttons get a 44px min touch target on mobile.
+*/
 
 const card =
   '[border-radius:10px] border border-slate-200 bg-white shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-800';
@@ -34,13 +38,13 @@ const heading = 'text-slate-900 [.ain-app.theme-dark_&]:text-slate-100';
 const muted = 'text-slate-500 [.ain-app.theme-dark_&]:text-slate-400';
 const label = 'mb-1.5 block text-sm font-medium text-slate-700 [.ain-app.theme-dark_&]:text-slate-300';
 const input =
-  'w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-100 [.ain-app.theme-dark_&]:hover:border-slate-600';
+  'block w-full min-w-0 max-w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-base sm:text-sm text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-100 [.ain-app.theme-dark_&]:hover:border-slate-600';
 const btnPrimary =
-  'inline-flex items-center justify-center gap-2 [border-radius:10px]! bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 transition-all duration-200 hover:-translate-y-px hover:bg-indigo-500 hover:shadow-md hover:shadow-indigo-600/30 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30';
+  'inline-flex min-h-[44px] sm:min-h-0 items-center justify-center gap-2 [border-radius:10px]! bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 transition-all duration-200 hover:-translate-y-px hover:bg-indigo-500 hover:shadow-md hover:shadow-indigo-600/30 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30';
 const btnGhost =
-  'inline-flex  items-center justify-center gap-2 [border-radius:10px]! border border-slate-300 bg-transparent px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 [.ain-app.theme-dark_&]:border-slate-600 [.ain-app.theme-dark_&]:text-slate-200 [.ain-app.theme-dark_&]:hover:bg-slate-700';
+  'inline-flex min-h-[44px] sm:min-h-0 items-center justify-center gap-2 [border-radius:10px]! border border-slate-300 bg-transparent px-4 py-2.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-slate-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 [.ain-app.theme-dark_&]:border-slate-600 [.ain-app.theme-dark_&]:text-slate-200 [.ain-app.theme-dark_&]:hover:bg-slate-700';
 const row =
-  'rounded-xl border border-slate-200 p-3 transition-all duration-200 hover:border-indigo-300 hover:shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:hover:border-indigo-500/60';
+  'rounded-xl mb-2 border border-slate-200 p-3 transition-all duration-200 hover:border-indigo-300 hover:shadow-sm [.ain-app.theme-dark_&]:border-slate-700 [.ain-app.theme-dark_&]:hover:border-indigo-500/60';
 
 /* Keyframes live here so the file works with no tailwind.config changes. */
 const keyframes = `
@@ -48,6 +52,9 @@ const keyframes = `
 @keyframes gs-pop   { from { opacity: 0; transform: scale(.96) translateY(-6px) } to { opacity: 1; transform: none } }
 @keyframes gs-toast { from { opacity: 0; transform: translateY(12px) scale(.96) } to { opacity: 1; transform: none } }
 @keyframes gs-out   { to { opacity: 0; transform: translateX(24px) scale(.97) } }
+.gs-root { max-width: 100%; }
+.gs-tabs { scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; }
+.gs-tabs::-webkit-scrollbar { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .gs-root * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }`;
@@ -65,11 +72,11 @@ const Toggle: React.FC<{
     role="switch"
     aria-checked={checked}
     onClick={() => onChange(!checked)}
-    className={`${row} group [border-radius:10px]! flex w-full items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20`}
+    className={`${row} group [border-radius:10px]! flex w-full min-w-0 items-center justify-between gap-3 text-left sm:gap-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20`}
   >
-    <span>
-      <span className={`block [font-size:1.3rem] font-medium ${heading}`}>{title}</span>
-      <span className={`block text-xs ${muted}`}>{hint}</span>
+    <span className="min-w-0 flex-1">
+      <span className={`block break-words [font-size:1rem] font-medium ${heading}`}>{title}</span>
+      <span className={`block break-words text-xs ${muted}`}>{hint}</span>
     </span>
     <span
       className={`relative h-6 w-11 shrink-0 [border-radius:10px]! transition-colors duration-300 ${checked ? 'bg-indigo-600' : 'bg-slate-300 [.ain-app.theme-dark_&]:bg-slate-600'
@@ -88,7 +95,7 @@ const Field: React.FC<{ title: string; hint?: string; children: React.ReactNode 
   hint,
   children,
 }) => (
-  <div>
+  <div className="min-w-0">
     <label className={label}>{title}</label>
     {children}
     {hint && <p className={`mt-1.5 text-xs ${muted}`}>{hint}</p>}
@@ -108,9 +115,9 @@ const Badge: React.FC<{ on?: boolean; children: React.ReactNode }> = ({ on, chil
 
 const tabs: { id: TabId; label: string }[] = [
   { id: 'general', label: 'General' },
-  { id: 'api', label: 'API keys' },
+  // { id: 'api', label: 'API keys' },
   { id: 'notifications', label: 'Notifications' },
-  { id: 'security', label: 'Security' },
+  // { id: 'security', label: 'Security' },
 ];
 
 const maskKey = (k: string) => `${k.slice(0, 8)}${'•'.repeat(14)}${k.slice(-4)}`;
@@ -161,6 +168,7 @@ const GlobalSettings: React.FC = () => {
 
   /* Sliding tab indicator */
   const tabRefs = useRef<Partial<Record<TabId, HTMLButtonElement | null>>>({});
+  const navRef = useRef<HTMLElement | null>(null);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
 
   const measure = useCallback(() => {
@@ -169,10 +177,32 @@ const GlobalSettings: React.FC = () => {
   }, [activeTab]);
 
   useLayoutEffect(measure, [measure]);
+
+  /* Re-measure on window resize AND whenever the nav itself changes size
+     (orientation change, sidebar collapse, font load, etc.) */
   useEffect(() => {
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined' && navRef.current) {
+      ro = new ResizeObserver(measure);
+      ro.observe(navRef.current);
+    }
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+      ro?.disconnect();
+    };
   }, [measure]);
+
+  /* Keep the active tab visible when the tab bar scrolls horizontally on small screens */
+  useEffect(() => {
+    const el = tabRefs.current[activeTab];
+    const nav = navRef.current;
+    if (!el || !nav) return;
+    const target = el.offsetLeft - (nav.clientWidth - el.offsetWidth) / 2;
+    nav.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }, [activeTab]);
 
   /* Toast auto-dismiss */
   useEffect(() => {
@@ -248,14 +278,18 @@ const GlobalSettings: React.FC = () => {
     <AdminLayout>
       <style>{keyframes}</style>
 
-      <div className="gs-root relative min-h-screen">
+      <div className="gs-root relative min-h-screen w-full min-w-0">
         {/* Header */}
-        <header className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="m-0 break-words [font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Global Settings</h2>
-            <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">System configuration and admin preferences</p>
+        <header className="mb-3 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0">
+            <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">
+              Global Settings
+            </h2>
+            <p className="mt-0.5 mb-0 text-sm text-[color:#6b7280] dark:text-slate-400">
+              System configuration and admin preferences
+            </p>
           </div>
-          <button className={btnPrimary} onClick={() => setToast('Settings saved')}>
+          <button className={`${btnPrimary} w-full shrink-0 sm:w-auto`} onClick={() => setToast('Settings saved')}>
             <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4" aria-hidden>
               <path d="M3 4a1 1 0 0 1 1-1h9.6a1 1 0 0 1 .7.3l2.4 2.4a1 1 0 0 1 .3.7V16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4Zm4 0v3h5V4H7Zm3 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z" />
             </svg>
@@ -263,10 +297,11 @@ const GlobalSettings: React.FC = () => {
           </button>
         </header>
 
-        {/* Tabs with sliding indicator */}
+        {/* Tabs with sliding indicator (scrolls horizontally if they don't fit) */}
         <nav
+          ref={navRef}
           role="tablist"
-          className={`relative mb-3 flex overflow-x-auto p-1.5 ${card}`}
+          className={`gs-tabs relative mb-3 flex w-full overflow-x-auto p-1.5 ${card}`}
         >
           <span
             aria-hidden
@@ -282,7 +317,7 @@ const GlobalSettings: React.FC = () => {
               role="tab"
               aria-selected={activeTab === t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`relative z-10 whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 ${activeTab === t.id
+              className={`relative z-10 min-h-[44px] flex-1 shrink-0 whitespace-nowrap rounded-xl px-3 py-2.5 text-center text-sm font-medium transition-colors duration-200 sm:min-h-0 sm:flex-none sm:px-5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 ${activeTab === t.id
                   ? 'text-indigo-600 [.ain-app.theme-dark_&]:text-indigo-300'
                   : `${muted} hover:text-slate-800 [.ain-app.theme-dark_&]:hover:text-slate-200`
                 }`}
@@ -296,25 +331,24 @@ const GlobalSettings: React.FC = () => {
         <section
           key={activeTab}
           role="tabpanel"
-          className={`${card} p-6 [animation:gs-panel_.35s_cubic-bezier(.2,.7,.2,1)_both]`}
+          className={`${card} min-w-0 p-4 sm:p-5 lg:p-6 [animation:gs-panel_.35s_cubic-bezier(.2,.7,.2,1)_both]`}
         >
           {/* ── General ── */}
           {activeTab === 'general' && (
-            <div className="max-w-2xl space-y-6">
-              <h2 className={`[font-size:1.5rem]!
-                 font-semibold ${heading}`}>General</h2>
+            <div className="w-full max-w-2xl space-y-5 sm:space-y-6">
+              <h2 className={`m-0 [font-size:1.25rem]! sm:[font-size:1.5rem]! font-semibold ${heading}`}>General</h2>
 
               <Field title="Site name" hint="The name displayed across the platform">
                 <input className={input} value={config.siteName} onChange={(e) => setCfg('siteName', e.target.value)} />
               </Field>
               <Field title="Site URL" hint="Base URL for your platform">
-                <input type="url" className={input} value={config.siteUrl} onChange={(e) => setCfg('siteUrl', e.target.value)} />
+                <input type="url" inputMode="url" className={input} value={config.siteUrl} onChange={(e) => setCfg('siteUrl', e.target.value)} />
               </Field>
               <Field title="Allowed domains" hint="Comma-separated list of allowed domains">
                 <textarea rows={3} className={`${input} resize-y`} value={config.allowedDomains} onChange={(e) => setCfg('allowedDomains', e.target.value)} />
               </Field>
               <Field title="Log retention (days)" hint="90 days is recommended">
-                <input type="number" className={input} value={config.logRetention} onChange={(e) => setCfg('logRetention', num(e.target.value))} />
+                <input type="number" inputMode="numeric" className={input} value={config.logRetention} onChange={(e) => setCfg('logRetention', num(e.target.value))} />
               </Field>
 
               <div className="space-y-3">
@@ -334,13 +368,13 @@ const GlobalSettings: React.FC = () => {
 
               <div className="h-px bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700" />
 
-              <h3 className={`[font-size:1.3rem]! font-semibold ${heading}`}>Rate limiting</h3>
-              <div className="grid gap-6 sm:grid-cols-2">
+              <h3 className={`m-0 [font-size:1rem]! font-semibold ${heading}`}>Rate limiting</h3>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
                 <Field title="Default rate limit (requests/min)">
-                  <input type="number" className={input} value={config.defaultRateLimit} onChange={(e) => setCfg('defaultRateLimit', num(e.target.value))} />
+                  <input type="number" inputMode="numeric" className={input} value={config.defaultRateLimit} onChange={(e) => setCfg('defaultRateLimit', num(e.target.value))} />
                 </Field>
                 <Field title="Max API calls per month">
-                  <input type="number" className={input} value={config.maxApiCalls} onChange={(e) => setCfg('maxApiCalls', num(e.target.value))} />
+                  <input type="number" inputMode="numeric" className={input} value={config.maxApiCalls} onChange={(e) => setCfg('maxApiCalls', num(e.target.value))} />
                 </Field>
               </div>
             </div>
@@ -348,9 +382,9 @@ const GlobalSettings: React.FC = () => {
 
           {/* ── API keys ── */}
           {activeTab === 'api' && (
-            <div>
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <h2 className={`[font-size:1.5rem]! font-semibold ${heading}`}>API keys</h2>
+            <div className="min-w-0">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3 sm:mb-2">
+                <h2 className={`m-0 [font-size:1.25rem]! sm:[font-size:1.5rem]! font-semibold ${heading}`}>API keys</h2>
                 <button className={btnPrimary} onClick={() => setShowApiForm((s) => !s)}>
                   <span
                     className={`inline-block text-base leading-none transition-transform duration-300 ${showApiForm ? 'rotate-45' : ''}`}
@@ -382,11 +416,11 @@ const GlobalSettings: React.FC = () => {
                       />
                       {nameError && <p className="mt-1.5 text-xs text-red-500">Enter a name so you can recognise this key later.</p>}
                     </Field>
-                    <div className="mt-4 flex justify-end gap-3">
-                      <button className={btnGhost} tabIndex={showApiForm ? 0 : -1} onClick={() => { setShowApiForm(false); setNameError(false); }}>
+                    <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-3">
+                      <button className={`${btnGhost} w-full sm:w-auto`} tabIndex={showApiForm ? 0 : -1} onClick={() => { setShowApiForm(false); setNameError(false); }}>
                         Cancel
                       </button>
-                      <button className={btnPrimary} tabIndex={showApiForm ? 0 : -1} onClick={handleGenerate}>
+                      <button className={`${btnPrimary} w-full sm:w-auto`} tabIndex={showApiForm ? 0 : -1} onClick={handleGenerate}>
                         Generate
                       </button>
                     </div>
@@ -394,7 +428,7 @@ const GlobalSettings: React.FC = () => {
                 </div>
               </div>
 
-              <ul className="grid gap-3 p-0!">
+              <ul className="m-0 grid list-none gap-3 p-0!">
                 {apiKeys.length === 0 && (
                   <li className={`rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm [.ain-app.theme-dark_&]:border-slate-600 ${muted}`}>
                     No API keys yet. Generate one to start making requests.
@@ -404,25 +438,25 @@ const GlobalSettings: React.FC = () => {
                   <li
                     key={k.id}
                     style={{ animationDelay: removingId ? undefined : `${i * 50}ms` }}
-                    className={`${row} [border-radius:10px]! flex flex-col gap-4 p-3! sm:flex-row sm:items-center sm:justify-between ${removingId === k.id
+                    className={`${row} [border-radius:10px]! mb-0 flex min-w-0 flex-col gap-3 p-3! sm:flex-row sm:items-center sm:justify-between sm:gap-4 ${removingId === k.id
                         ? '[animation:gs-out_.28s_ease_forwards]'
                         : '[animation:gs-pop_.35s_cubic-bezier(.2,.7,.2,1)_both]'
                       } ${k.isActive ? '' : 'opacity-70'}`}
                   >
                     <div className="min-w-0 flex-1">
-                      <h3 className={`mb-2 [font-size:1.3rem]! font-semibold ${heading}`}>{k.name}</h3>
-                      <div className="mb-2 flex items-center gap-2">
-                        <code className="min-w-0 flex-1 truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700 [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-200">
+                      <h3 className={`mb-2 break-words [font-size:1rem]! font-semibold ${heading}`}>{k.name}</h3>
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <code className="w-full min-w-0 break-all rounded-lg bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700 sm:w-auto sm:flex-1 sm:truncate sm:break-normal [.ain-app.theme-dark_&]:bg-slate-900 [.ain-app.theme-dark_&]:text-slate-200">
                           {revealed[k.id] ? k.key : maskKey(k.key)}
                         </code>
                         <button
-                          className="rounded-lg px-2.5 py-2 text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 active:scale-95 [.ain-app.theme-dark_&]:hover:bg-slate-700"
+                          className="min-h-[40px] rounded-lg px-3 py-2 text-xs font-medium text-slate-500 transition-all hover:bg-slate-100 active:scale-95 sm:min-h-0 sm:px-2.5 [.ain-app.theme-dark_&]:hover:bg-slate-700"
                           onClick={() => setRevealed((r) => ({ ...r, [k.id]: !r[k.id] }))}
                         >
                           {revealed[k.id] ? 'Hide' : 'Show'}
                         </button>
                         <button
-                          className={`w-16 rounded-lg px-2.5 py-2 text-xs font-medium transition-all duration-200 active:scale-95 ${copiedId === k.id
+                          className={`min-h-[40px] w-16 rounded-lg px-2.5 py-2 text-xs font-medium transition-all duration-200 active:scale-95 sm:min-h-0 ${copiedId === k.id
                               ? 'bg-emerald-100 text-emerald-700 [.ain-app.theme-dark_&]:bg-emerald-500/15 [.ain-app.theme-dark_&]:text-emerald-300'
                               : 'text-slate-500 hover:bg-slate-100 [.ain-app.theme-dark_&]:hover:bg-slate-700'
                             }`}
@@ -431,16 +465,16 @@ const GlobalSettings: React.FC = () => {
                           {copiedId === k.id ? 'Copied' : 'Copy'}
                         </button>
                       </div>
-                      <p className={`flex flex-wrap gap-x-4 text-xs ${muted}`}>
+                      <p className={`m-0 flex flex-wrap gap-x-4 gap-y-0.5 text-xs ${muted}`}>
                         <span>Created {k.createdAt}</span>
                         <span>Last used {k.lastUsed}</span>
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 sm:flex-col sm:items-end sm:justify-start sm:border-t-0 sm:pt-0 [.ain-app.theme-dark_&]:border-slate-700">
                       <button
                         onClick={() => setApiKeys((ks) => ks.map((x) => (x.id === k.id ? { ...x, isActive: !x.isActive } : x)))}
-                        className={`[border-radius:10px]! px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 ${k.isActive
+                        className={`min-h-[40px] [border-radius:10px]! px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 sm:min-h-0 ${k.isActive
                             ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 [.ain-app.theme-dark_&]:bg-emerald-500/15 [.ain-app.theme-dark_&]:text-emerald-300'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200 [.ain-app.theme-dark_&]:bg-slate-700 [.ain-app.theme-dark_&]:text-slate-300'
                           }`}
@@ -451,18 +485,18 @@ const GlobalSettings: React.FC = () => {
                       {confirmId === k.id ? (
                         <span className="flex items-center gap-1 [animation:gs-pop_.2s_ease_both]">
                           <button
-                            className="[border-radius:10px]! bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-red-500 active:scale-95"
+                            className="min-h-[40px] [border-radius:10px]! bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-red-500 active:scale-95 sm:min-h-0"
                             onClick={() => handleDelete(k.id)}
                           >
                             Delete key
                           </button>
-                          <button className="rounded-lg px-2 py-1.5 text-xs text-slate-500 hover:bg-slate-100 [.ain-app.theme-dark_&]:hover:bg-slate-700" onClick={() => setConfirmId(null)}>
+                          <button className="min-h-[40px] rounded-lg px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-100 sm:min-h-0 sm:px-2 [.ain-app.theme-dark_&]:hover:bg-slate-700" onClick={() => setConfirmId(null)}>
                             Keep
                           </button>
                         </span>
                       ) : (
                         <button
-                          className="[border-radius:10px]! px-3 py-1.5 text-xs font-medium text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 active:scale-95 [.ain-app.theme-dark_&]:hover:bg-red-500/10 [.ain-app.theme-dark_&]:hover:text-red-400"
+                          className="min-h-[40px] [border-radius:10px]! px-3 py-1.5 text-xs font-medium text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 active:scale-95 sm:min-h-0 [.ain-app.theme-dark_&]:hover:bg-red-500/10 [.ain-app.theme-dark_&]:hover:text-red-400"
                           onClick={() => setConfirmId(k.id)}
                         >
                           Delete
@@ -477,9 +511,9 @@ const GlobalSettings: React.FC = () => {
 
           {/* ── Notifications ── */}
           {activeTab === 'notifications' && (
-            <div>
-              <h2 className={`mb-2 [font-size:1.5rem]! font-semibold ${heading}`}>Notifications</h2>
-              <div className="grid gap-3   md:grid-cols-2">
+            <div className="min-w-0">
+              <h2 className={`mb-3 mt-0 [font-size:1.25rem]! sm:mb-2 sm:[font-size:1.5rem]! font-semibold ${heading}`}>Notifications</h2>
+              <div className="grid grid-cols-1 gap-x-4 gap-y-1 sm:gap-y-3 md:grid-cols-2 md:gap-x-4">
                 {notificationItems.map((n) => (
                   <Toggle
                     key={n.key}
@@ -495,19 +529,22 @@ const GlobalSettings: React.FC = () => {
 
           {/* ── Security ── */}
           {activeTab === 'security' && (
-            <div>
-              <h2 className={`mb-1 [font-size:1.5rem]! font-semibold ${heading}`}>Security</h2>
+            <div className="min-w-0">
+              <h2 className={`mb-3 mt-0 [font-size:1.25rem]! sm:mb-1 sm:[font-size:1.5rem]! font-semibold ${heading}`}>Security</h2>
               <div className="grid gap-3">
                 {securityItems.map((s) => (
-                  <div key={s.title} className={`${row} flex items-center justify-between gap-4`}>
-                    <div>
-                      <div className="mb-1 flex items-center gap-3">
-                        <h3 className={`[font-size:1.3rem]! font-semibold ${heading}`}>{s.title}</h3>
+                  <div
+                    key={s.title}
+                    className={`${row} mb-0 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4`}
+                  >
+                    <div className="min-w-0">
+                      <div className="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <h3 className={`m-0 break-words [font-size:1rem]! font-semibold ${heading}`}>{s.title}</h3>
                         {s.badge && <Badge on={s.on}>{s.badge}</Badge>}
                       </div>
-                      <p className={`text-sm ${muted}`}>{s.text}</p>
+                      <p className={`m-0 break-words text-sm ${muted}`}>{s.text}</p>
                     </div>
-                    <button className={`${btnGhost} shrink-0 !px-3.5 !py-2 text-[13px]`}>{s.action}</button>
+                    <button className={`${btnGhost} w-full shrink-0 !px-3.5 !py-2 text-[13px] sm:w-auto`}>{s.action}</button>
                   </div>
                 ))}
               </div>
@@ -515,12 +552,13 @@ const GlobalSettings: React.FC = () => {
           )}
         </section>
 
-        {/* Toast */}
+        {/* Toast: full-width bar on mobile, floating card on larger screens */}
         {toast && (
           <div
             role="status"
             key={toast}
-            className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl [animation:gs-toast_.3s_cubic-bezier(.2,.7,.2,1)_both]"
+            className="fixed inset-x-4 bottom-4 z-50 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-medium text-white shadow-xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:max-w-sm sm:text-left [animation:gs-toast_.3s_cubic-bezier(.2,.7,.2,1)_both]"
+            style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
           >
             {toast}
           </div>

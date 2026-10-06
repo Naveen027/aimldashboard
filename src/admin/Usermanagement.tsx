@@ -52,7 +52,7 @@ const ROOT_VARS = [
 ].join(' ');
 
 // min-h uses dvh so mobile browser toolbars don't cause extra scroll; overflow-x-hidden prevents sideways scroll
-const ROOT = `um user-management ${ROOT_VARS} bg-[var(--bg)] text-[color:var(--text)] min-h-screen min-h-[100dvh] w-full max-w-full overflow-x-hidden text-[14px]`;
+const ROOT = `um user-management ${ROOT_VARS} mx-auto w-full max-w-[1520px] 2xl:max-w-[1760px] bg-[var(--bg)] text-[color:var(--text)] min-h-screen min-h-[100dvh] overflow-x-hidden text-[14px]`;
 const cardBase = 'rounded-2xl border border-[color:var(--border)] bg-[var(--surface)] shadow-[0_1px_2px_rgba(16,24,40,0.04)]';
 
 const FOCUS_RING = 'focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_var(--ring)]';

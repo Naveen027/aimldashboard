@@ -686,16 +686,14 @@ const ExportMenu: React.FC = () => {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Export options"
-        className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 sm:h-8 sm:w-8 ${
-          open
-            ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
-            : "text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
-        }`}
+        className={`flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 sm:h-8 sm:w-8 ${open
+          ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+          : "text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+          }`}
       >
         <i
-          className={`bi bi-three-dots cursor-pointer transition-transform duration-300 ${
-            open ? "rotate-90" : "rotate-0"
-          }`}
+          className={`bi bi-three-dots cursor-pointer transition-transform duration-300 ${open ? "rotate-90" : "rotate-0"
+            }`}
         />
       </button>
 
@@ -703,11 +701,10 @@ const ExportMenu: React.FC = () => {
       <div
         role="menu"
         aria-hidden={!open}
-        className={`absolute right-0 z-30 mt-2 w-48 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg transition-all duration-200 ease-out motion-reduce:transition-none dark:border-slate-600 dark:bg-slate-800 ${
-          open
-            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none -translate-y-1 scale-95 opacity-0"
-        }`}
+        className={`absolute right-0 z-30 mt-2 w-48 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg transition-all duration-200 ease-out motion-reduce:transition-none dark:border-slate-600 dark:bg-slate-800 ${open
+          ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+          : "pointer-events-none -translate-y-1 scale-95 opacity-0"
+          }`}
       >
         <div className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
           Export data
@@ -724,9 +721,8 @@ const ExportMenu: React.FC = () => {
               disabled={busy !== null}
               onClick={() => run(item.kind)}
               style={{ transitionDelay: open ? `${60 + i * 50}ms` : "0ms" }}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-all duration-300 hover:bg-slate-50 disabled:cursor-wait disabled:opacity-70 sm:py-2 dark:text-slate-200 dark:hover:bg-slate-700 ${
-                open ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0"
-              }`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition-all duration-300 hover:bg-slate-50 disabled:cursor-wait disabled:opacity-70 sm:py-2 dark:text-slate-200 dark:hover:bg-slate-700 ${open ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0"
+                }`}
             >
               {isBusy ? (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-500" />
@@ -824,25 +820,27 @@ const AdminDashboard: React.FC = () => {
 
         {/* Stat cards: 1 col (<420) → 2 cols (≥420) → 4 cols (≥1280).
             Fixed height removed so cards grow naturally when text wraps. */}
-        <div className="mb-3 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:mb-5 sm:gap-5 xl:grid-cols-4">
+        {/* Stat cards: always 2 x 2 on phones → 4 across on xl */}
+        {/* Stat cards: 2 x 2 on phones → 4 across on xl (same alignment as User Management) */}
+        <div className="mb-3 grid grid-cols-2 gap-2.5 min-[480px]:gap-4 sm:mb-5 sm:gap-5 xl:grid-cols-4">
           {statCards.map((card) => (
             <div
               key={card.label}
-              className={`${cardBase} flex min-w-0 items-center gap-3 p-3 transition-shadow hover:shadow-md sm:gap-4 sm:p-5 lg:p-6`}
+              className={`${cardBase} flex min-w-0 items-center gap-2.5 p-3 transition-shadow hover:shadow-md max-[360px]:flex-col max-[360px]:items-start sm:gap-4 sm:p-5 lg:p-6`}
             >
               <span
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xl sm:h-[50px] sm:w-[50px] sm:text-2xl ${card.healthy
-                  ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                  : "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg sm:h-[50px] sm:w-[50px] sm:text-2xl ${card.healthy
+                    ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                    : "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
                   }`}
               >
                 <i className={`bi ${card.icon}`} />
               </span>
               <div className="min-w-0">
-                <div className="text-[13px] leading-snug text-slate-500 sm:text-[15px] dark:text-slate-400">
+                <div className="truncate text-xs text-slate-500 sm:text-[15px] dark:text-slate-400">
                   {card.label}
                 </div>
-                <div className="text-xl font-bold leading-tight text-slate-900 sm:text-2xl lg:text-[25px] dark:text-white">
+                <div className="truncate text-lg font-bold leading-tight text-slate-900 sm:text-2xl lg:text-[25px] dark:text-white">
                   {card.value}
                 </div>
               </div>

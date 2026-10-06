@@ -336,7 +336,7 @@ const ModelControl: React.FC = () => {
       `}</style>
 
       <div
-        className={`mc-root mx-auto min-h-[100dvh] w-full max-w-[1800px] bg-slate-100 p-0 text-slate-700 ${dark}:bg-transparent ${dark}:text-gray-100`}
+        className={`mc-root mx-auto min-h-[100dvh] w-full max-w-[1520px] bg-slate-100 p-0 text-slate-700 2xl:max-w-[1760px] ${dark}:bg-transparent ${dark}:text-gray-100`}
       >
         {/* ---------- Header ---------- */}
         <div className="mc-rise mb-0 flex flex-col items-start justify-between gap-2 sm:gap-4 md:flex-row md:gap-0">
