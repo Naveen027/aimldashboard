@@ -4,7 +4,6 @@ import {
     CheckCircle2,
     ChevronDown,
     Clock,
-    LifeBuoy,
     Mail,
     Phone,
     Send,

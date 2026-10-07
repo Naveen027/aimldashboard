@@ -11,9 +11,6 @@ import {
     Plug,
     ShieldCheck,
     Target,
-    UserCheck,
-    CalendarDays,
-    Clock,
     Play,
     ScanFace,
     Fingerprint,
@@ -25,7 +22,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { aiModelCatalog, type AiModelType } from "../data/aiModels";
-import ProfileCard from "./ProfileCard";
 import UserHeader from "./UserHeader";
 import UserSidebar from "./UserSidebar";
 import AIModelsDashboard from "./AIModelsDashboard";

@@ -1,4 +1,4 @@
-import { Bell, Search } from "lucide-react";
+import { Bell } from "lucide-react";
 import { GlobalThemeToggle } from "./ThemeToggle";
 
 interface UserHeaderProps {
@@ -6,10 +6,7 @@ interface UserHeaderProps {
     onSearchChange: (value: string) => void;
 }
 
-function UserHeader({
-    searchQuery,
-    // onSearchChange,
-}: UserHeaderProps) {
+function UserHeader(_props: UserHeaderProps) {
     return (
         <header className="sticky top-0 z-20 flex h-[54px] items-center justify-end gap-0 border-b border-[#eef0f4] bg-white px-8 py-2 shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-colors duration-300 max-[768px]:gap-3 max-[768px]:px-4 [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937] [.theme-dark_&]:shadow-[0_1px_3px_rgba(0,0,0,0.35)]">
             <button
