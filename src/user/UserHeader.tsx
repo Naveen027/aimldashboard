@@ -8,18 +8,18 @@ interface UserHeaderProps {
 
 function UserHeader({
     searchQuery,
-    onSearchChange,
+    // onSearchChange,
 }: UserHeaderProps) {
     return (
         <header className="sticky top-0 z-20 flex h-[54px] items-center justify-end gap-0 border-b border-[#eef0f4] bg-white px-8 py-2 shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-colors duration-300 max-[768px]:gap-3 max-[768px]:px-4 [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937] [.theme-dark_&]:shadow-[0_1px_3px_rgba(0,0,0,0.35)]">
             <button
                 type="button"
-                className="inline-flex cursor-pointer items-center justify-center rounded bg-transparent p-0 text-[#2c3e50] transition-colors duration-300 hover:bg-[#f5f6fa] [.theme-dark_&]:text-[#f3f4f6] [.theme-dark_&]:hover:bg-[#111827]"
+                className="inline-flex cursor-pointer mr-1.5 items-center justify-center rounded bg-transparent p-0 text-[#2c3e50] transition-colors duration-300 hover:bg-[#f5f6fa] [.theme-dark_&]:text-[#f3f4f6] [.theme-dark_&]:hover:bg-[#111827]"
                 aria-label="Notifications"
             >
                 <Bell strokeWidth={1.5} aria-hidden="true" />
             </button>
-            <div className="relative ml-5 w-full max-w-[300px] max-[768px]:ml-0 max-[768px]:max-w-full">
+            {/* <div className="relative ml-5 w-full max-w-[300px] max-[768px]:ml-0 max-[768px]:max-w-full">
                 <label
                     htmlFor="search-input"
                     className="sr-only"
@@ -41,7 +41,7 @@ function UserHeader({
                         onSearchChange(event.target.value)
                     }
                 />
-            </div>
+            </div> */}
             <GlobalThemeToggle />
         </header>
     );

@@ -15,11 +15,12 @@ import {
     CalendarDays,
     Clock,
     Play,
-    MessageSquare,
-    Eye,
-    Network,
     ScanFace,
     Fingerprint,
+    MessageSquareText,
+    FileSearch,
+    Bot,
+    Languages,
     type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -30,13 +31,6 @@ import UserSidebar from "./UserSidebar";
 import AIModelsDashboard from "./AIModelsDashboard";
 import { useDashboardTheme } from "./ThemeToggle";
 
-/* ---------- types ---------- */
-interface ParsedDescription {
-    intro: string;
-    sections: { title: string; items: string[] }[];
-    links: string[];
-}
-
 interface UserModel {
     id: string;
     name: string;
@@ -44,7 +38,7 @@ interface UserModel {
     group: string;
     category: string;
     summary: string;
-    parsed: ParsedDescription;
+    parsed: { intro: string; sections: { title: string; items: string[] }[]; links: string[] };
     highlights: string[];
     provider: string;
     version: string;
@@ -56,140 +50,13 @@ interface UserModel {
     lastUpdated: string;
 }
 
-/* ---------- description parser ---------- */
-const CTA_LABELS = ["Request Demo", "Technical Documentation", "Case Studies"];
-
-const parseDescription = (raw: string): ParsedDescription => {
-    const intro: string[] = [];
-    const sections: ParsedDescription["sections"] = [];
-    const links: string[] = [];
-    let current: ParsedDescription["sections"][number] | null = null;
-
-    const lines = raw
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean);
-
-    for (const line of lines) {
-        if (CTA_LABELS.includes(line)) {
-            links.push(line);
-            continue;
-        }
-        if (line.endsWith(":")) {
-            current = { title: line.slice(0, -1), items: [] };
-            sections.push(current);
-            continue;
-        }
-        const text = line.replace(/^[-•]\s*/, "");
-        if (current) current.items.push(text);
-        else intro.push(text);
-    }
-
-    return { intro: intro.join(" "), sections, links };
-};
-
-const sectionMeta = (title: string): { label: string; Icon: LucideIcon } => {
-    const t = title.toLowerCase();
-    if (t.includes("capabilit")) return { label: "Capabilities", Icon: Sparkles };
-    if (t.includes("integration")) return { label: "Integration", Icon: Plug };
-    if (t.includes("governance")) return { label: "Governance", Icon: ShieldCheck };
-    if (t.includes("outcome")) return { label: "Outcome", Icon: Target };
-    return { label: title, Icon: Sparkles };
-};
-
-/* ---------- Lucide icons for models (same as Model Control) ---------- */
-const modelTypeIcon: Record<string, LucideIcon> = {
-    llm: MessageSquare,
-    vision: Eye,
-    embedding: Network,
-    other: Cpu,
-};
-
-const modelIdIcon: Record<string, LucideIcon> = {
-    "kartavya-face-matching": ScanFace,
-    "muzzle-print-identification": Fingerprint,
-};
-
-const getModelIcon = (model: Pick<UserModel, "id" | "type">): LucideIcon =>
-    modelIdIcon[model.id] ?? modelTypeIcon[model.type] ?? Cpu;
-
-const modelTypeLabel: Record<string, string> = {
-    llm: "Language",
-    vision: "Vision",
-    embedding: "Embedding",
-    other: "Other",
-};
-const getTypeLabel = (type: string) => modelTypeLabel[type] ?? "Other";
-
-/* ---------- model data ---------- */
-const typeGroup: Record<string, string> = {
-    llm: "Language",
-    vision: "Vision",
-    embedding: "Data",
-    other: "Other",
-};
-
-const USAGE = [48.3, 21.8, 15.2, 14.7, 14.7, 12.4];
-const RPM = [10000, 5000, 3000, 8000, 8000, 6000];
-const REQUESTS = [48210, 21840, 15230, 14720, 14690, 12410];
-const LATENCY = [820, 312, 245, 410, 395, 360];
-
-const buildModels = (): UserModel[] =>
-    aiModelCatalog.map((model, i) => {
-        const parsed = parseDescription(model.description);
-        return {
-            ...model,
-            group: typeGroup[model.type] ?? "Other",
-            summary: parsed.intro || model.category,
-            parsed,
-            provider: "Karnataka AI Cell",
-            version: model.highlights.find((h) => h.startsWith("v"))?.slice(1) ?? "1.0",
-            status: "active",
-            usagePercentage: USAGE[i] ?? 0,
-            rpmLimit: RPM[i] ?? 5000,
-            requests: REQUESTS[i] ?? 0,
-            latency: LATENCY[i] ?? 0,
-            lastUpdated: "2026-10-01",
-        };
-    });
-
-/* ---------- animations ---------- */
-const keyframes = `
-@keyframes ud-rise  { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
-@keyframes ud-fade  { from { opacity: 0 } to { opacity: 1 } }
-@keyframes ud-pop   { from { opacity: 0; transform: translateY(16px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
-@keyframes ud-sheet { from { opacity: 0; transform: translateY(100%) } to { opacity: 1; transform: translateY(0) } }
-@keyframes ud-fill  { from { width: 0 } to { width: var(--ud-w) } }
-@keyframes ud-sheen { 0% { transform: translateX(-120%) } 100% { transform: translateX(220%) } }
-@keyframes ud-ping  { 0% { transform: scale(1); opacity: .6 } 80%,100% { transform: scale(2.4); opacity: 0 } }
-.ud-rise  { animation: ud-rise .55s cubic-bezier(.22,1,.36,1) both }
-.ud-fade  { animation: ud-fade .25s ease-out both }
-.ud-pop   { animation: ud-pop .35s cubic-bezier(.22,1,.36,1) both }
-.ud-fill  { animation: ud-fill 1s cubic-bezier(.22,1,.36,1) .35s both }
-.ud-sheen { animation: ud-sheen 2.4s ease-in-out infinite }
-.ud-ping  { animation: ud-ping 1.8s cubic-bezier(0,0,.2,1) infinite }
-@media (max-width: 639px) { .ud-pop { animation-name: ud-sheet } }
-.ud-root { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
-.ud-root h2, .ud-root h3 { overflow-wrap: anywhere; }
-
-/* default button radius (low specificity so Tailwind radius classes can override it) */
-:where(.ud-scope) button { border-radius: 10px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .ud-rise,.ud-fade,.ud-pop,.ud-fill,.ud-sheen,.ud-ping { animation: none !important }
-}
-`;
-
-const delay = (i: number, step = 70): CSSProperties => ({
-    animationDelay: `${i * step}ms`,
-});
-
 function UserDashboard() {
     const { authResponse, logout } = useAuth();
     const navigate = useNavigate();
-    const { isDarkMode } = useDashboardTheme();
+    const { isDarkMode: d } = useDashboardTheme();
     const { pathname } = useLocation();
 
+    /* ---------- state ---------- */
     const [searchQuery, setSearchQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
     const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
@@ -198,40 +65,114 @@ function UserDashboard() {
     const showAIModelsDashboard = pathname === "/my-profile";
     const userName = authResponse?.username ?? "Alex Johnson";
 
-    const models = useMemo(buildModels, []);
-    const filters = useMemo(
-        () => ["All", ...Array.from(new Set(models.map((m) => m.group)))],
-        [models]
-    );
+    /* ---------- model data ---------- */
+    const models = useMemo<UserModel[]>(() => {
+        const ctaLabels = ["Request Demo", "Technical Documentation", "Case Studies"];
+        const groups: Record<string, string> = { llm: "Language", vision: "Vision", embedding: "Data", other: "Other" };
+        const usage = [48.3, 21.8, 15.2, 14.7, 14.7, 12.4];
+        const rpm = [10000, 5000, 3000, 8000, 8000, 6000];
+        const requests = [48210, 21840, 15230, 14720, 14690, 12410];
+        const latency = [820, 312, 245, 410, 395, 360];
+
+        // split the raw description into intro text, titled sections and CTA links
+        const parseDescription = (raw: string) => {
+            const intro: string[] = [];
+            const sections: { title: string; items: string[] }[] = [];
+            const links: string[] = [];
+            let current: { title: string; items: string[] } | null = null;
+
+            const lines = raw
+                .split("\n")
+                .map((l) => l.trim())
+                .filter(Boolean);
+
+            for (const line of lines) {
+                if (ctaLabels.includes(line)) {
+                    links.push(line);
+                    continue;
+                }
+                if (line.endsWith(":")) {
+                    current = { title: line.slice(0, -1), items: [] };
+                    sections.push(current);
+                    continue;
+                }
+                const text = line.replace(/^[-•]\s*/, "");
+                if (current) current.items.push(text);
+                else intro.push(text);
+            }
+            return { intro: intro.join(" "), sections, links };
+        };
+
+        return aiModelCatalog.map((model, i) => {
+            const parsed = parseDescription(model.description);
+            return {
+                ...model,
+                group: groups[model.type] ?? "Other",
+                summary: parsed.intro || model.category,
+                parsed,
+                provider: "Karnataka AI Cell",
+                version: model.highlights.find((h) => h.startsWith("v"))?.slice(1) ?? "1.0",
+                status: "active",
+                usagePercentage: usage[i] ?? 0,
+                rpmLimit: rpm[i] ?? 5000,
+                requests: requests[i] ?? 0,
+                latency: latency[i] ?? 0,
+                lastUpdated: "2026-10-01",
+            };
+        });
+    }, []);
+
+    const filters = ["All", ...Array.from(new Set(models.map((m) => m.group)))];
 
     const q = searchQuery.trim().toLowerCase();
-    const filteredModels = useMemo(
-        () =>
-            models.filter((m) => {
-                const matchesFilter = activeFilter === "All" || m.group === activeFilter;
-                const matchesSearch =
-                    !q ||
-                    [m.name, m.category, m.summary, m.group].some((f) =>
-                        String(f ?? "").toLowerCase().includes(q)
-                    );
-                return matchesFilter && matchesSearch;
-            }),
-        [models, activeFilter, q]
-    );
+    const filteredModels = models.filter((m) => {
+        const matchesFilter = activeFilter === "All" || m.group === activeFilter;
+        const matchesSearch =
+            !q || [m.name, m.category, m.summary, m.group].some((f) => String(f ?? "").toLowerCase().includes(q));
+        return matchesFilter && matchesSearch;
+    });
+
+    /* ---------- selected model (modal) ---------- */
+    // same icons and colours as the API Keys page (one per model)
+    const modelLook: Record<string, { color: string; Icon: LucideIcon }> = {
+        "kartavya-face-matching": { color: "#4285f4", Icon: ScanFace },
+        "muzzle-print-identification": { color: "#34a853", Icon: Fingerprint },
+        "grievance-management": { color: "#fbbc04", Icon: MessageSquareText },
+        "government-order-information": { color: "#9c27b0", Icon: FileSearch },
+        "ai-enabled-chatbots": { color: "#1ba098", Icon: Bot },
+        "kannada-kasthuri": { color: "#ea4335", Icon: Languages },
+    };
+    const typeLabels: Record<string, string> = { llm: "Language", vision: "Vision", embedding: "Embedding", other: "Other" };
+
+    const getModelIcon = (m: UserModel): LucideIcon => modelLook[m.id]?.Icon ?? Cpu;
+    const getModelColor = (m: UserModel): string => modelLook[m.id]?.color ?? "#6366f1";
+    const getTypeLabel = (type: string) => typeLabels[type] ?? "Other";
+
+    // icon + label for each section tab in the modal
+    const getSectionMeta = (title: string): { label: string; Icon: LucideIcon } => {
+        const t = title.toLowerCase();
+        if (t.includes("capabilit")) return { label: "Capabilities", Icon: Sparkles };
+        if (t.includes("integration")) return { label: "Integration", Icon: Plug };
+        if (t.includes("governance")) return { label: "Governance", Icon: ShieldCheck };
+        if (t.includes("outcome")) return { label: "Outcome", Icon: Target };
+        return { label: title, Icon: Sparkles };
+    };
 
     const selectedModel = models.find((m) => m.id === selectedModelId) || null;
     const SelectedIcon = selectedModel ? getModelIcon(selectedModel) : Cpu;
     const tabs = selectedModel
         ? [
             { key: "overview", label: "Overview", Icon: LayoutGrid },
-            ...selectedModel.parsed.sections.map((s) => ({ key: s.title, ...sectionMeta(s.title) })),
+            ...selectedModel.parsed.sections.map((s) => ({ key: s.title, ...getSectionMeta(s.title) })),
         ]
         : [];
 
+    /* ---------- effects ---------- */
     useEffect(() => {
         setActiveTab("overview");
     }, [selectedModelId]);
 
+    // close modal on Escape + lock page scroll while it is open
     useEffect(() => {
         if (!selectedModelId) return;
         const onKey = (e: KeyboardEvent) => {
@@ -246,31 +187,26 @@ function UserDashboard() {
         };
     }, [selectedModelId]);
 
+    /* ---------- handlers ---------- */
     const handleLogout = () => {
         logout();
         navigate("/", { replace: true });
     };
 
-    // TODO: point this at your real playground route
     const openPlayground = (model: UserModel) => {
         navigate(`/playground?model=${encodeURIComponent(model.id)}`);
     };
 
     /* ---------- theme classes ---------- */
-    const d = isDarkMode;
     const title = d ? "text-white" : "text-slate-900";
     const faint = d ? "text-slate-400" : "text-slate-500";
-    const surface = d
-        ? "border-gray-700 bg-gray-800 text-gray-100"
-        : "border-slate-200 bg-white text-slate-700";
+    const surface = d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700";
     const tileModal = d ? "bg-gray-800 ring-white/5" : "bg-slate-50 ring-slate-100";
 
-    // same status pills as Model Control cards
     const cardStatus = {
         active: d ? "bg-emerald-500/15 text-emerald-300" : "bg-emerald-50 text-emerald-700",
         disabled: d ? "bg-rose-500/15 text-rose-300" : "bg-rose-50 text-rose-700",
     };
-    // same badge as Model Control modal hero
     const heroStatus = {
         active: "bg-green-100 text-green-800",
         disabled: "bg-red-100 text-red-800",
@@ -279,12 +215,37 @@ function UserDashboard() {
     const primaryBtn =
         "rounded-[10px] bg-indigo-500 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 active:translate-y-0 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
+    /* ---------- UI ---------- */
     return (
         <div
             className={`ud-scope relative isolate flex min-h-screen transition-[background-color,color] duration-[700ms] ${d ? "theme-dark bg-[#111827] text-[#f3f4f6]" : "theme-light bg-[#f8fafc] text-[#2c3e50]"
                 }`}
         >
-            <style>{keyframes}</style>
+            <style>{`
+                @keyframes ud-rise  { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+                @keyframes ud-fade  { from { opacity: 0 } to { opacity: 1 } }
+                @keyframes ud-pop   { from { opacity: 0; transform: translateY(16px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
+                @keyframes ud-sheet { from { opacity: 0; transform: translateY(100%) } to { opacity: 1; transform: translateY(0) } }
+                @keyframes ud-fill  { from { width: 0 } to { width: var(--ud-w) } }
+                @keyframes ud-sheen { 0% { transform: translateX(-120%) } 100% { transform: translateX(220%) } }
+                @keyframes ud-ping  { 0% { transform: scale(1); opacity: .6 } 80%,100% { transform: scale(2.4); opacity: 0 } }
+                .ud-rise  { animation: ud-rise .55s cubic-bezier(.22,1,.36,1) both }
+                .ud-fade  { animation: ud-fade .25s ease-out both }
+                .ud-pop   { animation: ud-pop .35s cubic-bezier(.22,1,.36,1) both }
+                .ud-fill  { animation: ud-fill 1s cubic-bezier(.22,1,.36,1) .35s both }
+                .ud-sheen { animation: ud-sheen 2.4s ease-in-out infinite }
+                .ud-ping  { animation: ud-ping 1.8s cubic-bezier(0,0,.2,1) infinite }
+                @media (max-width: 639px) { .ud-pop { animation-name: ud-sheet } }
+                .ud-root { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+                .ud-root h2, .ud-root h3 { overflow-wrap: anywhere; }
+
+                /* default button radius (low specificity so Tailwind radius classes can override it) */
+                :where(.ud-scope) button { border-radius: 10px; }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .ud-rise,.ud-fade,.ud-pop,.ud-fill,.ud-sheen,.ud-ping { animation: none !important }
+                }
+            `}</style>
 
             <UserSidebar userName={userName} onLogout={handleLogout} />
 
@@ -305,37 +266,21 @@ function UserDashboard() {
                             </div>
 
                             {/* ---------- Profile cards ---------- */}
-                            <section className="ud-rise mb-3 w-full grid grid-cols-1 gap-2 sm:grid-cols-3" style={delay(1)}>
-                                <ProfileCard
-                                    label="Account Status"
-                                    value="Active"
-                                    Icon={UserCheck}
-                                    gradient="from-emerald-500 to-teal-500"
-                                    live
-                                />
-                                <ProfileCard
-                                    label="Joined"
-                                    value="October 2023"
-                                    Icon={CalendarDays}
-                                    gradient="from-violet-500 to-indigo-500"
-                                />
-                                <ProfileCard
-                                    label="Last Activity"
-                                    value="5 mins ago"
-                                    Icon={Clock}
-                                    gradient="from-sky-500 to-blue-500"
-                                />
-                            </section>
+                            {/* <section className="ud-rise mb-3 w-full grid grid-cols-1 gap-2 sm:grid-cols-3" style={{ animationDelay: "70ms" }}>
+                                <ProfileCard label="Account Status" value="Active" Icon={UserCheck} healthy live />
+                                <ProfileCard label="Joined" value="October 2023" Icon={CalendarDays} />
+                                <ProfileCard label="Last Activity" value="5 mins ago" Icon={Clock} />
+                            </section> */}
 
                             {/* ---------- Search + filter pills ---------- */}
-                            <div className="ud-rise mb-3 flex flex-wrap items-center gap-2" style={delay(2)}>
+                            <div className="ud-rise mb-3 flex flex-wrap items-center gap-2" style={{ animationDelay: "140ms" }}>
                                 <label
-                                    className={`group flex h-10 w-full max-w-[340px] items-center gap-2 rounded-[10px] border px-3 transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 ${d ? "border-gray-700 bg-gray-800" : "border-slate-200 bg-white"
+                                    className={`group flex h-10 w-full !flex max-w-[340px] items-center gap-2 rounded-[10px] border px-3 transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 ${d ? "border-gray-700 bg-gray-800" : "border-slate-200 bg-white"
                                         }`}
                                 >
                                     <Search
                                         size={16}
-                                        className="shrink-0 text-slate-400 transition-colors group-focus-within:text-indigo-500"
+                                        className={`shrink-0 transition-colors group-focus-within:text-indigo-500 ${d ? "text-slate-400" : "text-slate-500"}`}
                                         aria-hidden="true"
                                     />
                                     <input
@@ -343,7 +288,7 @@ function UserDashboard() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search models..."
-                                        className={`min-w-0 flex-1 rounded-[10px] bg-transparent text-base outline-none placeholder:text-slate-400 sm:text-sm ${d ? "text-gray-100" : "text-slate-700"
+                                        className={`min-w-0 flex-1 !rounded-[10px] !border-0 !bg-transparent !p-0 !shadow-none text-base outline-none placeholder:text-slate-400 sm:text-sm ${d ? "text-gray-100" : "text-slate-700"
                                             }`}
                                     />
                                     {searchQuery && (
@@ -351,7 +296,10 @@ function UserDashboard() {
                                             type="button"
                                             onClick={() => setSearchQuery("")}
                                             aria-label="Clear search"
-                                            className="rounded-[10px] p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                                            className={`rounded-[10px] p-1 transition-colors ${d
+                                                ? "text-slate-400 hover:bg-gray-700 hover:text-slate-200"
+                                                : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                                                }`}
                                         >
                                             <X size={14} />
                                         </button>
@@ -368,11 +316,11 @@ function UserDashboard() {
                                                 role="tab"
                                                 aria-selected={on}
                                                 onClick={() => setActiveFilter(f)}
-                                                className={`rounded-[10px] border px-3 py-1.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-95 ${on
-                                                    ? "border-indigo-600 bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                                                className={`!rounded-[10px] border px-3 py-1.5 text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-95 ${on
+                                                    ? "!border-transparent !bg-gradient-to-br !from-violet-500 !to-indigo-500 !text-white shadow-md shadow-indigo-500/30"
                                                     : d
-                                                        ? "border-gray-700 bg-gray-800 text-gray-200 hover:-translate-y-0.5 hover:border-indigo-400/40"
-                                                        : "border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm"
+                                                        ? "!border-gray-700 !bg-gray-800 !text-gray-200 hover:-translate-y-0.5 hover:!border-indigo-400/40"
+                                                        : "!border-slate-200 !bg-white !text-slate-700 hover:-translate-y-0.5 hover:!border-indigo-200 hover:shadow-sm"
                                                     }`}
                                             >
                                                 {f}
@@ -382,15 +330,18 @@ function UserDashboard() {
                                 </div>
                             </div>
 
-                            {/* ---------- Cards (same design as Model Control) ---------- */}
+                            {/* ---------------------AI models heaidngs------ */}
+
+                            {/* ---------- Cards ---------- */}
                             {filteredModels.length > 0 ? (
                                 <div
                                     key={`${activeFilter}-${q}`}
-                                    className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                                    className="grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,340px),1fr))] gap-3 sm:gap-4"
                                 >
                                     {filteredModels.map((model, i) => {
                                         const isActive = model.status === "active";
                                         const ModelIcon = getModelIcon(model);
+                                        const modelColor = getModelColor(model);
                                         return (
                                             <div
                                                 key={model.id}
@@ -405,7 +356,7 @@ function UserDashboard() {
                                                         setSelectedModelId(model.id);
                                                     }
                                                 }}
-                                                style={delay(i + 3)}
+                                                style={{ animationDelay: `${(i + 3) * 70}ms` }}
                                                 className={`ud-rise ![gap:10px] group relative flex min-w-0 cursor-pointer flex-col rounded-[16px]! border p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === "disabled" ? "opacity-80" : ""
                                                     } ${surface}`}
                                             >
@@ -418,14 +369,17 @@ function UserDashboard() {
                                                 {/* top row: icon + title + status pill */}
                                                 <div className="mb-2 flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                                                     <div className="flex min-w-0 flex-1 basis-[180px] items-center gap-3 sm:gap-4">
-                                                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px]! bg-gradient-to-br text-2xl [color:rgb(19 27 46)] [background:white] [border:1px solid #131b2e] shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]">
+                                                        <span
+                                                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform duration-300 group-hover:scale-105 sm:h-[52px] sm:w-[52px]"
+                                                            style={{ color: modelColor, background: `${modelColor}1f` }}
+                                                        >
                                                             <ModelIcon size={24} strokeWidth={2} aria-hidden="true" />
                                                         </span>
                                                         <div className="min-w-0">
-                                                            <h3 className={`m-0 line-clamp-2 !text-base font-semibold leading-tight sm:!text-[18px] ${title}`}>
+                                                            <h3 className={`m-0 break-words !text-[20px] font-semibold leading-snug ${title}`}>
                                                                 {model.name}
                                                             </h3>
-                                                            <p className={`m-0 mt-1 truncate text-[13px] sm:text-sm ${d ? "text-slate-300" : "text-slate-500"}`}>
+                                                            <p className={`m-0 mt-1 break-words text-[13px] sm:text-sm ${d ? "text-slate-300" : "text-slate-500"}`}>
                                                                 v{model.version} · {getTypeLabel(model.type)}
                                                             </p>
                                                         </div>
@@ -465,7 +419,7 @@ function UserDashboard() {
                                                     disabled={!isActive}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        setSelectedModelId(model.id);
+                                                        openPlayground(model);
                                                     }}
                                                     onKeyDown={(e) => e.stopPropagation()}
                                                     className={`mt-auto inline-flex w-full items-center justify-center gap-1.5 !rounded-[14px] border px-3 py-2.5 text-center text-sm font-medium transition-all duration-200 active:scale-[.98] focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed sm:text-base ${isActive
@@ -499,7 +453,7 @@ function UserDashboard() {
                                 </div>
                             )}
 
-                            {/* ---------- Model Modal (same design as Model Control) ---------- */}
+                            {/* ---------- Model Modal ---------- */}
                             {selectedModel && (
                                 <div
                                     className="ud-fade fixed inset-0 z-[1000] flex items-end justify-center bg-slate-900/60 backdrop-blur-md sm:items-center sm:p-4"
@@ -678,7 +632,7 @@ function UserDashboard() {
                                                         ?.items.map((item, idx) => (
                                                             <li
                                                                 key={`${item}-${idx}`}
-                                                                style={delay(idx, 40)}
+                                                                style={{ animationDelay: `${idx * 40}ms` }}
                                                                 className={`ud-rise flex items-start gap-2.5 rounded-[12px] border p-3 text-[13px] leading-snug transition-all duration-200 ${d
                                                                     ? "border-white/5 bg-gray-800 text-slate-200 hover:border-indigo-400/30"
                                                                     : "border-slate-100 bg-slate-50 text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/60"

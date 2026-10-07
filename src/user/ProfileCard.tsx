@@ -7,6 +7,7 @@ interface ProfileCardProps {
     value: string;
     Icon: LucideIcon;
     gradient?: string;
+    healthy?: boolean;
     /** shows a green pulse dot next to the value (for status) */
     live?: boolean;
 }
@@ -15,10 +16,11 @@ function ProfileCard({
     label,
     value,
     Icon,
-    gradient = "from-violet-500 to-indigo-500",
+    healthy,
     live = false,
 }: ProfileCardProps) {
     const { isDarkMode: d } = useDashboardTheme();
+    const isHealthy = healthy ?? live;
 
     return (
         <div
@@ -30,10 +32,14 @@ function ProfileCard({
         >
             {/* Icon */}
             <span
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-lg text-white shadow-md transition-transform duration-300 group-hover:scale-105 sm:h-[50px] sm:w-[50px] sm:text-2xl ${gradient}`}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg transition-transform duration-300 group-hover:scale-105 sm:h-[50px] sm:w-[50px] sm:text-2xl ${
+                    isHealthy
+                        ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        : "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300"
+                }`}
             >
                 <Icon
-                    size={20}
+                    size={22}
                     strokeWidth={1.8}
                     aria-hidden="true"
                     className="sm:h-6 sm:w-6"

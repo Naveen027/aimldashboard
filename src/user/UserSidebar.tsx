@@ -3,14 +3,15 @@ import logoutImage from "../assets/logout.png";
 import dashboardImage from "../assets/dashboard.png";
 import myProfileImage from "../assets/myprofile.png";
 import apiKeyImage from "../assets/apikey.png";
-import billingImage from "../assets/billing.png";
 import supportImage from "../assets/support.png";
+import { FlaskConical, type LucideIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface NavItem {
   label: string;
-  icon: string;
+  icon?: string;
+  Icon?: LucideIcon;
   to: string;
   end?: boolean;
 }
@@ -26,7 +27,7 @@ const navItems: NavItem[] = [
   { label: "Dashboard", icon: dashboardImage, to: "/user-dashboard", end: true },
   { label: "My Profile", icon: myProfileImage, to: "/my-profile", end: true },
   { label: "API Keys", icon: apiKeyImage, to: "/api-keys" },
-  { label: "Billing", icon: billingImage, to: "/billing" },
+  { label: "Playground", Icon: FlaskConical, to: "/playground" },
   { label: "Support", icon: supportImage, to: "/support" },
 ];
 
@@ -468,7 +469,11 @@ function UserSidebar({
                     }`
                   }
                 >
-                  <img src={item.icon} alt="" aria-hidden="true" />
+                  {item.Icon ? (
+                    <item.Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  ) : (
+                    <img src={item.icon} alt="" aria-hidden="true" />
+                  )}
                   <span className={labelClass}>{item.label}</span>
                 </NavLink>
               </li>

@@ -22,6 +22,7 @@ const Systemlogs = lazy(() => import("./admin/Systemlogs"));
 const ApiKeys = lazy(() => import("./user/ApiKeys"));
 const Support = lazy(() => import("./user/Support"));
 const Billing = lazy(() => import("./user/Billing"));
+const Playground = lazy(() => import("./user/Playground"));
 
 function App() {
   const { isDarkMode } = useDashboardTheme();
@@ -47,6 +48,7 @@ function App() {
             <Route path="/api-keys" element={<ApiKeys />} />
             <Route path="/support" element={<Support />} />
             <Route path="/billing" element={<Billing />} />
+            <Route path="/playground" element={<Playground />} />
           </Route>
 
 
