@@ -53,6 +53,15 @@ const navItems: NavItem[] = [
 
 const MOBILE_QUERY = "(max-width: 767px)";
 const SWIPE_CLOSE_DISTANCE = 60; // px
+const COLLAPSED_STORAGE_KEY = "ain-user-sidebar-collapsed";
+
+const getInitialCollapsedState = () => {
+  try {
+    return localStorage.getItem(COLLAPSED_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
 
 const expandedWidth = `
   [width:260px]
@@ -72,12 +81,22 @@ function UserSidebar({
   onToggle: onToggleProp,
 }: UserSidebarProps) {
   // Controlled when the parent passes `collapsed`, otherwise self-managed
-  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(getInitialCollapsedState);
   const isControlled = collapsedProp !== undefined;
   const collapsed = isControlled ? collapsedProp : internalCollapsed;
 
   const onToggle = useCallback(() => {
-    if (!isControlled) setInternalCollapsed((prev) => !prev);
+    if (!isControlled) {
+      setInternalCollapsed((prev) => {
+        const next = !prev;
+        try {
+          localStorage.setItem(COLLAPSED_STORAGE_KEY, next ? "1" : "0");
+        } catch {
+          // Keep the in-memory toggle working if browser storage is unavailable.
+        }
+        return next;
+      });
+    }
     onToggleProp?.();
   }, [isControlled, onToggleProp]);
 
