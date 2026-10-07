@@ -25,15 +25,27 @@ import { useDashboardTheme } from "./ThemeToggle";
 // TODO: replace this with your real API call.
 // e.g. const form = new FormData(); files.forEach((f) => form.append("files", f));
 //      const res = await fetch(`/api/models/${modelId}/run`, { method: "POST", body: form });
-//      return res.json();
-const runModel = async (modelId: string, input: { text: string; files: File[] }) => {
+//      const data = await res.json();
+//      return data.result; // return a readable string (or format the response into text here)
+const runModel = async (
+    modelName: string,
+    input: { text: string; files: File[] }
+): Promise<string> => {
     await new Promise((r) => setTimeout(r, 1200));
-    return {
-        model: modelId,
-        status: "success",
-        input: input.files.length ? input.files.map((f) => f.name) : input.text,
-        result: "Replace this with the real model response",
-    };
+
+    const received = input.files.length
+        ? input.files.map((f) => f.name).join(", ")
+        : input.text.length > 120
+            ? `${input.text.slice(0, 120)}...`
+            : input.text;
+
+    return [
+        `API integration is pending for "${modelName}".`,
+        "",
+        "This is a placeholder response. Connect the real model API to get an accurate result.",
+        "",
+        `Input received: ${received}`,
+    ].join("\n");
 };
 
 function Playground() {
@@ -108,11 +120,11 @@ function Playground() {
         setOutput(null);
         const start = performance.now();
         try {
-            const res = await runModel(model.id, {
+            const res = await runModel(model.name, {
                 text,
                 files: files.slice(0, slots.length).filter(Boolean) as File[],
             });
-            setOutput(JSON.stringify(res, null, 2));
+            setOutput(res);
             setSeconds((performance.now() - start) / 1000);
         } catch {
             setError("Something went wrong. Please try again.");
@@ -155,9 +167,9 @@ function Playground() {
             <main className="min-h-screen min-w-0 flex-1 ml-[var(--user-sidebar-width,260px)] transition-[margin] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-[767px]:ml-0">
                 <UserHeader searchQuery={search} onSearchChange={setSearch} />
 
-                <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-4 p-[15px]">
+                <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-0  p-[15px]">
                     {/* ---------- heading ---------- */}
-                    <header className="pg-rise">
+                    <header className="pg-rise mb-2">
                         <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Playground</h2>
                         <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Pick a model, give it an input and see what it returns.</p>
                     </header>
@@ -311,7 +323,7 @@ function Playground() {
                                     {error}
                                 </p>
                             ) : output ? (
-                                <pre className={`pg-fade m-0 max-h-[460px] flex-1 overflow-auto rounded-xl border p-4 text-xs leading-relaxed ${inset}`}>
+                                <pre className={`pg-fade m-0 max-h-[460px] flex-1 overflow-auto whitespace-pre-wrap break-words rounded-xl border p-4 text-xs leading-relaxed ${inset}`}>
                                     {output}
                                 </pre>
                             ) : (
