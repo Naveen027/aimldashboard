@@ -1,10 +1,9 @@
 import seal from "../assets/Seal_of_Karnataka.svg";
-import logoutImage from "../assets/logout.png";
 import dashboardImage from "../assets/dashboard.png";
 import myProfileImage from "../assets/myprofile.png";
 import apiKeyImage from "../assets/apikey.png";
 import supportImage from "../assets/support.png";
-import { FlaskConical, type LucideIcon } from "lucide-react";
+import { FlaskConical, LogOut, type LucideIcon } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -198,9 +197,8 @@ function UserSidebar({
   };
 
   const easing = "[transition-timing-function:cubic-bezier(0.22,1,0.36,1)]";
-  const labelClass = `whitespace-nowrap transition-opacity duration-[450ms] ${easing} motion-reduce:transition-none ${
-    labelsHidden ? "opacity-0" : "opacity-100"
-  }`;
+  const labelClass = `whitespace-nowrap transition-opacity duration-[450ms] ${easing} motion-reduce:transition-none ${labelsHidden ? "opacity-0" : "opacity-100"
+    }`;
 
   const barBase = `absolute left-1/2 top-1/2 block h-[2px] w-5 -ml-2.5 -mt-px rounded-full bg-white transition-[transform,opacity] duration-[350ms] ${easing} motion-reduce:transition-none`;
 
@@ -234,35 +232,31 @@ function UserSidebar({
             motion-reduce:transition-none
             focus-visible:[outline:2px_solid_rgba(255,255,255,0.6)]
             focus-visible:[outline-offset:2px]
-            ${
-              mobileOpen
-                ? "[transform:translateX(calc(min(280px,85vw)_-_64px))] [box-shadow:none]"
-                : "[transform:translateX(0)]"
+            ${mobileOpen
+              ? "[transform:translateX(calc(min(280px,85vw)_-_64px))] [box-shadow:none]"
+              : "[transform:translateX(0)]"
             }`}
         >
           <span
             aria-hidden="true"
-            className={`${barBase} ${
-              mobileOpen
+            className={`${barBase} ${mobileOpen
                 ? "[transform:translateY(0)_rotate(45deg)]"
                 : "[transform:translateY(-6px)]"
-            }`}
+              }`}
           />
           <span
             aria-hidden="true"
-            className={`${barBase} ${
-              mobileOpen
+            className={`${barBase} ${mobileOpen
                 ? "opacity-0 [transform:scaleX(0)]"
                 : "opacity-100 [transform:scaleX(1)]"
-            }`}
+              }`}
           />
           <span
             aria-hidden="true"
-            className={`${barBase} ${
-              mobileOpen
+            className={`${barBase} ${mobileOpen
                 ? "[transform:translateY(0)_rotate(-45deg)]"
                 : "[transform:translateY(6px)]"
-            }`}
+              }`}
           />
         </button>
       )}
@@ -293,15 +287,13 @@ function UserSidebar({
         onTouchEnd={isMobile ? handleTouchEnd : undefined}
         className={`ain-sidebar [border-radius:0px_10px_10px_0px]!
       ${isMobile ? mobileWidth : collapsed ? collapsedWidth : expandedWidth}
-      ${
-        isMobile
-          ? `[height:100dvh] [z-index:50] ${
-              mobileOpen
-                ? "[transform:translateX(0)] [box-shadow:0_0_40px_rgba(0,0,0,0.45)]"
-                : "[transform:translateX(-100%)]"
+      ${isMobile
+            ? `[height:100dvh] [z-index:50] ${mobileOpen
+              ? "[transform:translateX(0)] [box-shadow:0_0_40px_rgba(0,0,0,0.45)]"
+              : "[transform:translateX(-100%)]"
             }`
-          : "[height:100vh]  [z-index:30]"
-      }
+            : "[height:100vh]  [z-index:30]"
+          }
       transition-[width,transform]
       duration-[450ms]
       ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -392,7 +384,7 @@ function UserSidebar({
       [&_.ain-footer-toggle]:[font-size:20px]
       [&_.ain-footer-toggle]:[line-height:1]
       [&_.ain-footer-toggle]:[cursor:pointer]
-      [&_.ain-footer-toggle]:[transform:translateX(26px)]
+      [&_.ain-footer-toggle]:[transform:translateX(25px)]
       [&_.ain-footer-toggle]:[transition:color_0.2s_ease,_background-color_0.2s_ease]
 
       [&_.ain-footer-toggle:hover]:[color:#fff]
@@ -401,11 +393,10 @@ function UserSidebar({
 
       [&_.ain-sidebar-footer]:[flex:0_0_auto]
       [&_.ain-sidebar-footer]:[margin-top:auto]
-      ${
-        isMobile
-          ? "[&_.ain-sidebar-footer]:[padding:12px_20px_calc(12px_+_env(safe-area-inset-bottom,_0px))]"
-          : "[&_.ain-sidebar-footer]:[padding:12px_20px]"
-      }
+      ${isMobile
+            ? "[&_.ain-sidebar-footer]:[padding:12px_20px_calc(12px_+_env(safe-area-inset-bottom,_0px))]"
+            : "[&_.ain-sidebar-footer]:[padding:12px_20px]"
+          }
       [&_.ain-sidebar-footer]:[border-top:1px_solid_rgba(255,_255,_255,_0.08)]
       [&_.ain-sidebar-footer]:[overflow:hidden]
       [&_.ain-footer-actions]:[width:100%]
@@ -417,6 +408,11 @@ function UserSidebar({
       [&_.ain-user-chip]:[margin-bottom:4px]
       [&_.ain-user-chip]:[min-width:0]
       [&_.ain-user-chip]:[justify-content:flex-start]
+      [&_.ain-avatar-sm]:[border-radius:50%]
+      [&_.ain-avatar-sm]:[background:rgba(255,_255,_255,_0.15)]
+      [&_.ain-avatar-sm]:[color:#fff]
+      [&_.ain-avatar-sm]:[font-size:0.85rem]
+      [&_.ain-avatar-sm]:[font-weight:600]
       [&_.ain-avatar-sm]:[flex:0_0_32px]
       [&_.ain-avatar-sm]:[width:32px]
       [&_.ain-avatar-sm]:[height:32px]
@@ -448,10 +444,9 @@ function UserSidebar({
       [&_.ain-logout-icon-container]:[width:32px]
       [&_.ain-logout-icon-container]:[height:32px]
       [&_.ain-logout-icon-container]:[flex:0_0_32px]
-      [&_.ain-logout-icon-container_img]:[width:18px]
-      [&_.ain-logout-icon-container_img]:[height:18px]
-      [&_.ain-logout-icon-container_img]:[flex:0_0_18px]
-      [&_.ain-logout-icon-container_img]:[object-fit:contain]
+      [&_.ain-logout-icon-container_svg]:[width:18px]
+      [&_.ain-logout-icon-container_svg]:[height:18px]
+      [&_.ain-logout-icon-container_svg]:[flex:0_0_18px]
       motion-reduce:[&_.ain-nav-link]:[transition:none]!`}
       >
         {/* Sidebar brand */}
@@ -483,8 +478,7 @@ function UserSidebar({
                   aria-label={item.label}
                   onClick={closeMobile}
                   className={({ isActive }) =>
-                    `nav-link ain-nav-link d-flex align-items-center ${
-                      isActive ? "active" : ""
+                    `nav-link ain-nav-link d-flex align-items-center ${isActive ? "active" : ""
                     }`
                   }
                 >
@@ -539,12 +533,7 @@ function UserSidebar({
               }}
             >
               <span className="ain-logout-icon-container">
-                <img
-                  src={logoutImage}
-                  alt=""
-                  aria-hidden="true"
-                  style={{ filter: "brightness(0) invert(1)" }}
-                />
+                <LogOut aria-hidden="true" />
               </span>
               <span
                 className={labelClass}

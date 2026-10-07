@@ -19,7 +19,7 @@ const SUPPORT_PHONE_DISPLAY = "1800-XXX-XXXX"; // toll-free number shown to user
 const SUPPORT_PHONE_TEL = "1800XXXXXXX"; // digits only, used for the tap-to-call link
 const SUPPORT_HOURS = "Mon – Sat, 10:00 AM – 6:00 PM IST";
 
-const categories = ["General question", "API keys", "Model or playground issue", "Billing and usage", "Feedback"];
+const categories = ["General question", "API keys", "Model or playground issue", "Token usage", "Feedback"];
 
 const faqs = [
     {

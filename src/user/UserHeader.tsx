@@ -6,40 +6,108 @@ interface UserHeaderProps {
     onSearchChange: (value: string) => void;
 }
 
+const headerStyles = `
+.ain-user-header {
+  --ain-hdr-border: rgba(15, 23, 42, 0.12);
+  --ain-hdr-border-hover: rgba(15, 23, 42, 0.22);
+  --ain-hdr-bg: #ffffff;
+  --ain-hdr-bg-hover: rgba(15, 23, 42, 0.05);
+  --ain-hdr-text: #0f172a;
+  --ain-hdr-muted: #64748b;
+  --ain-hdr-focus: #6366f1;
+  --ain-hdr-bar-border: #eef0f4;
+  --ain-hdr-bar-shadow: 0 1px 3px rgba(20, 30, 60, 0.08);
+
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  height: 54px;
+  padding: 8px 32px;
+  background: var(--ain-hdr-bg);
+  border-bottom: 1px solid var(--ain-hdr-bar-border);
+  box-shadow: var(--ain-hdr-bar-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:root[data-theme="dark"] .ain-user-header,
+:root[data-bs-theme="dark"] .ain-user-header,
+.ain-app.theme-dark .ain-user-header,
+.theme-dark .ain-user-header,
+.dark .ain-user-header,
+[data-theme="dark"] .ain-user-header {
+  --ain-hdr-border: rgba(255, 255, 255, 0.14);
+  --ain-hdr-border-hover: rgba(255, 255, 255, 0.28);
+  --ain-hdr-bg: #1f2937;
+  --ain-hdr-bg-hover: rgba(255, 255, 255, 0.08);
+  --ain-hdr-text: #f1f5f9;
+  --ain-hdr-muted: #94a3b8;
+  --ain-hdr-focus: #818cf8;
+  --ain-hdr-bar-border: #374151;
+  --ain-hdr-bar-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .ain-user-header {
+    padding: 8px 16px;
+  }
+}
+
+/* Icon buttons (notification + theme toggle wrapper) */
+.ain-user-header .ain-user-notification,
+.ain-user-header .ain-user-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 6px;
+  color: var(--ain-hdr-text);
+  background: transparent;
+  /* border: 1px solid transparent; */
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.ain-user-header .ain-user-notification svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ain-user-header .ain-user-notification:hover,
+.ain-user-header .ain-user-theme-toggle:hover,
+.ain-user-header .ain-user-notification:focus-visible,
+.ain-user-header .ain-user-theme-toggle:focus-within {
+  background: var(--ain-hdr-bg-hover);
+  border-color: var(--ain-hdr-border-hover);
+}
+
+.ain-user-header .ain-user-notification:focus-visible {
+  outline: 2px solid var(--ain-hdr-focus);
+  outline-offset: 2px;
+}
+`;
+
 function UserHeader(_props: UserHeaderProps) {
     return (
-        <header className="sticky top-0 z-20 flex h-[54px] items-center justify-end gap-0 border-b border-[#eef0f4] bg-white px-8 py-2 shadow-[0_1px_3px_rgba(20,30,60,0.08)] transition-colors duration-300 max-[768px]:gap-3 max-[768px]:px-4 [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#1f2937] [.theme-dark_&]:shadow-[0_1px_3px_rgba(0,0,0,0.35)]">
+        <header className="ain-user-header">
+            <style>{headerStyles}</style>
+
             <button
                 type="button"
-                className="inline-flex cursor-pointer mr-1.5 items-center justify-center rounded bg-transparent p-0 text-[#2c3e50] transition-colors duration-300 hover:bg-[#f5f6fa] [.theme-dark_&]:text-[#f3f4f6] [.theme-dark_&]:hover:bg-[#111827]"
+                className="ain-user-notification"
                 aria-label="Notifications"
             >
                 <Bell strokeWidth={1.5} aria-hidden="true" />
             </button>
-            {/* <div className="relative ml-5 w-full max-w-[300px] max-[768px]:ml-0 max-[768px]:max-w-full">
-                <label
-                    htmlFor="search-input"
-                    className="sr-only"
-                >
-                    Search
-                </label>
-                <Search
-                    className="pointer-events-none absolute left-3 top-1/2 z-[3] h-[18px] w-[18px] -translate-y-1/2 text-[#5f6b7a] [.theme-dark_&]:text-[#c1c8d3]"
-                    size={18}
-                    aria-hidden="true"
-                />
-                <input
-                    id="search-input"
-                    type="search"
-                    className="w-full rounded-md border border-[#e0e6ed] bg-[#f5f6fa] py-2 pl-[42px] pr-3 text-sm text-[#2c3e50] transition-all duration-300 placeholder:text-[#5f6b7a] placeholder:opacity-100 focus:border-[#1ba098] focus:bg-white focus:outline-none focus:shadow-[0_0_0_3px_rgba(27,160,152,0.1)] max-[576px]:px-2.5 max-[576px]:py-1.5 max-[576px]:pl-[42px] max-[576px]:text-xs [.theme-dark_&]:border-[#374151] [.theme-dark_&]:bg-[#111827] [.theme-dark_&]:text-[#f3f4f6] [.theme-dark_&]:placeholder:text-[#d1d5db] [.theme-dark_&]:focus:bg-[#111827]"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(event) =>
-                        onSearchChange(event.target.value)
-                    }
-                />
-            </div> */}
-            <GlobalThemeToggle />
+
+            <div className="ain-user-theme-toggle">
+                <GlobalThemeToggle />
+            </div>
         </header>
     );
 }

@@ -20,7 +20,6 @@ const navItems: NavItem[] = [
   { label: "Dashboard", icon: "bi-grid-1x2-fill", to: "/admin-dashboard" },
   { label: "User Management", icon: "bi-person", to: "/admin/user-management" },
   { label: "AI Products", icon: "bi-gear", to: "/admin/model-control" },
-  // { label: "Billing Admin", icon: "bi-receipt", to: "/admin/billing" },
   { label: "Global Settings", icon: "bi-sliders", to: "/admin/global-settings" },
   { label: "System Logs", icon: "bi-file-earmark-text", to: "/admin/system-logs" },
 ];
@@ -94,45 +93,42 @@ function AdminSidebar({
       ? window.matchMedia(MOBILE_QUERY).matches
       : false
   );
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [openPath, setOpenPath] = useState<string | null>(null);
 
-  const closeMobile = useCallback(() => setMobileOpen(false), []);
-  const toggleMobile = useCallback(() => setMobileOpen((prev) => !prev), []);
+  const closeMobile = useCallback(() => setOpenPath(null), []);
+  const toggleMobile = useCallback(
+    () => setOpenPath((current) => current === location.pathname ? null : location.pathname),
+    [location.pathname]
+  );
 
   // Labels are always visible in the mobile drawer; the desktop collapse
   // state only applies on >= 768px.
   const labelsHidden = collapsed && !isMobile;
-  const drawerOpen = isMobile && mobileOpen;
+  const drawerOpen = isMobile && openPath === location.pathname;
 
   /* Track viewport; close drawer when leaving the mobile breakpoint */
   useEffect(() => {
     const mq = window.matchMedia(MOBILE_QUERY);
     const handleChange = (event: MediaQueryListEvent) => {
       setIsMobile(event.matches);
-      if (!event.matches) setMobileOpen(false);
+      if (!event.matches) closeMobile();
     };
-    setIsMobile(mq.matches);
     mq.addEventListener("change", handleChange);
     return () => mq.removeEventListener("change", handleChange);
-  }, []);
-
-  /* Close on route change */
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
+  }, [closeMobile]);
 
   /* Close on Escape + return focus to the toggle button */
   useEffect(() => {
     if (!drawerOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setMobileOpen(false);
+        closeMobile();
         menuButtonRef.current?.focus();
       }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [drawerOpen]);
+  }, [closeMobile, drawerOpen]);
 
   /* Lock page scroll while the drawer is open */
   useEffect(() => {
@@ -148,8 +144,8 @@ function AdminSidebar({
   useEffect(() => {
     const el = asideRef.current as (HTMLElement & { inert?: boolean }) | null;
     if (!el) return;
-    el.inert = isMobile && !mobileOpen;
-  }, [isMobile, mobileOpen]);
+    el.inert = isMobile && !drawerOpen;
+  }, [isMobile, drawerOpen]);
 
   /* Swipe-left to close */
   const handleTouchStart = (event: React.TouchEvent<HTMLElement>) => {
@@ -177,8 +173,8 @@ function AdminSidebar({
           ref={menuButtonRef}
           type="button"
           onClick={toggleMobile}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
+          aria-label={drawerOpen ? "Close menu" : "Open menu"}
+          aria-expanded={drawerOpen}
           aria-controls="admin-sidebar"
           className={`
             [position:fixed]
@@ -200,7 +196,7 @@ function AdminSidebar({
             focus-visible:[outline:2px_solid_rgba(255,255,255,0.6)]
             focus-visible:[outline-offset:2px]
             ${
-              mobileOpen
+              drawerOpen
                 ? "[transform:translateX(calc(min(280px,85vw)_-_64px))] [box-shadow:none]"
                 : "[transform:translateX(0)]"
             }`}
@@ -208,7 +204,7 @@ function AdminSidebar({
           <span
             aria-hidden="true"
             className={`${barBase} ${
-              mobileOpen
+              drawerOpen
                 ? "[transform:translateY(0)_rotate(45deg)]"
                 : "[transform:translateY(-6px)]"
             }`}
@@ -216,7 +212,7 @@ function AdminSidebar({
           <span
             aria-hidden="true"
             className={`${barBase} ${
-              mobileOpen
+              drawerOpen
                 ? "opacity-0 [transform:scaleX(0)]"
                 : "opacity-100 [transform:scaleX(1)]"
             }`}
@@ -224,7 +220,7 @@ function AdminSidebar({
           <span
             aria-hidden="true"
             className={`${barBase} ${
-              mobileOpen
+              drawerOpen
                 ? "[transform:translateY(0)_rotate(-45deg)]"
                 : "[transform:translateY(6px)]"
             }`}
@@ -247,7 +243,7 @@ function AdminSidebar({
             duration-[450ms]
             ${easing}
             motion-reduce:transition-none
-            ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+            ${drawerOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         />
       )}
 
@@ -261,7 +257,7 @@ function AdminSidebar({
       ${
         isMobile
           ? `[height:100dvh] [z-index:50] ${
-              mobileOpen
+              drawerOpen
                 ? "[transform:translateX(0)] [box-shadow:0_0_40px_rgba(0,0,0,0.45)]"
                 : "[transform:translateX(-100%)]"
             }`
@@ -369,7 +365,7 @@ function AdminSidebar({
       [&_.ain-footer-toggle]:[font-size:20px]
       [&_.ain-footer-toggle]:[line-height:1]
       [&_.ain-footer-toggle]:[cursor:pointer]
-      [&_.ain-footer-toggle]:[transform:translateX(26px)]
+      [&_.ain-footer-toggle]:[transform:translateX(25px)]
       [&_.ain-footer-toggle]:[transition:color_0.2s_ease,_background-color_0.2s_ease]
 
       [&_.ain-footer-toggle:hover]:[color:#fff]
