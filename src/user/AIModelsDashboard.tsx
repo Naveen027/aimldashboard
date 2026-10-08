@@ -218,7 +218,7 @@ export default function AIModelsDashboard() {
     const track = d ? "bg-gray-700" : "bg-slate-100";
     const segmentedWrap = `flex max-w-full overflow-x-auto rounded-lg p-0.5 ${d ? "bg-gray-700" : "bg-slate-100"}`;
     const segmentBtn = (on: boolean) =>
-        `shrink-0 whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
+        `shrink-0 whitespace-nowrap [border-radius:10px]! px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
             on
                 ? "bg-gradient-to-br from-violet-500 to-indigo-500 text-white shadow"
                 : d
