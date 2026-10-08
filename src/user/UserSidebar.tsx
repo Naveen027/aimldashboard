@@ -409,7 +409,7 @@ function UserSidebar({
       [&_.ain-user-chip]:[min-width:0]
       [&_.ain-user-chip]:[justify-content:flex-start]
       [&_.ain-avatar-sm]:[border-radius:50%]
-      [&_.ain-avatar-sm]:[background:rgba(255,_255,_255,_0.15)]
+      [&_.ain-avatar-sm]:[background:#13407d]
       [&_.ain-avatar-sm]:[color:#fff]
       [&_.ain-avatar-sm]:[font-size:0.85rem]
       [&_.ain-avatar-sm]:[font-weight:600]
