@@ -50,7 +50,7 @@ function ProfileCard({
             <div className="min-w-0 flex-1">
                 <div
                     className={`truncate text-xs sm:text-[15px] ${
-                        d ? "text-slate-400" : "text-slate-500"
+                        d                         ? "text-[#c1c8d3]" : "text-slate-500"
                     }`}
                 >
                     {label}
@@ -66,7 +66,7 @@ function ProfileCard({
 
                     <span
                         className={`truncate text-lg font-bold leading-tight sm:text-2xl lg:text-[25px] ${
-                            d ? "text-white" : "text-slate-900"
+                            d ? "text-[#f3f4f6]" : "text-slate-900"
                         }`}
                     >
                         {value}

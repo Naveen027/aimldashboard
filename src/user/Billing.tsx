@@ -98,7 +98,7 @@ function Billing() {
                             </p>
                         </div>
                         <button
-                            className="btn btn-outline-primary"
+                            className={`btn btn-outline-primary ${isDarkMode ? "!border-[#374151] !bg-[#1f2937] !text-[#c1c8d3] hover:!border-[#4b5563] hover:!bg-[#273449]" : ""}`}
                             type="button"
                             onClick={downloadStatement}
                         >
@@ -123,7 +123,7 @@ function Billing() {
                                             <span className={`text-secondary ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}> / month</span>
                                         </div>
                                     </div>
-                                    <hr className={isDarkMode ? "border-[#4b5563] opacity-100" : ""} />
+                                    <hr className={isDarkMode ? "border-[#374151] opacity-100" : ""} />
                                     <div className="d-flex justify-content-between small mb-2">
                                         <span>Monthly model usage</span>
                                         <strong>72 / 100 requests</strong>
@@ -133,7 +133,7 @@ function Billing() {
                                     </div>
                                     <div className="d-flex justify-content-between mt-3">
                                         <small className={`text-secondary ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}>Renews on October 1, 2026</small>
-                                        <button className="btn btn-sm btn-outline-danger" type="button">
+                                        <button className={`btn btn-sm btn-outline-danger ${isDarkMode ? "!border-red-400 !text-red-300 hover:!bg-red-500/10" : ""}`} type="button">
                                             Cancel plan
                                         </button>
                                     </div>
@@ -149,7 +149,7 @@ function Billing() {
                                     </div>
                                     <p className="mb-1">•••• •••• •••• 4242</p>
                                     <p className={`small text-secondary mb-4 ${isDarkMode ? "!text-[#c1c8d3]" : ""}`}>Expires 08/28</p>
-                                    <button className="btn btn-sm btn-outline-secondary" type="button">
+                                    <button className={`btn btn-sm btn-outline-secondary ${isDarkMode ? "!border-[#374151] !text-[#c1c8d3] hover:!border-[#4b5563] hover:!bg-[#273449]" : ""}`} type="button">
                                         Update payment method
                                     </button>
                                 </div>
@@ -171,7 +171,7 @@ function Billing() {
                                             <th className={isDarkMode ? "!text-[#c1c8d3] !bg-transparent !border-b-[#374151]" : "text-[0.78rem] font-semibold uppercase text-[#667085]"} scope="col">Invoice</th>
                                             <th className={isDarkMode ? "!text-[#c1c8d3] !bg-transparent !border-b-[#374151]" : "text-[0.78rem] font-semibold uppercase text-[#667085]"} scope="col">Amount</th>
                                             <th className={isDarkMode ? "!text-[#c1c8d3] !bg-transparent !border-b-[#374151]" : "text-[0.78rem] font-semibold uppercase text-[#667085]"} scope="col">Status</th>
-                                            <th scope="col" className="text-end">Receipt</th>
+                                            <th scope="col" className={`text-end ${isDarkMode ? "!text-[#c1c8d3] !bg-transparent !border-b-[#374151]" : ""}`}>Receipt</th>
                                         </tr>
                                     </thead>
                                     <tbody>

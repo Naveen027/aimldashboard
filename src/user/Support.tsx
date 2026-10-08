@@ -78,8 +78,8 @@ function Support() {
     };
 
     /* ---------- theme classes ---------- */
-    const title = d ? "text-white" : "text-slate-900";
-    const muted = d ? "text-slate-400" : "text-slate-500";
+    const title = d ? "text-[#f3f4f6]" : "text-slate-900";
+    const muted = d ? "text-[#c1c8d3]" : "text-slate-500";
     const card = d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700";
     const inset = d ? "border-gray-700 bg-gray-900/60" : "border-slate-200 bg-slate-50";
     const field = `w-full min-w-0 rounded-[10px] border px-3 py-2.5 text-base outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 sm:text-sm ${d
@@ -145,7 +145,7 @@ function Support() {
                 <div className="sp-root mx-auto flex w-full min-w-0 max-w-[1520px] flex-col gap-3 p-3 sm:p-[15px]">
                     {/* ---------- heading ---------- */}
                     <div className="sp-rise min-w-0">
-                        <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Support center</h2>
+                        <h2 className={`m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight ${title}`}>Support center</h2>
                         <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">We are here to help</p>
                     </div>
 

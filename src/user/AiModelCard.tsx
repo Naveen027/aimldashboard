@@ -58,7 +58,7 @@ function AiModelCard({ model }: AiModelCardProps) {
                 <div className="mb-0">
                     <p className="m-0 flex items-center gap-2 text-[13px] text-[#5f6b7a] [.theme-dark_&]:text-[#c1c8d3]">
                         Status:{" "}
-                        <span className="inline-block rounded bg-[#e8f5f3] px-2 py-0.5 text-[11px] font-semibold capitalize text-[#1ba098]">
+                        <span className="inline-block rounded bg-[#e8f5f3] px-2 py-0.5 text-[11px] font-semibold capitalize text-[#1ba098] [.theme-dark_&]:bg-emerald-500/15 [.theme-dark_&]:text-emerald-300">
                             Available
                         </span>
                     </p>

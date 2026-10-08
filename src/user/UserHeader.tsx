@@ -39,12 +39,12 @@ const headerStyles = `
 .theme-dark .ain-user-header,
 .dark .ain-user-header,
 [data-theme="dark"] .ain-user-header {
-  --ain-hdr-border: rgba(255, 255, 255, 0.14);
-  --ain-hdr-border-hover: rgba(255, 255, 255, 0.28);
+  --ain-hdr-border: #374151;
+  --ain-hdr-border-hover: #4b5563;
   --ain-hdr-bg: #1f2937;
   --ain-hdr-bg-hover: rgba(255, 255, 255, 0.08);
-  --ain-hdr-text: #f1f5f9;
-  --ain-hdr-muted: #94a3b8;
+  --ain-hdr-text: #f3f4f6;
+  --ain-hdr-muted: #c1c8d3;
   --ain-hdr-focus: #818cf8;
   --ain-hdr-bar-border: #374151;
   --ain-hdr-bar-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);

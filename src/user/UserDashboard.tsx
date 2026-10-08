@@ -194,10 +194,10 @@ function UserDashboard() {
     };
 
     /* ---------- theme classes ---------- */
-    const title = d ? "text-white" : "text-slate-900";
-    const faint = d ? "text-slate-400" : "text-slate-500";
+    const title = d ? "text-[#f3f4f6]" : "text-slate-900";
+    const faint = d ? "text-[#c1c8d3]" : "text-slate-500";
     const surface = d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700";
-    const tileModal = d ? "bg-gray-800 ring-white/5" : "bg-slate-50 ring-slate-100";
+    const tileModal = d ? "bg-gray-800 ring-gray-700" : "bg-slate-50 ring-slate-100";
 
     const cardStatus = {
         active: d ? "bg-emerald-500/15 text-emerald-300" : "bg-emerald-50 text-emerald-700",
@@ -257,7 +257,7 @@ function UserDashboard() {
                         <div className="mx-auto w-full max-w-[1520px]">
                             {/* ---------- Heading ---------- */}
                             <div className="min-w-0 mb-2">
-                                <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">Hi, {userName}!</h2>
+                                <h2 className={`m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight ${title}`}>Hi, {userName}!</h2>
                                 <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Pick a model and try it in the playground.</p>
                             </div>
 
@@ -276,7 +276,7 @@ function UserDashboard() {
                                 >
                                     <Search
                                         size={16}
-                                        className={`shrink-0 transition-colors group-focus-within:text-indigo-500 ${d ? "text-slate-400" : "text-slate-500"}`}
+                                        className={`shrink-0 transition-colors group-focus-within:text-indigo-500 ${d ? "text-[#c1c8d3]" : "text-slate-500"}`}
                                         aria-hidden="true"
                                     />
                                     <input
@@ -460,7 +460,7 @@ function UserDashboard() {
                                         aria-modal="true"
                                         aria-label={selectedModel.name}
                                         onClick={(e) => e.stopPropagation()}
-                                        className={`ud-pop relative flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-t-3xl shadow-2xl ring-1 sm:max-h-[90dvh] sm:rounded-3xl ${d ? "bg-gray-900 text-gray-100 ring-white/10" : "bg-white text-slate-700 ring-black/5"
+                                        className={`ud-pop relative flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-t-3xl shadow-2xl ring-1 sm:max-h-[90dvh] sm:rounded-3xl ${d ? "bg-gray-900 text-gray-100 ring-gray-700" : "bg-white text-slate-700 ring-black/5"
                                             }`}
                                     >
                                         {/* close */}
@@ -468,7 +468,7 @@ function UserDashboard() {
                                             type="button"
                                             onClick={() => setSelectedModelId(null)}
                                             aria-label="Close model details"
-                                            className="group absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center bg-white/20 text-white backdrop-blur transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-95 motion-reduce:hover:rotate-0 sm:h-8 sm:w-8"
+                                            className="group absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center bg-white/20 text-white backdrop-blur transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 active:scale-95 motion-reduce:hover:rotate-0 sm:h-8 sm:w-8"
                                         >
                                             <X size={16} aria-hidden="true" />
                                         </button>
@@ -479,7 +479,7 @@ function UserDashboard() {
                                             <span className="pointer-events-none absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-white/10" />
 
                                             <div className="relative flex items-center gap-3 pr-11">
-                                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-white/30 backdrop-blur sm:h-12 sm:w-12">
+                                                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white ring-1 ring-indigo-200/50 backdrop-blur sm:h-12 sm:w-12">
                                                     <SelectedIcon size={24} strokeWidth={2} aria-hidden="true" />
                                                 </span>
                                                 <div className="min-w-0">
@@ -493,10 +493,10 @@ function UserDashboard() {
                                             </div>
 
                                             <div className="relative mt-3 flex flex-wrap items-center gap-2">
-                                                <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase text-white ring-1 ring-white/25">
+                                                <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold uppercase text-white ring-1 ring-indigo-200/40">
                                                     {getTypeLabel(selectedModel.type)}
                                                 </span>
-                                                <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/25">
+                                                <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-indigo-200/40">
                                                     v{selectedModel.version}
                                                 </span>
                                                 <span
@@ -570,7 +570,7 @@ function UserDashboard() {
                                                     {/* metrics */}
                                                     <div className="grid grid-cols-1 gap-2.5 min-[360px]:grid-cols-2 sm:gap-3">
                                                         <div className={`min-w-0 rounded-[12px] p-3 ring-1 ${tileModal}`}>
-                                                            <div className="text-[11px] uppercase tracking-wide text-slate-400">Usage</div>
+                                                            <div className={`text-[11px] uppercase tracking-wide ${faint}`}>Usage</div>
                                                             <div className={`text-lg font-bold sm:text-xl ${title}`}>
                                                                 {selectedModel.usagePercentage.toFixed(1)}%
                                                             </div>
@@ -594,7 +594,7 @@ function UserDashboard() {
                                                             { label: "Latency", value: `${selectedModel.latency} ms` },
                                                         ].map((m) => (
                                                             <div key={m.label} className={`min-w-0 rounded-[12px] p-3 ring-1 ${tileModal}`}>
-                                                                <div className="text-[11px] uppercase tracking-wide text-slate-400">{m.label}</div>
+                                                                <div className={`text-[11px] uppercase tracking-wide ${faint}`}>{m.label}</div>
                                                                 <div className={`truncate text-lg font-bold sm:text-xl ${title}`}>{m.value}</div>
                                                             </div>
                                                         ))}
@@ -617,7 +617,7 @@ function UserDashboard() {
                                                         </div>
                                                     )}
 
-                                                    <div className="text-center text-[11px] text-slate-400">
+                                                    <div className={`text-center text-[11px] ${faint}`}>
                                                         Last Updated: {selectedModel.lastUpdated}
                                                     </div>
                                                 </div>
@@ -630,7 +630,7 @@ function UserDashboard() {
                                                                 key={`${item}-${idx}`}
                                                                 style={{ animationDelay: `${idx * 40}ms` }}
                                                                 className={`ud-rise flex items-start gap-2.5 rounded-[12px] border p-3 text-[13px] leading-snug transition-all duration-200 ${d
-                                                                    ? "border-white/5 bg-gray-800 text-slate-200 hover:border-indigo-400/30"
+                                                                    ? "border-gray-700 bg-gray-800 text-slate-200 hover:border-indigo-400/30"
                                                                     : "border-slate-100 bg-slate-50 text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/60"
                                                                     }`}
                                                             >

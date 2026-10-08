@@ -204,8 +204,14 @@ export default function AIModelsDashboard() {
     const visible = filtered.slice((safePage - 1) * 4, safePage * 4);
 
     /* ---------- theme classes ---------- */
-    const muted = d ? "text-slate-400" : "text-slate-500";
-    const heading = d ? "text-white" : "text-slate-900";
+    const muted = d ? "text-[#c1c8d3]" : "text-slate-500";
+    const heading = d ? "text-[#f3f4f6]" : "text-slate-900";
+
+    // Every border in the dashboard gets an explicit colour so nothing falls back
+    // to the default (white / currentColor) border colour in dark mode.
+    const border = d ? "border-gray-700" : "border-slate-200";
+    const borderSoft = d ? "border-gray-700" : "border-slate-100";
+
     const panel = `w-full min-w-0 rounded-xl border p-3 sm:p-[15px] ${
         d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700"
     }`;
@@ -243,7 +249,7 @@ export default function AIModelsDashboard() {
                         <span className="mb-1 inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600">
                             <Radio size={14} aria-hidden="true" /> Model usage
                         </span>
-                        <h1 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">AI model activity</h1>
+                        <h1 className={`m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight ${heading}`}>My activity</h1>
                         <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Usage across your connected models, updated in real time.</p>
                     </div>
                     <div
@@ -295,7 +301,7 @@ export default function AIModelsDashboard() {
                 >
                     {/* time allocation (bar chart) */}
                     <section className={panel}>
-                        <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <header className={`mb-3 flex flex-wrap items-center justify-between gap-2 border-b ${border}`}>
                             <div className="min-w-0">
                                 <h2 className={`text-sm font-semibold sm:text-base ${heading}`}>Time allocation</h2>
                                 <p className={`text-xs ${muted}`}>{metricLabel} per model · click a bar to filter the registry</p>
@@ -320,7 +326,7 @@ export default function AIModelsDashboard() {
                                             onClick={() => setSelected(isSelected ? "All" : s.id)}
                                             aria-label={`Filter table by ${s.name}`}
                                             aria-pressed={isSelected}
-                                            className={`group block w-full min-w-0 rounded-lg p-2 text-left transition-all duration-300 ${
+                                            className={`group block w-full min-w-0 rounded-lg border-0 p-2 text-left transition-all duration-300 ${
                                                 isSelected
                                                     ? "bg-indigo-500/10 ring-1 ring-indigo-500/40"
                                                     : d
@@ -362,7 +368,7 @@ export default function AIModelsDashboard() {
                         </ul>
 
                         {/* summary strip */}
-                        <div className={`mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-center ${d ? "border-gray-700" : "border-slate-100"}`}>
+                        <div className={`mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-center ${borderSoft}`}>
                             {[
                                 { label: "Total", value: `${barTotal.toLocaleString(undefined, { maximumFractionDigits: 1 })}${unit}` },
                                 { label: "Average", value: `${barAverage.toLocaleString(undefined, { maximumFractionDigits: 1 })}${unit}` },
@@ -452,20 +458,20 @@ export default function AIModelsDashboard() {
                 {/* ---------- model registry ---------- */}
                 <div className="dash-in w-full min-w-0" style={{ animationDelay: "240ms" }}>
                     <section className={panel}>
-                        <header className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <header className={`mb-3 flex flex-wrap items-center justify-between gap-2 border-b ${border}`}>
                             <div className="min-w-0">
                                 <h2 className={`text-sm font-semibold sm:text-base ${heading}`}>Model registry</h2>
                                 <p className={`text-xs ${muted}`}>Open a row for full details</p>
                             </div>
-                            <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
-                                <label className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-lg border px-2 py-1 text-xs sm:max-w-[220px] ${d ? "border-gray-700 bg-gray-900" : "border-slate-200 bg-slate-50"}`}>
+                            <div className="flex  min-w-0 max-w-full flex-wrap items-center gap-2">
+                                <label className={`flex [display:inline-flex]! h-9 min-w-0 flex-1 items-center gap-1.5 rounded-lg border px-2 py-1 text-xs sm:max-w-[220px] ${d ? "border-gray-700 bg-gray-900 text-gray-100" : "border-slate-200 bg-slate-50 text-slate-700"}`}>
                                     <Search size={13} aria-hidden="true" className="shrink-0" />
                                     <input
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
                                         placeholder="Search"
                                         aria-label="Search models"
-                                        className="w-full min-w-0 bg-transparent outline-none"
+                                        className={`w-full min-w-0 border-0 bg-transparent outline-none ${d ? "placeholder:text-slate-400" : "placeholder:text-slate-400"}`}
                                     />
                                 </label>
                                 <div className={segmentedWrap}>
@@ -607,11 +613,11 @@ export default function AIModelsDashboard() {
                         {/* ----- table layout (when the dashboard is wide enough) ----- */}
                         {showTable && (
                             <div className="w-full overflow-x-auto">
-                                <table className="w-full min-w-[760px] text-sm">
-                                    <thead className={muted}>
-                                        <tr>
+                                <table className={`w-full min-w-[760px] border-collapse text-sm ${border}`}>
+                                    <thead className={`${muted} ${border}`}>
+                                        <tr className={border}>
                                             {columns.map(([key, label]) => (
-                                                <th key={key} className="whitespace-nowrap px-2 py-2 text-left font-medium">
+                                                <th key={key} className={`whitespace-nowrap px-2 py-2 text-left font-medium ${border}`}>
                                                     <button
                                                         type="button"
                                                         onClick={() =>
@@ -624,14 +630,14 @@ export default function AIModelsDashboard() {
                                                     </button>
                                                 </th>
                                             ))}
-                                            <th className="px-2 py-2 text-left font-medium">Status</th>
+                                            <th className={`px-2 py-2 text-left font-medium ${border}`}>Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className={border}>
                                         {visible.map((s) => (
                                             <React.Fragment key={s.id}>
                                                 <tr className={`row-in border-t transition-colors ${d ? "border-gray-700 hover:bg-gray-700/40" : "border-slate-100 hover:bg-slate-50"}`}>
-                                                    <td className={`px-2 py-2.5 font-medium ${heading}`}>
+                                                    <td className={`px-2 py-2.5 font-medium ${border} ${heading}`}>
                                                         <span className="flex items-center gap-2">
                                                             <span style={{ color: s.color }}>
                                                                 <s.Icon size={16} aria-hidden="true" />
@@ -639,8 +645,8 @@ export default function AIModelsDashboard() {
                                                             {s.name}
                                                         </span>
                                                     </td>
-                                                    <td className="px-2 py-2.5">{s.category}</td>
-                                                    <td className="px-2 py-2.5">
+                                                    <td className={`px-2 py-2.5 ${border}`}>{s.category}</td>
+                                                    <td className={`px-2 py-2.5 ${border}`}>
                                                         <div>{s.totalTokens.toLocaleString()}K</div>
                                                         <div className={`mt-1 h-1 w-16 overflow-hidden rounded-full ${track}`}>
                                                             <div
@@ -649,11 +655,11 @@ export default function AIModelsDashboard() {
                                                             />
                                                         </div>
                                                     </td>
-                                                    <td className="px-2 py-2.5">{s.timeSpentHours}h</td>
-                                                    <td className="px-2 py-2.5">{s.daysActive}/30</td>
-                                                    <td className="px-2 py-2.5">{s.requests.toLocaleString()}</td>
-                                                    <td className="px-2 py-2.5">{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
-                                                    <td className="px-2 py-2.5">
+                                                    <td className={`px-2 py-2.5 ${border}`}>{s.timeSpentHours}h</td>
+                                                    <td className={`px-2 py-2.5 ${border}`}>{s.daysActive}/30</td>
+                                                    <td className={`px-2 py-2.5 ${border}`}>{s.requests.toLocaleString()}</td>
+                                                    <td className={`px-2 py-2.5 ${border}`}>{s.lastUsedDaysAgo === 0 ? "Today" : `${s.lastUsedDaysAgo}d ago`}</td>
+                                                    <td className={`px-2 py-2.5 ${border}`}>
                                                         {s.id === top.id ? (
                                                             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${mostUsedBadge}`}>
                                                                 <Zap size={11} aria-hidden="true" /> Most used
@@ -664,8 +670,8 @@ export default function AIModelsDashboard() {
                                                     </td>
                                                 </tr>
                                                 {open === s.id && (
-                                                    <tr className={d ? "bg-gray-900/40" : "bg-slate-50"}>
-                                                        <td colSpan={8} className="row-in px-3 py-2.5">
+                                                    <tr className={`${border} ${d ? "bg-gray-900/40" : "bg-slate-50"}`}>
+                                                        <td colSpan={8} className={`row-in px-3 py-2.5 ${border}`}>
                                                             <div className={`flex flex-wrap items-center gap-2 text-xs ${d ? "text-slate-300" : "text-slate-600"}`}>
                                                                 <span className="inline-flex items-center gap-1.5">
                                                                     <Clock size={13} aria-hidden="true" />
@@ -683,8 +689,8 @@ export default function AIModelsDashboard() {
                                             </React.Fragment>
                                         ))}
                                         {visible.length === 0 && (
-                                            <tr>
-                                                <td colSpan={8} className={`px-2 py-8 text-center text-sm ${muted}`}>
+                                            <tr className={border}>
+                                                <td colSpan={8} className={`px-2 py-8 text-center text-sm ${border} ${muted}`}>
                                                     No models match. Clear the search or filters to see all models.
                                                 </td>
                                             </tr>
@@ -694,7 +700,7 @@ export default function AIModelsDashboard() {
                             </div>
                         )}
 
-                        <footer className={`mt-3 flex flex-wrap items-center justify-between gap-2 text-xs ${muted}`}>
+                        <footer className={`mt-3 flex flex-wrap items-center justify-between gap-2 text-xs ${muted} ${border}`}>
                             <span>
                                 {filtered.length} model{filtered.length === 1 ? "" : "s"} · Page {safePage} of {pages}
                             </span>

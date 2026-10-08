@@ -24,9 +24,9 @@ interface UserSidebarProps {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", icon: dashboardImage, to: "/user-dashboard", end: true },
-  { label: "My Profile", icon: myProfileImage, to: "/my-profile", end: true },
-  { label: "API Keys", icon: apiKeyImage, to: "/api-keys" },
   { label: "Playground", Icon: FlaskConical, to: "/playground" },
+  { label: "API Keys", icon: apiKeyImage, to: "/api-keys" }, 
+  { label: "My Activity", icon: myProfileImage, to: "/my-profile", end: true },
   { label: "Support", icon: supportImage, to: "/support" },
 ];
 
@@ -230,7 +230,7 @@ function UserSidebar({
             duration-[450ms]
             ${easing}
             motion-reduce:transition-none
-            focus-visible:[outline:2px_solid_rgba(255,255,255,0.6)]
+            focus-visible:[outline:2px_solid_#818cf8]
             focus-visible:[outline-offset:2px]
             ${mobileOpen
               ? "[transform:translateX(calc(min(280px,85vw)_-_64px))] [box-shadow:none]"
@@ -314,7 +314,7 @@ function UserSidebar({
       [&_.ain-header]:[height:54px]
       [&_.ain-header]:[flex:0_0_54px]
       [&_.ain-header]:[padding:0_18px]
-      [&_.ain-header]:[border-bottom:1px_solid_rgba(255,_255,_255,_0.1)]
+      [&_.ain-header]:[border-bottom:1px_solid_#374151]
       [&_.ain-brand]:[display:flex]
       [&_.ain-brand]:[align-items:center]
       [&_.ain-brand]:[gap:8px]
@@ -370,7 +370,7 @@ function UserSidebar({
       [&_.ain-nav-link:focus]:[outline:none]
       [&_.ain-nav-link.active]:[background:rgba(255,_255,_255,_0.1)]
       [&_.ain-nav-link.active]:[color:#fff]!
-     [&_.ain-nav-link.active]:![border-left:2px_solid_#fff]
+     [&_.ain-nav-link.active]:![border-left:2px_solid_#6366f1]
 
       [&_.ain-footer-toggle]:[height:32px]
       [&_.ain-footer-toggle]:[margin-left:20px]
@@ -388,7 +388,7 @@ function UserSidebar({
       [&_.ain-footer-toggle]:[transition:color_0.2s_ease,_background-color_0.2s_ease]
 
       [&_.ain-footer-toggle:hover]:[color:#fff]
-      [&_.ain-footer-toggle:focus-visible]:[outline:2px_solid_rgba(255,_255,_255,_0.5)]
+      [&_.ain-footer-toggle:focus-visible]:[outline:2px_solid_#818cf8]
       [&_.ain-footer-toggle:focus-visible]:[outline-offset:2px]
 
       [&_.ain-sidebar-footer]:[flex:0_0_auto]
@@ -397,7 +397,7 @@ function UserSidebar({
             ? "[&_.ain-sidebar-footer]:[padding:12px_20px_calc(12px_+_env(safe-area-inset-bottom,_0px))]"
             : "[&_.ain-sidebar-footer]:[padding:12px_20px]"
           }
-      [&_.ain-sidebar-footer]:[border-top:1px_solid_rgba(255,_255,_255,_0.08)]
+      [&_.ain-sidebar-footer]:[border-top:1px_solid_#374151]
       [&_.ain-sidebar-footer]:[overflow:hidden]
       [&_.ain-footer-actions]:[width:100%]
       [&_.ain-footer-actions]:[display:flex]

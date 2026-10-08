@@ -78,8 +78,8 @@ function ApiKeys() {
     };
 
     /* ---------- theme classes ---------- */
-    const title = d ? "text-white" : "text-slate-900";
-    const muted = d ? "text-slate-400" : "text-slate-500";
+    const title = d ? "text-[#f3f4f6]" : "text-slate-900";
+    const muted = d ? "text-[#c1c8d3]" : "text-slate-500";
     const card = d ? "border-gray-700 bg-gray-800 text-gray-100" : "border-slate-200 bg-white text-slate-700";
     const inset = d ? "border-gray-700 bg-gray-900/60" : "border-slate-200 bg-slate-50";
 
@@ -110,7 +110,7 @@ function ApiKeys() {
                     {/* ---------- heading ---------- */}
                     <header className="ak-rise flex min-w-0 flex-wrap items-end justify-between gap-3">
                         <div className="min-w-0">
-                            <h2 className="m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight text-black dark:text-white">API Keys</h2>
+                            <h2 className={`m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight ${title}`}>API Keys</h2>
                             <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">
                                 Each AI model has its own key. Use it to connect your applications to Karnataka AI.
                             </p>
