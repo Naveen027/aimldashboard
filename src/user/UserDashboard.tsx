@@ -27,6 +27,32 @@ import UserSidebar from "./UserSidebar";
 import AIModelsDashboard from "./AIModelsDashboard";
 import { useDashboardTheme } from "./ThemeToggle";
 
+/* ------------------------------------------------------------------
+   @keyframes cannot be written as Tailwind utility classes, so only the
+   keyframe definitions stay here. Every animation / style that used to be
+   in the old <style> block is now applied with Tailwind classes below.
+------------------------------------------------------------------- */
+const KEYFRAMES = `
+@keyframes ud-rise  { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes ud-fade  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes ud-pop   { from { opacity: 0; transform: translateY(16px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
+@keyframes ud-sheet { from { opacity: 0; transform: translateY(100%) } to { opacity: 1; transform: translateY(0) } }
+@keyframes ud-fill  { from { width: 0 } to { width: var(--ud-w) } }
+@keyframes ud-sheen { 0% { transform: translateX(-120%) } 100% { transform: translateX(220%) } }
+@keyframes ud-ping  { 0% { transform: scale(1); opacity: .6 } 80%,100% { transform: scale(2.4); opacity: 0 } }
+`;
+
+/* animation utilities (replace the old .ud-* classes; reduced-motion kept) */
+const ANIM = {
+    rise: "animate-[ud-rise_.55s_cubic-bezier(.22,1,.36,1)_both] motion-reduce:!animate-none",
+    fade: "animate-[ud-fade_.25s_ease-out_both] motion-reduce:!animate-none",
+    // bottom sheet on mobile (<640px), pop on sm and up
+    pop: "animate-[ud-sheet_.35s_cubic-bezier(.22,1,.36,1)_both] sm:animate-[ud-pop_.35s_cubic-bezier(.22,1,.36,1)_both] motion-reduce:!animate-none",
+    fill: "animate-[ud-fill_1s_cubic-bezier(.22,1,.36,1)_.35s_both] motion-reduce:!animate-none",
+    sheen: "animate-[ud-sheen_2.4s_ease-in-out_infinite] motion-reduce:!animate-none",
+    ping: "animate-[ud-ping_1.8s_cubic-bezier(0,0,.2,1)_infinite] motion-reduce:!animate-none",
+};
+
 interface UserModel {
     id: string;
     name: string;
@@ -208,8 +234,9 @@ function UserDashboard() {
         disabled: "bg-red-100 text-red-800",
     };
 
+    // note: `!rounded-[10px]` replaces the old global `:where(.ud-scope) button { border-radius: 10px }`
     const primaryBtn =
-        "rounded-[10px] bg-indigo-500 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 active:translate-y-0 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none";
+        "!rounded-[10px] bg-indigo-500 text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-lg hover:shadow-indigo-500/30 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 active:translate-y-0 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
     /* ---------- UI ---------- */
     return (
@@ -217,40 +244,17 @@ function UserDashboard() {
             className={`ud-scope relative isolate flex min-h-screen transition-[background-color,color] duration-[700ms] ${d ? "theme-dark bg-[#111827] text-[#f3f4f6]" : "theme-light bg-[#f8fafc] text-[#2c3e50]"
                 }`}
         >
-            <style>{`
-                @keyframes ud-rise  { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
-                @keyframes ud-fade  { from { opacity: 0 } to { opacity: 1 } }
-                @keyframes ud-pop   { from { opacity: 0; transform: translateY(16px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
-                @keyframes ud-sheet { from { opacity: 0; transform: translateY(100%) } to { opacity: 1; transform: translateY(0) } }
-                @keyframes ud-fill  { from { width: 0 } to { width: var(--ud-w) } }
-                @keyframes ud-sheen { 0% { transform: translateX(-120%) } 100% { transform: translateX(220%) } }
-                @keyframes ud-ping  { 0% { transform: scale(1); opacity: .6 } 80%,100% { transform: scale(2.4); opacity: 0 } }
-                .ud-rise  { animation: ud-rise .55s cubic-bezier(.22,1,.36,1) both }
-                .ud-fade  { animation: ud-fade .25s ease-out both }
-                .ud-pop   { animation: ud-pop .35s cubic-bezier(.22,1,.36,1) both }
-                .ud-fill  { animation: ud-fill 1s cubic-bezier(.22,1,.36,1) .35s both }
-                .ud-sheen { animation: ud-sheen 2.4s ease-in-out infinite }
-                .ud-ping  { animation: ud-ping 1.8s cubic-bezier(0,0,.2,1) infinite }
-                @media (max-width: 639px) { .ud-pop { animation-name: ud-sheet } }
-                .ud-root { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
-                .ud-root h2, .ud-root h3 { overflow-wrap: anywhere; }
-
-                /* default button radius (low specificity so Tailwind radius classes can override it) */
-                :where(.ud-scope) button { border-radius: 10px; }
-
-                @media (prefers-reduced-motion: reduce) {
-                    .ud-rise,.ud-fade,.ud-pop,.ud-fill,.ud-sheen,.ud-ping { animation: none !important }
-                }
-            `}</style>
+            {/* keyframes only (cannot be expressed as utility classes) */}
+            <style>{KEYFRAMES}</style>
 
             <UserSidebar userName={userName} onLogout={handleLogout} />
 
             <main className="relative z-[2] min-h-screen min-w-0 flex-1 bg-transparent ml-[var(--user-sidebar-width,260px)] transition-[margin] duration-[450ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-[767px]:ml-0">
                 <UserHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-                <div className="ud-root relative z-[2] [padding:15px]! text-inherit">
+                <div className="ud-root relative z-[2] [padding:15px]! text-inherit overflow-x-hidden [-webkit-text-size-adjust:100%] [&_h2]:[overflow-wrap:anywhere] [&_h3]:[overflow-wrap:anywhere]">
                     {showAIModelsDashboard ? (
-                        <div className="ud-fade">
+                        <div className={ANIM.fade}>
                             <AIModelsDashboard />
                         </div>
                     ) : (
@@ -262,14 +266,14 @@ function UserDashboard() {
                             </div>
 
                             {/* ---------- Profile cards ---------- */}
-                            {/* <section className="ud-rise mb-3 w-full grid grid-cols-1 gap-2 sm:grid-cols-3" style={{ animationDelay: "70ms" }}>
+                            {/* <section className={`${ANIM.rise} mb-3 w-full grid grid-cols-1 gap-2 sm:grid-cols-3`} style={{ animationDelay: "70ms" }}>
                                 <ProfileCard label="Account Status" value="Active" Icon={UserCheck} healthy live />
                                 <ProfileCard label="Joined" value="October 2023" Icon={CalendarDays} />
                                 <ProfileCard label="Last Activity" value="5 mins ago" Icon={Clock} />
                             </section> */}
 
                             {/* ---------- Search + filter pills ---------- */}
-                            <div className="ud-rise mb-3 flex flex-wrap items-center gap-2" style={{ animationDelay: "140ms" }}>
+                            <div className={`${ANIM.rise} mb-3 flex flex-wrap items-center gap-2`} style={{ animationDelay: "140ms" }}>
                                 <label
                                     className={`group flex h-10 w-full !flex max-w-[340px] items-center gap-2 rounded-[10px] border px-3 transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 ${d ? "border-gray-700 bg-gray-800" : "border-slate-200 bg-white"
                                         }`}
@@ -292,7 +296,7 @@ function UserDashboard() {
                                             type="button"
                                             onClick={() => setSearchQuery("")}
                                             aria-label="Clear search"
-                                            className={`rounded-[10px] p-1 transition-colors ${d
+                                            className={`!rounded-[10px] p-1 transition-colors ${d
                                                 ? "text-slate-400 hover:bg-gray-700 hover:text-slate-200"
                                                 : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                                                 }`}
@@ -353,7 +357,7 @@ function UserDashboard() {
                                                     }
                                                 }}
                                                 style={{ animationDelay: `${(i + 3) * 70}ms` }}
-                                                className={`ud-rise ![gap:10px] group relative flex min-w-0 cursor-pointer flex-col rounded-[16px]! border p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === "disabled" ? "opacity-80" : ""
+                                                className={`${ANIM.rise} ![gap:10px] group relative flex min-w-0 cursor-pointer flex-col rounded-[16px]! border p-3 shadow-sm outline-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/20 active:scale-[.99] ${model.status === "disabled" ? "opacity-80" : ""
                                                     } ${surface}`}
                                             >
                                                 {/* animated border: draws left → right on hover */}
@@ -385,7 +389,7 @@ function UserDashboard() {
                                                     >
                                                         {isActive && (
                                                             <span className="relative flex h-1.5 w-1.5">
-                                                                <span className="ud-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500" />
+                                                                <span className={`${ANIM.ping} absolute inline-flex h-full w-full rounded-full bg-emerald-500`} />
                                                                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-600" />
                                                             </span>
                                                         )}
@@ -433,7 +437,7 @@ function UserDashboard() {
                                     })}
                                 </div>
                             ) : (
-                                <div className={`ud-rise rounded-[16px] border border-dashed p-4 text-center ${surface}`}>
+                                <div className={`${ANIM.rise} rounded-[16px] border border-dashed p-4 text-center ${surface}`}>
                                     <p className={`m-0 mb-1 text-base font-semibold ${title}`}>No models found</p>
                                     <p className={`m-0 mb-3 text-sm ${faint}`}>Try a different keyword or filter.</p>
                                     <button
@@ -452,7 +456,7 @@ function UserDashboard() {
                             {/* ---------- Model Modal ---------- */}
                             {selectedModel && (
                                 <div
-                                    className="ud-fade fixed inset-0 z-[1000] flex items-end justify-center bg-slate-900/60 backdrop-blur-md sm:items-center sm:p-4"
+                                    className={`${ANIM.fade} fixed inset-0 z-[1000] flex items-end justify-center bg-slate-900/60 backdrop-blur-md sm:items-center sm:p-4`}
                                     onClick={() => setSelectedModelId(null)}
                                 >
                                     <div
@@ -460,7 +464,7 @@ function UserDashboard() {
                                         aria-modal="true"
                                         aria-label={selectedModel.name}
                                         onClick={(e) => e.stopPropagation()}
-                                        className={`ud-pop relative flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-t-3xl shadow-2xl ring-1 sm:max-h-[90dvh] sm:rounded-3xl ${d ? "bg-gray-900 text-gray-100 ring-gray-700" : "bg-white text-slate-700 ring-black/5"
+                                        className={`${ANIM.pop} relative flex max-h-[92dvh] w-full max-w-[640px] flex-col overflow-hidden rounded-t-3xl shadow-2xl ring-1 sm:max-h-[90dvh] sm:rounded-3xl ${d ? "bg-gray-900 text-gray-100 ring-gray-700" : "bg-white text-slate-700 ring-black/5"
                                             }`}
                                     >
                                         {/* close */}
@@ -468,7 +472,7 @@ function UserDashboard() {
                                             type="button"
                                             onClick={() => setSelectedModelId(null)}
                                             aria-label="Close model details"
-                                            className="group absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center bg-white/20 text-white backdrop-blur transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 active:scale-95 motion-reduce:hover:rotate-0 sm:h-8 sm:w-8"
+                                            className="group absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center !rounded-[10px] bg-white/20 text-white backdrop-blur transition-all duration-300 hover:rotate-90 hover:scale-110 hover:bg-rose-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 active:scale-95 motion-reduce:hover:rotate-0 sm:h-8 sm:w-8"
                                         >
                                             <X size={16} aria-hidden="true" />
                                         </button>
@@ -541,7 +545,7 @@ function UserDashboard() {
                                         {/* content */}
                                         <div
                                             key={`${selectedModel.id}-${activeTab}`}
-                                            className="ud-fade min-h-[140px] flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:min-h-[250px] md:px-6 [scrollbar-width:thin]"
+                                            className={`${ANIM.fade} min-h-[140px] flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:min-h-[250px] md:px-6 [scrollbar-width:thin]`}
                                         >
                                             {activeTab === "overview" ? (
                                                 <div className="space-y-4">
@@ -576,7 +580,7 @@ function UserDashboard() {
                                                             </div>
                                                             <div className={`mt-2 h-1.5 w-full overflow-hidden rounded-full ${d ? "bg-gray-700" : "bg-slate-200"}`}>
                                                                 <div
-                                                                    className="ud-fill relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"
+                                                                    className={`${ANIM.fill} relative h-full overflow-hidden rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500`}
                                                                     style={
                                                                         {
                                                                             ["--ud-w" as string]: `${Math.min(selectedModel.usagePercentage, 100)}%`,
@@ -584,7 +588,7 @@ function UserDashboard() {
                                                                         } as CSSProperties
                                                                     }
                                                                 >
-                                                                    <span className="ud-sheen absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+                                                                    <span className={`${ANIM.sheen} absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent`} />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -629,7 +633,7 @@ function UserDashboard() {
                                                             <li
                                                                 key={`${item}-${idx}`}
                                                                 style={{ animationDelay: `${idx * 40}ms` }}
-                                                                className={`ud-rise flex items-start gap-2.5 rounded-[12px] border p-3 text-[13px] leading-snug transition-all duration-200 ${d
+                                                                className={`${ANIM.rise} flex items-start gap-2.5 rounded-[12px] border p-3 text-[13px] leading-snug transition-all duration-200 ${d
                                                                     ? "border-gray-700 bg-gray-800 text-slate-200 hover:border-indigo-400/30"
                                                                     : "border-slate-100 bg-slate-50 text-slate-700 hover:border-indigo-200 hover:bg-indigo-50/60"
                                                                     }`}

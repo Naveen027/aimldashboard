@@ -219,7 +219,7 @@ function Playground() {
 
                 <div className="mx-auto flex w-full max-w-[1520px] flex-col gap-0  p-[15px]">
                     {/* ---------- heading ---------- */}
-                    <header className="pg-rise mb-2">
+                    <header className="pg-rise mb-3">
                         <h2 className={`m-0 break-words [font-size:1.35rem]! sm:[font-size:1.6rem]! !font-bold leading-tight tracking-tight ${title}`}>Playground</h2>
                         <p className="mt-0.5 mb-0 text-sm text-[color:var(--muted)]">Pick a model, give it an input and see what it returns.</p>
                     </header>

@@ -270,6 +270,17 @@ const cardBase =
   "rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] dark:border-slate-700/60 dark:bg-slate-800";
 
 /* -------------------------------------------------------------------------- */
+/*  Dark-mode overrides for the user detail modal                             */
+/*  (replaces the old inline <style> that targeted                            */
+/*   `.admin-user-detail-modal.theme-dark .bg-white / .border-slate-200`).    */
+/*  Same selector, same !important, now applied per element with Tailwind.    */
+/*  Note: the old `.text-black` override matched nothing inside the modal,    */
+/*  so it has no equivalent here.                                             */
+/* -------------------------------------------------------------------------- */
+const MODAL_DARK_BG = "[.admin-user-detail-modal.theme-dark_&]:bg-[#1f2937]!";
+const MODAL_DARK_BORDER = "[.admin-user-detail-modal.theme-dark_&]:border-[#374151]!";
+
+/* -------------------------------------------------------------------------- */
 /*  User detail modal                                                         */
 /*  Mobile: bottom sheet (full width, anchored to bottom)                     */
 /*  Tablet / desktop: centered dialog                                         */
@@ -354,17 +365,6 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
       aria-modal="true"
       aria-labelledby="user-detail-title"
     >
-      <style>{`
-        .admin-user-detail-modal.theme-dark .bg-white {
-          background-color: #1f2937 !important;
-        }
-        .admin-user-detail-modal.theme-dark .text-black {
-          color: #f3f4f6 !important;
-        }
-        .admin-user-detail-modal.theme-dark .border-slate-200 {
-          border-color: #374151 !important;
-        }
-      `}</style>
       {/* Backdrop */}
       <div
         onClick={handleClose}
@@ -374,7 +374,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
 
       {/* Panel (bottom sheet on phones, centered dialog from sm up) */}
       <div
-        className={`relative flex max-h-[92dvh] w-full max-w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-[250ms] ease-out motion-reduce:transition-none sm:max-h-[90dvh] sm:max-w-2xl sm:rounded-2xl lg:max-w-3xl dark:border-slate-700 dark:bg-slate-800 ${visible
+        className={`${MODAL_DARK_BG} ${MODAL_DARK_BORDER} relative flex max-h-[92dvh] w-full max-w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-all duration-[250ms] ease-out motion-reduce:transition-none sm:max-h-[90dvh] sm:max-w-2xl sm:rounded-2xl lg:max-w-3xl dark:border-slate-700 dark:bg-slate-800 ${visible
           ? "translate-y-0 scale-100 opacity-100"
           : "translate-y-10 scale-95 opacity-0 sm:translate-y-6"
           }`}
@@ -487,7 +487,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
             <h4 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">
               Current model
             </h4>
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-3 py-3 sm:px-4 dark:border-slate-700">
+            <div className={`${MODAL_DARK_BORDER} flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-3 py-3 sm:px-4 dark:border-slate-700`}>
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">
                   <i className="bi bi-cpu-fill" />
@@ -558,7 +558,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ row, onClose }) => {
           <button
             type="button"
             onClick={handleClose}
-            className="w-full rounded-[10px]! border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:py-2 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+            className={`${MODAL_DARK_BORDER} w-full rounded-[10px]! border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto sm:py-2 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700`}
           >
             Close
           </button>
@@ -893,15 +893,10 @@ const AdminDashboard: React.FC = () => {
               ))}
             </div>
 
-            {/* Height scales with screen size; taller on phones so the wrapped legend fits */}
-            <div className="admin-model-performance-chart h-[320px] w-full min-[420px]:h-[300px] sm:h-[300px] md:h-[320px] xl:h-[340px] 2xl:h-[380px]">
-              <style>{`
-                .admin-model-performance-chart :focus,
-                .admin-model-performance-chart :focus-visible {
-                  outline: none !important;
-                  box-shadow: none !important;
-                }
-              `}</style>
+            {/* Height scales with screen size; taller on phones so the wrapped legend fits.
+                The [&_:focus]/[&_:focus-visible] classes replace the old inline <style>
+                (removes the focus outline / box-shadow on every element inside the chart). */}
+            <div className="admin-model-performance-chart h-[320px] w-full min-[420px]:h-[300px] sm:h-[300px] md:h-[320px] xl:h-[340px] 2xl:h-[380px] [&_:focus]:[outline:none]! [&_:focus]:[box-shadow:none]! [&_:focus-visible]:[outline:none]! [&_:focus-visible]:[box-shadow:none]!">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartData}
